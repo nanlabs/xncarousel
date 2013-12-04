@@ -1,4 +1,4 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+!function(e){"object"==typeof exports?module.exports=e():"function"==typeof define&&define.amd?define(e):"undefined"!=typeof window?window.true=e():"undefined"!=typeof global?global.true=e():"undefined"!=typeof self&&(self.true=e())}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Modernizr = require('./lib/Modernizr'),
     ModernizrProto = require('./lib/ModernizrProto'),
     classes = require('./lib/classes'),
@@ -744,16 +744,22 @@ module.exports = {
             var plugin = this.data( dataKey );
             if (plugin && plugin[method]) {
                 var value = plugin[method].apply(plugin, [].slice.call(arguments, 1));
-				if(typeof value === 'undefined') { value = $(this); }
+				if(typeof value === 'undefined') { value = this }
 				return value;
 
             } else if (typeof method === 'object' || !method) {
 
-                return this.each(function() {
+                $elems = this.each(function() {
                     if ( !$.data( this, dataKey ) ) {
                         $.data( this, dataKey, new clazz( this, method ) );
                     }
                 });
+
+				if(method && method.api && this.length > 0) {
+					return this.eq(0).data(dataKey);
+				}
+
+				return $elems;
 
             } else {
                 $.error('Method ' + method + ' does not exist on ' + name);
@@ -1027,9 +1033,9 @@ MediaQueryWatcher.prototype = {
 
 // Exports the class
 module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":31,"./lib/matchMedia.addListener":30,"jquery":"lrHQu6"}],"class":[function(require,module,exports){
-module.exports=require('hHRmiF');
-},{}],"hHRmiF":[function(require,module,exports){
+},{"./lib/matchMedia":31,"./lib/matchMedia.addListener":30,"jquery":"6obL00"}],"class":[function(require,module,exports){
+module.exports=require('MFFfPr');
+},{}],"MFFfPr":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1488,7 +1494,7 @@ module.exports = Class.extend({
 
 });
 
-},{"browsernizr":1,"browsernizr/test/css/transitions":28,"class":"hHRmiF"}],37:[function(require,module,exports){
+},{"browsernizr":1,"browsernizr/test/css/transitions":28,"class":"MFFfPr"}],37:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -1650,7 +1656,7 @@ module.exports = Class.extend({
 	}
 });
 
-},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"hHRmiF","jquery":"lrHQu6"}],38:[function(require,module,exports){
+},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"MFFfPr","jquery":"6obL00"}],38:[function(require,module,exports){
 var AbstractStrategy = require('./abstract-strategy');
 
 module.exports = AbstractStrategy.extend({
@@ -2849,7 +2855,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":50,"./pagination/paging-module":53,"./responsive-module":54,"./util":55,"class":"hHRmiF","jquery":"lrHQu6"}],42:[function(require,module,exports){
+},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":50,"./pagination/paging-module":53,"./responsive-module":54,"./util":55,"class":"MFFfPr","jquery":"6obL00"}],42:[function(require,module,exports){
 /**
 * Returns a function which calls the specified function in the specified
 * scope.
@@ -3302,13 +3308,13 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"hHRmiF","jquery":"lrHQu6"}],44:[function(require,module,exports){
+},{"class":"MFFfPr","jquery":"6obL00"}],44:[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
 require('jquery-plugin-wrapper').wrap("xnCarousel", require('./carousel'), require('jquery'));
 
-},{"./carousel":41,"jquery":"lrHQu6","jquery-plugin-wrapper":29}],"lrHQu6":[function(require,module,exports){
+},{"./carousel":41,"jquery":"6obL00","jquery-plugin-wrapper":29}],"6obL00":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
@@ -3316,7 +3322,7 @@ require('jquery-plugin-wrapper').wrap("xnCarousel", require('./carousel'), requi
 module.exports = jQuery;
 
 },{}],"jquery":[function(require,module,exports){
-module.exports=require('lrHQu6');
+module.exports=require('6obL00');
 },{}],47:[function(require,module,exports){
 var Class = require('class');
 
@@ -3334,7 +3340,7 @@ module.exports = Class.extend({
 	
 });
 
-},{"class":"hHRmiF"}],48:[function(require,module,exports){
+},{"class":"MFFfPr"}],48:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3382,7 +3388,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":47,"./spinner":51,"jquery":"lrHQu6"}],49:[function(require,module,exports){
+},{"./abstract-strategy":47,"./spinner":51,"jquery":"6obL00"}],49:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3430,7 +3436,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":47,"./spinner":51,"jquery":"lrHQu6"}],50:[function(require,module,exports){
+},{"./abstract-strategy":47,"./spinner":51,"jquery":"6obL00"}],50:[function(require,module,exports){
 var Class = require('class');
 
 var LazyStrategy = require('./lazy-strategy');
@@ -3512,7 +3518,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./eager-strategy":48,"./lazy-strategy":49,"class":"hHRmiF"}],51:[function(require,module,exports){
+},{"./eager-strategy":48,"./lazy-strategy":49,"class":"MFFfPr"}],51:[function(require,module,exports){
 var Class = require('class'),
 SpinJs = require('spin.js'),
 $ = require('jquery');
@@ -3619,7 +3625,7 @@ module.exports = Class.extend({
     }
 });
 
-},{"class":"hHRmiF","jquery":"lrHQu6","spin.js":35}],52:[function(require,module,exports){
+},{"class":"MFFfPr","jquery":"6obL00","spin.js":35}],52:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -3723,7 +3729,7 @@ module.exports = Class.extend({
 
 });
 
-},{"class":"hHRmiF","jquery":"lrHQu6"}],53:[function(require,module,exports){
+},{"class":"MFFfPr","jquery":"6obL00"}],53:[function(require,module,exports){
 var Class = require('class');
 var PaginationIndicator = require('./paging-indicator.js');
 
@@ -3985,7 +3991,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./paging-indicator.js":52,"class":"hHRmiF"}],54:[function(require,module,exports){
+},{"./paging-indicator.js":52,"class":"MFFfPr"}],54:[function(require,module,exports){
 var Class = require('class'),
 MediaQueryWatcher = require('mediaquerywatcher'),
 $ = require('jquery');
@@ -4137,7 +4143,7 @@ module.exports = Class.extend({
 	}
 	
 });
-},{"class":"hHRmiF","jquery":"lrHQu6","mediaquerywatcher":32}],55:[function(require,module,exports){
+},{"class":"MFFfPr","jquery":"6obL00","mediaquerywatcher":32}],55:[function(require,module,exports){
 exports.getDependency = function(dependencies, name, defaultDep) {
 	dependencies = dependencies || {};
 	return dependencies[name] || defaultDep;
@@ -4232,4 +4238,6 @@ exports.isIE = function() {
 };
 
 },{}]},{},[44])
+(44)
+});
 ;

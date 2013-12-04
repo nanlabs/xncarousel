@@ -39,6 +39,7 @@ module.exports = (grunt) ->
 				src: 'src/js/jquery-wrapper.js',
 				dest: 'dist/<%= JQUERY_PLUGIN_JS %>.js'
 				options:
+					standalone: 'true'
 					alias: ['src/js/jquery.shim.js:jquery', 'node_modules/resig-class/index.js:class']
 			test:
 				src: 'test/automated/**/*.coffee'
