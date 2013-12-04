@@ -87,7 +87,7 @@ module.exports = Class.extend({
 
 		this.mediaStylesProperties.actualAppliedMediaRule = actualAppliedMediaRule;
 
-		if (typeof(this.mediaStylesProperties[actualAppliedMediaRule]) === 'undefined') {
+		if (typeof(this.mediaStylesProperties[actualAppliedMediaRule]) === 'undefined' && typeof(this.mediaQueryWatcher.mediaQueriesRules[actualAppliedMediaRule]) !== 'undefined') {
 			actualAppliedProperties = this.mediaQueryWatcher.getMediaQueryProperties(this.mediaQueryWatcher.mediaQueriesRules[actualAppliedMediaRule], this.api.getSelectors(this.$viewport), targetProperties);
 			this.mediaStylesProperties[actualAppliedMediaRule] = {};
 			this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties = actualAppliedProperties;
@@ -137,14 +137,17 @@ module.exports = Class.extend({
 	//Recalculates viewport height of an indicated item to keep aspect ratio.
 	_windowResizedHandler: function () {
 		var actualAppliedMediaRule = this.mediaStylesProperties.actualAppliedMediaRule, height;
-		if (this._isActiveForViewportWidth(window.innerWidth) === true && (actualAppliedMediaRule !== "noMediaRule")) {
-				height = window.innerWidth * parseInt(this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.height, 10) / this.mediaStylesProperties[actualAppliedMediaRule].viewportWidth;
-		} else { //Default css behaviour
-				height = parseInt(this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.height, 10);
-		}
-		this.$element.css('height', height + "px");
-		if (this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.width) {
-			this.$element.css('width', this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.width);
+		
+		if (typeof(this.mediaStylesProperties[actualAppliedMediaRule]) !== 'undefined') {
+			if (this._isActiveForViewportWidth(window.innerWidth) === true && (actualAppliedMediaRule !== "noMediaRule")) {
+					height = window.innerWidth * parseInt(this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.height, 10) / this.mediaStylesProperties[actualAppliedMediaRule].viewportWidth;
+			} else { //Default css behaviour
+					height = parseInt(this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.height, 10);
+			}
+			this.$element.css('height', height + "px");
+			if (this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.width) {
+				this.$element.css('width', this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.width);
+			}
 		}
 	}
 	
