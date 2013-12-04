@@ -1,0 +1,10 @@
+/node_modules/
+/libs/bower
+/tmp
+/doc
+*.orig
+.idea
+
+# Ignore dist files except the jquery plugin, used to create the bower component
+/dist/*
+!/dist/jquery.*

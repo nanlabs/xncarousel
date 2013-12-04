@@ -1,0 +1,22 @@
+{
+	"name": "xnCarousel",
+	"version": "0.1.0",
+	"main": ["dist/jquery.xnCarousel.min.js", "dist/jquery.xnCarousel.min.css"],
+	"private": true,
+	"ignore": [
+		"*",
+		"!dist/jquery.*"
+	],
+	"dependencies": {
+		"jquery": ">=1.9"
+	},
+	"devDependencies": {
+		"chai": "~1.7.2",
+		"mocha": "~1.13.0",
+		"less.js": "~1.4.2",
+		"jquery-simulate": "*",
+		"sinon": "http://sinonjs.org/releases/sinon-1.7.3.js",
+		"sinon-chai": "~2.4.0",
+		"blanket": "~1.1.5"
+	}
+}
