@@ -1,4 +1,4 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+!function(e){"object"==typeof exports?module.exports=e():"function"==typeof define&&define.amd?define(e):"undefined"!=typeof window?window.true=e():"undefined"!=typeof global?global.true=e():"undefined"!=typeof self&&(self.true=e())}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Modernizr = require('./lib/Modernizr'),
     ModernizrProto = require('./lib/ModernizrProto'),
     classes = require('./lib/classes'),
@@ -2203,13 +2203,18 @@ module.exports = Class.extend({
 	 * @fires carousel:itemAdded - Event to notify that item has been added.
 	 */
 	addItem: function (item, batchMode) {
+		var itemObject;
+
+		if (typeof(item) === "object") {
+			itemObject = item;
+			item = this.settings.itemTemplate(item);
+		}
 
 		var pageCount = this.getPageCount();
-		var carouselItemInnerHtml = this.settings.itemTemplate(item);
 
 		var $carouselItem = $('<div class="carousel-item"></div>');
 
-		this.loadingModule.preLoadItem($carouselItem, carouselItemInnerHtml);
+		this.loadingModule.preLoadItem($carouselItem, item);
 
 		$carouselItem.click($.proxy(this.selectItemHandlerMouse, this));
 		$carouselItem.on('itemTouched', $.proxy(this.selectItemHandlerTouch, this));
@@ -2234,7 +2239,7 @@ module.exports = Class.extend({
 
 			this._updateNavigators();
 
-			this._trigger('carousel:itemAdded', [item, $carouselItem]);
+			this._trigger('carousel:itemAdded', [itemObject || item, $carouselItem]);
 		}
 	},
 
@@ -2246,13 +2251,22 @@ module.exports = Class.extend({
 	 * @fires carousel:rendered - Event to notify that the rendering is ready.
 	 */
 	render: function (items) {
+
+		if (typeof(items) === 'undefined'){
+			var $items = this.$viewport.find('.xn-items');
+			items = [];		
+			$.each($items.children(), function(i, el){
+				items.push(el.outerHTML);
+			});
+			$items.remove();
+		}
+
 		this._createContainer();
 		this._initLoadingModule();
 
 		this.clear({ silent: true });
 
 		var self = this;
-
 		$.each(items, function (i, e) {
 			self.addItem(e, true);
 		});
@@ -4241,4 +4255,6 @@ exports.isIE = function() {
 };
 
 },{}]},{},[44])
+(44)
+});
 ;

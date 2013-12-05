@@ -81,6 +81,36 @@ $(function () {
 });
 ```
 
+Thats it, but there's also another way to have the carousel rendered. Just put the items markup into the carousel carousel container inside a wrapper with "xn-items" class defined. 
+
+ie:
+
+	```
+	<div class="carousel-container">
+		<div class="xn-items">
+			<div class="template"><img src="test1.jpg"></img></div>
+			<div class="template"><img src="test2.jpg"></img></div>
+			<div class="template"><img src="test3.jpg"></img></div>
+		</div>
+	</div>
+	``` 
+
+	Then call the constructor as usual
+
+```javascript
+	var carousel = new Carousel(".carousel-container", {
+		...
+		...
+	});
+```
+
+	And finally make a call to the render method
+	
+```javascript
+carousel.render();
+```
+
+
 ###JQuery plugin:
 Just perform the previous steps 1,2,3 and then:
 ```javascript

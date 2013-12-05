@@ -389,13 +389,18 @@ module.exports = Class.extend({
 	 * @fires carousel:itemAdded - Event to notify that item has been added.
 	 */
 	addItem: function (item, batchMode) {
+		var itemObject;
+
+		if (typeof(item) === "object") {
+			itemObject = item;
+			item = this.settings.itemTemplate(item);
+		}
 
 		var pageCount = this.getPageCount();
-		var carouselItemInnerHtml = this.settings.itemTemplate(item);
 
 		var $carouselItem = $('<div class="carousel-item"></div>');
 
-		this.loadingModule.preLoadItem($carouselItem, carouselItemInnerHtml);
+		this.loadingModule.preLoadItem($carouselItem, item);
 
 		$carouselItem.click($.proxy(this.selectItemHandlerMouse, this));
 		$carouselItem.on('itemTouched', $.proxy(this.selectItemHandlerTouch, this));
@@ -420,7 +425,7 @@ module.exports = Class.extend({
 
 			this._updateNavigators();
 
-			this._trigger('carousel:itemAdded', [item, $carouselItem]);
+			this._trigger('carousel:itemAdded', [itemObject || item, $carouselItem]);
 		}
 	},
 
@@ -432,13 +437,22 @@ module.exports = Class.extend({
 	 * @fires carousel:rendered - Event to notify that the rendering is ready.
 	 */
 	render: function (items) {
+
+		if (typeof(items) === 'undefined'){
+			var $items = this.$viewport.find('.xn-items');
+			items = [];		
+			$.each($items.children(), function(i, el){
+				items.push(el.outerHTML);
+			});
+			$items.remove();
+		}
+
 		this._createContainer();
 		this._initLoadingModule();
 
 		this.clear({ silent: true });
 
 		var self = this;
-
 		$.each(items, function (i, e) {
 			self.addItem(e, true);
 		});
