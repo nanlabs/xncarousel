@@ -983,6 +983,7 @@ function obtainCSS(rule) {
 MediaQueryWatcher.prototype = {
 
  addMediaQueriesListener : function (styleSheet, mediaChangeHandler) {
+>>>>>>>>>>>>>>>>>>>> File 1
     var rules, actualAppliedRules = ["noMediaRule"], mql;
     if (styleSheet) {
       rules = styleSheet.cssRules;
@@ -999,16 +1000,58 @@ MediaQueryWatcher.prototype = {
             this.mediaQueriesRules["noMediaRule"] = this.mediaQueriesRules["noMediaRule"] || {};
             $.extend(this.mediaQueriesRules["noMediaRule"], obtainCSS(rules[j]));
         }
+>>>>>>>>>>>>>>>>>>>> File 2
+    var rules, actualAppliedRule = "noMediaRule", mql;
+   if (styleSheet) {
+    rules = styleSheet.cssRules;
+    for (var j = 0; j < rules.length; j += 1) {
+      if (rules[j].constructor === window.CSSMediaRule) {
+          this.mediaQueriesRules[rules[j].media.mediaText] = this.mediaQueriesRules[rules[j].media.mediaText] || {};
+          $.extend(this.mediaQueriesRules[rules[j].media.mediaText], obtainCSSValuesFromRule(rules[j].cssRules));
+          mql = window.matchMedia(rules[j].media.mediaText);
+          if (mql.matches === true) {
+            actualAppliedRule = rules[j].media.mediaText; 
+          }
+          mql.addListener(mediaChangeHandler);
+      } else {
+          this.mediaQueriesRules["noMediaRule"] = this.mediaQueriesRules["noMediaRule"] || {};
+          $.extend(this.mediaQueriesRules["noMediaRule"], obtainCSS(rules[j]));
+>>>>>>>>>>>>>>>>>>>> File 3
+    var rules, actualAppliedRule = "noMediaRule", mql;
+   if (styleSheet) {
+    rules = styleSheet.cssRules;
+    for (var j = 0; j < rules.length; j += 1) {
+      if (rules[j].constructor === window.CSSMediaRule) {
+          this.mediaQueriesRules[rules[j].media.mediaText] = this.mediaQueriesRules[rules[j].media.mediaText] || {};
+          $.extend(this.mediaQueriesRules[rules[j].media.mediaText], obtainCSSValuesFromRule(rules[j].cssRules));
+          mql = window.matchMedia(rules[j].media.mediaText);
+          if (mql.matches === true) {
+            actualAppliedRule = rules[j].media.mediaText; 
+          }
+          mql.addListener(mediaChangeHandler);
+      } else {
+          this.mediaQueriesRules["noMediaRule"] = this.mediaQueriesRules["noMediaRule"] || {};
+          $.extend(this.mediaQueriesRules["noMediaRule"], obtainCSS(rules[j]));
+<<<<<<<<<<<<<<<<<<<<
       }
     }
+>>>>>>>>>>>>>>>>>>>> File 1
     
     return actualAppliedRules;
+>>>>>>>>>>>>>>>>>>>> File 2
+  }
+    return actualAppliedRule;
+>>>>>>>>>>>>>>>>>>>> File 3
+  }
+    return actualAppliedRule;
+<<<<<<<<<<<<<<<<<<<<
   },
 
   //gets the target CSS properties from a @mediaData for the indicated selectors in descending priority order.
   getMediaQueryProperties : function (mediaData, selectors, targetProperties) {
     var propertiesObject = {}, itemsRemoved = 0;
 
+>>>>>>>>>>>>>>>>>>>> File 1
     if (typeof(mediaData) !== 'undefined') {
       $.each(selectors, function (index, selector) {
         var property, propertyPosition;
@@ -1028,6 +1071,43 @@ MediaQueryWatcher.prototype = {
         }
       });
     }
+>>>>>>>>>>>>>>>>>>>> File 2
+    $.each(selectors, function (index, selector) {
+      var property, propertyPosition;
+      if (typeof(mediaData[selector]) !== 'undefined') {
+        $.each(mediaData[selector], function(i, val) {
+          property = val.property.split(" ").join("");
+          propertyPosition = targetProperties.indexOf(property);
+          if (propertyPosition !== -1) {
+            propertiesObject[property] = val.value.split(" ").join("");
+            targetProperties.splice(propertyPosition - itemsRemoved, 1);
+            itemsRemoved += 1;
+          }
+        });
+      }
+      if (targetProperties.length === 0) {
+        return false;
+      }
+    });
+>>>>>>>>>>>>>>>>>>>> File 3
+    $.each(selectors, function (index, selector) {
+      var property, propertyPosition;
+      if (typeof(mediaData[selector]) !== 'undefined') {
+        $.each(mediaData[selector], function(i, val) {
+          property = val.property.split(" ").join("");
+          propertyPosition = targetProperties.indexOf(property);
+          if (propertyPosition !== -1) {
+            propertiesObject[property] = val.value.split(" ").join("");
+            targetProperties.splice(propertyPosition - itemsRemoved, 1);
+            itemsRemoved += 1;
+          }
+        });
+      }
+      if (targetProperties.length === 0) {
+        return false;
+      }
+    });
+<<<<<<<<<<<<<<<<<<<<
 
     return propertiesObject;
   }
@@ -1036,9 +1116,19 @@ MediaQueryWatcher.prototype = {
 
 // Exports the class
 module.exports = MediaQueryWatcher;
+>>>>>>>>>>>>>>>>>>>> File 1
 },{"./lib/matchMedia":31,"./lib/matchMedia.addListener":30,"jquery":"H0VjM3"}],"class":[function(require,module,exports){
 module.exports=require('DSkb5a');
 },{}],"DSkb5a":[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 2
+},{"./lib/matchMedia":31,"./lib/matchMedia.addListener":30,"jquery":"H0VjM3"}],"class":[function(require,module,exports){
+module.exports=require('DSkb5a');
+},{}],"DSkb5a":[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 3
+},{"./lib/matchMedia":31,"./lib/matchMedia.addListener":30,"jquery":"lrHQu6"}],"class":[function(require,module,exports){
+module.exports=require('hHRmiF');
+},{}],"hHRmiF":[function(require,module,exports){
+<<<<<<<<<<<<<<<<<<<<
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1497,7 +1587,13 @@ module.exports = Class.extend({
 
 });
 
+>>>>>>>>>>>>>>>>>>>> File 1
 },{"browsernizr":1,"browsernizr/test/css/transitions":28,"class":"DSkb5a"}],37:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 2
+},{"browsernizr":1,"browsernizr/test/css/transitions":28,"class":"DSkb5a"}],37:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 3
+},{"browsernizr":1,"browsernizr/test/css/transitions":28,"class":"hHRmiF"}],37:[function(require,module,exports){
+<<<<<<<<<<<<<<<<<<<<
 var $ = require('jquery');
 var Class = require('class');
 
@@ -1659,7 +1755,13 @@ module.exports = Class.extend({
 	}
 });
 
+>>>>>>>>>>>>>>>>>>>> File 1
 },{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"DSkb5a","jquery":"H0VjM3"}],38:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 2
+},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"DSkb5a","jquery":"H0VjM3"}],38:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 3
+},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"hHRmiF","jquery":"lrHQu6"}],38:[function(require,module,exports){
+<<<<<<<<<<<<<<<<<<<<
 var AbstractStrategy = require('./abstract-strategy');
 
 module.exports = AbstractStrategy.extend({
@@ -2872,7 +2974,13 @@ module.exports = Class.extend({
 
 });
 
+>>>>>>>>>>>>>>>>>>>> File 1
 },{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":50,"./pagination/paging-module":53,"./responsive-module":54,"./util":55,"class":"DSkb5a","jquery":"H0VjM3"}],42:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 2
+},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":50,"./pagination/paging-module":53,"./responsive-module":54,"./util":55,"class":"DSkb5a","jquery":"H0VjM3"}],42:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 3
+},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":50,"./pagination/paging-module":53,"./responsive-module":54,"./util":55,"class":"hHRmiF","jquery":"lrHQu6"}],42:[function(require,module,exports){
+<<<<<<<<<<<<<<<<<<<<
 /**
 * Returns a function which calls the specified function in the specified
 * scope.
@@ -3325,21 +3433,41 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
+>>>>>>>>>>>>>>>>>>>> File 1
 },{"class":"DSkb5a","jquery":"H0VjM3"}],44:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 2
+},{"class":"DSkb5a","jquery":"H0VjM3"}],44:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 3
+},{"class":"hHRmiF","jquery":"lrHQu6"}],44:[function(require,module,exports){
+<<<<<<<<<<<<<<<<<<<<
 /**
  * jQuery plugin wrapper
  */
 require('jquery-plugin-wrapper').wrap("xnCarousel", require('./carousel'), require('jquery'));
 
+>>>>>>>>>>>>>>>>>>>> File 1
 },{"./carousel":41,"jquery":"H0VjM3","jquery-plugin-wrapper":29}],"H0VjM3":[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 2
+},{"./carousel":41,"jquery":"H0VjM3","jquery-plugin-wrapper":29}],"jquery":[function(require,module,exports){
+module.exports=require('H0VjM3');
+},{}],"H0VjM3":[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 3
+},{"./carousel":41,"jquery":"lrHQu6","jquery-plugin-wrapper":29}],"lrHQu6":[function(require,module,exports){
+<<<<<<<<<<<<<<<<<<<<
 /**
  * Helper module to adapt jQuery to CommonJS
  *
  */
 module.exports = jQuery;
 
+>>>>>>>>>>>>>>>>>>>> File 1
 },{}],"jquery":[function(require,module,exports){
 module.exports=require('H0VjM3');
+>>>>>>>>>>>>>>>>>>>> File 2
+>>>>>>>>>>>>>>>>>>>> File 3
+},{}],"jquery":[function(require,module,exports){
+module.exports=require('lrHQu6');
+<<<<<<<<<<<<<<<<<<<<
 },{}],47:[function(require,module,exports){
 var Class = require('class');
 
@@ -3357,7 +3485,13 @@ module.exports = Class.extend({
 	
 });
 
+>>>>>>>>>>>>>>>>>>>> File 1
 },{"class":"DSkb5a"}],48:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 2
+},{"class":"DSkb5a"}],48:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 3
+},{"class":"hHRmiF"}],48:[function(require,module,exports){
+<<<<<<<<<<<<<<<<<<<<
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3405,7 +3539,13 @@ module.exports = AbstractStrategy.extend({
 
 });
 
+>>>>>>>>>>>>>>>>>>>> File 1
 },{"./abstract-strategy":47,"./spinner":51,"jquery":"H0VjM3"}],49:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 2
+},{"./abstract-strategy":47,"./spinner":51,"jquery":"H0VjM3"}],49:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 3
+},{"./abstract-strategy":47,"./spinner":51,"jquery":"lrHQu6"}],49:[function(require,module,exports){
+<<<<<<<<<<<<<<<<<<<<
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3453,7 +3593,13 @@ module.exports = AbstractStrategy.extend({
 
 });
 
+>>>>>>>>>>>>>>>>>>>> File 1
 },{"./abstract-strategy":47,"./spinner":51,"jquery":"H0VjM3"}],50:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 2
+},{"./abstract-strategy":47,"./spinner":51,"jquery":"H0VjM3"}],50:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 3
+},{"./abstract-strategy":47,"./spinner":51,"jquery":"lrHQu6"}],50:[function(require,module,exports){
+<<<<<<<<<<<<<<<<<<<<
 var Class = require('class');
 
 var LazyStrategy = require('./lazy-strategy');
@@ -3535,7 +3681,13 @@ module.exports = Class.extend({
 
 });
 
+>>>>>>>>>>>>>>>>>>>> File 1
 },{"./eager-strategy":48,"./lazy-strategy":49,"class":"DSkb5a"}],51:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 2
+},{"./eager-strategy":48,"./lazy-strategy":49,"class":"DSkb5a"}],51:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 3
+},{"./eager-strategy":48,"./lazy-strategy":49,"class":"hHRmiF"}],51:[function(require,module,exports){
+<<<<<<<<<<<<<<<<<<<<
 var Class = require('class'),
 SpinJs = require('spin.js'),
 $ = require('jquery');
@@ -3642,7 +3794,13 @@ module.exports = Class.extend({
     }
 });
 
+>>>>>>>>>>>>>>>>>>>> File 1
 },{"class":"DSkb5a","jquery":"H0VjM3","spin.js":35}],52:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 2
+},{"class":"DSkb5a","jquery":"H0VjM3","spin.js":35}],52:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 3
+},{"class":"hHRmiF","jquery":"lrHQu6","spin.js":35}],52:[function(require,module,exports){
+<<<<<<<<<<<<<<<<<<<<
 var $ = require('jquery');
 var Class = require('class');
 
@@ -3746,7 +3904,13 @@ module.exports = Class.extend({
 
 });
 
+>>>>>>>>>>>>>>>>>>>> File 1
 },{"class":"DSkb5a","jquery":"H0VjM3"}],53:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 2
+},{"class":"DSkb5a","jquery":"H0VjM3"}],53:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 3
+},{"class":"hHRmiF","jquery":"lrHQu6"}],53:[function(require,module,exports){
+<<<<<<<<<<<<<<<<<<<<
 var Class = require('class');
 var PaginationIndicator = require('./paging-indicator.js');
 
@@ -4008,7 +4172,13 @@ module.exports = Class.extend({
 
 });
 
+>>>>>>>>>>>>>>>>>>>> File 1
 },{"./paging-indicator.js":52,"class":"DSkb5a"}],54:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 2
+},{"./paging-indicator.js":52,"class":"DSkb5a"}],54:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 3
+},{"./paging-indicator.js":52,"class":"hHRmiF"}],54:[function(require,module,exports){
+<<<<<<<<<<<<<<<<<<<<
 var Class = require('class'),
 MediaQueryWatcher = require('mediaquerywatcher'),
 $ = require('jquery');
@@ -4022,14 +4192,30 @@ module.exports = Class.extend({
 		this.api = api;
 		this.$element = $element;
 		this.activeIntervals = activeIntervals;
+>>>>>>>>>>>>>>>>>>>> File 1
 		var actualAppliedMediaRules;
+>>>>>>>>>>>>>>>>>>>> File 2
+		var actualAppliedMediaRule;
+>>>>>>>>>>>>>>>>>>>> File 3
+		var actualAppliedMediaRule;
+<<<<<<<<<<<<<<<<<<<<
 		this.mediaStylesProperties = {};
 		this.mediaQueryWatcher = new MediaQueryWatcher();
+>>>>>>>>>>>>>>>>>>>> File 1
 		actualAppliedMediaRules = this.mediaQueryWatcher.addMediaQueriesListener(api.getStylesheet(), $.proxy(this._mediaChangedHandler, this));
 		var self = this;
 		$.each(actualAppliedMediaRules, function(i, actualAppliedMediaRule){
 			self._setActualMediaProperties(actualAppliedMediaRule, ['height', 'width']);
 		});
+>>>>>>>>>>>>>>>>>>>> File 2
+		actualAppliedMediaRule = this.mediaQueryWatcher.addMediaQueriesListener(api.getStylesheet(), $.proxy(this._mediaChangedHandler, this));
+		this._setActualMediaProperties(actualAppliedMediaRule, ['height', 'width']);
+
+>>>>>>>>>>>>>>>>>>>> File 3
+		actualAppliedMediaRule = this.mediaQueryWatcher.addMediaQueriesListener(api.getStylesheet(), $.proxy(this._mediaChangedHandler, this));
+		this._setActualMediaProperties(actualAppliedMediaRule, ['height', 'width']);
+
+<<<<<<<<<<<<<<<<<<<<
 		this._windowResizedHandler();
 		$(window).resize($.proxy(this._windowResizedHandler, this));
 	},
@@ -4065,12 +4251,21 @@ module.exports = Class.extend({
 
 	//Whenever a media query changes, it gets the indicated CSS properties from a target stylesheet.
 	_mediaChangedHandler: function (mql) {
+>>>>>>>>>>>>>>>>>>>> File 1
 		var actualAppliedMediaRule, self = this,
 		mediaQueriesRules = this.mediaQueryWatcher.mediaQueriesRules, exists = false,
 		missingMediaProperties = ['height', 'width'];
+>>>>>>>>>>>>>>>>>>>> File 2
+		var actualAppliedMediaRule, media,
+		mediaQueriesRules = this.mediaQueryWatcher.mediaQueriesRules, exists = false;
+>>>>>>>>>>>>>>>>>>>> File 3
+		var actualAppliedMediaRule, media,
+		mediaQueriesRules = this.mediaQueryWatcher.mediaQueriesRules, exists = false;
+<<<<<<<<<<<<<<<<<<<<
 		
 		//we actually have to know if a media query does not exist for viewport actual state.
 		if (mql.matches === false) {
+>>>>>>>>>>>>>>>>>>>> File 1
 			$.each(mediaQueriesRules, function(media) {
 				if (media !== "noMediaRule") {
 					exists = self._mediaQueryMatches(media);
@@ -4091,6 +4286,21 @@ module.exports = Class.extend({
 				//If media queries cannot supply required properties it seeks in the stylesheet.
 				if (missingMediaProperties.length > 0) {
 					this._setActualMediaProperties("noMediaRule", missingMediaProperties);
+>>>>>>>>>>>>>>>>>>>> File 2
+			for (media in mediaQueriesRules) {
+				if (mediaQueriesRules.hasOwnProperty(media) === true) {
+					exists = this._mediaQueryMatches(media);
+					if (exists === true) {
+						break;
+					}
+>>>>>>>>>>>>>>>>>>>> File 3
+			for (media in mediaQueriesRules) {
+				if (mediaQueriesRules.hasOwnProperty(media) === true) {
+					exists = this._mediaQueryMatches(media);
+					if (exists === true) {
+						break;
+					}
+<<<<<<<<<<<<<<<<<<<<
 				}
 			}
 		}
@@ -4101,6 +4311,12 @@ module.exports = Class.extend({
 
 			this._setActualMediaProperties(actualAppliedMediaRule, ['height', 'width']);
 		
+>>>>>>>>>>>>>>>>>>>> File 1
+>>>>>>>>>>>>>>>>>>>> File 2
+			var self = this;
+>>>>>>>>>>>>>>>>>>>> File 3
+			var self = this;
+<<<<<<<<<<<<<<<<<<<<
 			//defer execution so other action do not invalidate this one.
 			setTimeout(function(){
 				self._windowResizedHandler();
@@ -4111,16 +4327,40 @@ module.exports = Class.extend({
 	//Stores the selected CSS properties from a media query for the actual viewport size, to avoid continuous querying.
 	_setActualMediaProperties: function (actualAppliedMediaRule, targetProperties) {
 		var actualAppliedProperties;
+>>>>>>>>>>>>>>>>>>>> File 1
 		
+>>>>>>>>>>>>>>>>>>>> File 2
+
+>>>>>>>>>>>>>>>>>>>> File 3
+
+<<<<<<<<<<<<<<<<<<<<
 		this.mediaStylesProperties.actualAppliedMediaRule = actualAppliedMediaRule;
 
+>>>>>>>>>>>>>>>>>>>> File 1
 		actualAppliedProperties = this.mediaQueryWatcher.getMediaQueryProperties(this.mediaQueryWatcher.mediaQueriesRules[actualAppliedMediaRule], this.api.getSelectors(this.$element), targetProperties);
 		if (actualAppliedProperties.height) {
 			this.mediaStylesProperties.viewportWidth = this._getMediaQueryViewportWidth(actualAppliedMediaRule);
+>>>>>>>>>>>>>>>>>>>> File 2
+		if (typeof(this.mediaStylesProperties[actualAppliedMediaRule]) === 'undefined' && typeof(this.mediaQueryWatcher.mediaQueriesRules[actualAppliedMediaRule]) !== 'undefined') {
+			actualAppliedProperties = this.mediaQueryWatcher.getMediaQueryProperties(this.mediaQueryWatcher.mediaQueriesRules[actualAppliedMediaRule], this.api.getSelectors(this.$viewport), targetProperties);
+			this.mediaStylesProperties[actualAppliedMediaRule] = {};
+			this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties = actualAppliedProperties;
+			this.mediaStylesProperties[actualAppliedMediaRule].viewportWidth = this._getMediaQueryViewportWidth(actualAppliedMediaRule);
+>>>>>>>>>>>>>>>>>>>> File 3
+		if (typeof(this.mediaStylesProperties[actualAppliedMediaRule]) === 'undefined' && typeof(this.mediaQueryWatcher.mediaQueriesRules[actualAppliedMediaRule]) !== 'undefined') {
+			actualAppliedProperties = this.mediaQueryWatcher.getMediaQueryProperties(this.mediaQueryWatcher.mediaQueriesRules[actualAppliedMediaRule], this.api.getSelectors(this.$viewport), targetProperties);
+			this.mediaStylesProperties[actualAppliedMediaRule] = {};
+			this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties = actualAppliedProperties;
+			this.mediaStylesProperties[actualAppliedMediaRule].viewportWidth = this._getMediaQueryViewportWidth(actualAppliedMediaRule);
+<<<<<<<<<<<<<<<<<<<<
 		}
+>>>>>>>>>>>>>>>>>>>> File 1
 
 		this.mediaStylesProperties.actualAppliedProperties = this.mediaStylesProperties.actualAppliedProperties || {}; 
 		this.mediaStylesProperties.actualAppliedProperties = $.extend({}, this.mediaStylesProperties.actualAppliedProperties, actualAppliedProperties);
+>>>>>>>>>>>>>>>>>>>> File 2
+>>>>>>>>>>>>>>>>>>>> File 3
+<<<<<<<<<<<<<<<<<<<<
 	},
 
 	//Helper to determine wether a mediaQuery applies to the actual viewport size.
@@ -4166,6 +4406,7 @@ module.exports = Class.extend({
 	_windowResizedHandler: function () {
 		var actualAppliedMediaRule = this.mediaStylesProperties.actualAppliedMediaRule, height;
 		
+>>>>>>>>>>>>>>>>>>>> File 1
 		if (this._isActiveForViewportWidth(window.innerWidth) === true && (actualAppliedMediaRule !== "noMediaRule")) {
 				height = window.innerWidth * parseInt(this.mediaStylesProperties.actualAppliedProperties.height, 10) / this.mediaStylesProperties.viewportWidth;
 		} else { //Default css behaviour
@@ -4174,11 +4415,40 @@ module.exports = Class.extend({
 		this.$element.css('height', height + "px");
 		if (this.mediaStylesProperties.actualAppliedProperties.width) {
 			this.$element.css('width', this.mediaStylesProperties.actualAppliedProperties.width);
+>>>>>>>>>>>>>>>>>>>> File 2
+		if (typeof(this.mediaStylesProperties[actualAppliedMediaRule]) !== 'undefined') {
+			if (this._isActiveForViewportWidth(window.innerWidth) === true && (actualAppliedMediaRule !== "noMediaRule")) {
+					height = window.innerWidth * parseInt(this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.height, 10) / this.mediaStylesProperties[actualAppliedMediaRule].viewportWidth;
+			} else { //Default css behaviour
+					height = parseInt(this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.height, 10);
+			}
+			this.$element.css('height', height + "px");
+			if (this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.width) {
+				this.$element.css('width', this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.width);
+			}
+>>>>>>>>>>>>>>>>>>>> File 3
+		if (typeof(this.mediaStylesProperties[actualAppliedMediaRule]) !== 'undefined') {
+			if (this._isActiveForViewportWidth(window.innerWidth) === true && (actualAppliedMediaRule !== "noMediaRule")) {
+					height = window.innerWidth * parseInt(this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.height, 10) / this.mediaStylesProperties[actualAppliedMediaRule].viewportWidth;
+			} else { //Default css behaviour
+					height = parseInt(this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.height, 10);
+			}
+			this.$element.css('height', height + "px");
+			if (this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.width) {
+				this.$element.css('width', this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.width);
+			}
+<<<<<<<<<<<<<<<<<<<<
 		}
 	}
 	
 });
+>>>>>>>>>>>>>>>>>>>> File 1
 },{"class":"DSkb5a","jquery":"H0VjM3","mediaquerywatcher":32}],55:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 2
+},{"class":"DSkb5a","jquery":"H0VjM3","mediaquerywatcher":32}],55:[function(require,module,exports){
+>>>>>>>>>>>>>>>>>>>> File 3
+},{"class":"hHRmiF","jquery":"lrHQu6","mediaquerywatcher":32}],55:[function(require,module,exports){
+<<<<<<<<<<<<<<<<<<<<
 exports.getDependency = function(dependencies, name, defaultDep) {
 	dependencies = dependencies || {};
 	return dependencies[name] || defaultDep;
