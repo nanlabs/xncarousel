@@ -28,6 +28,12 @@ module.exports = (grunt) ->
 			test: options: { message: 'Tests passed successfully' }
 			build: options: { message: 'Build Complete' }
 
+		umd:
+				default:
+						src: 'dist/xnCarousel.js'
+						objectToExport: "require(\'xnCarousel\')"
+						globalAlias: 'xnCarousel'
+
 		browserify:
 			src:
 				src: 'src/js/carousel.js'
@@ -161,6 +167,7 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-connect'
 	grunt.loadNpmTasks 'grunt-notify'
 	grunt.loadNpmTasks 'grunt-browserify'
+	grunt.loadNpmTasks 'grunt-umd'
 	grunt.loadNpmTasks 'grunt-open'
 
 	## Used for automated testing
@@ -169,7 +176,7 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-jsdoc'
 
 	## Default task.
-	grunt.registerTask 'compile', ['clean', 'jshint', 'coffeelint', 'browserify']
+	grunt.registerTask 'compile', ['clean', 'jshint', 'coffeelint', 'browserify', 'umd']
 	grunt.registerTask 'test', ['compile', 'mocha']
 	grunt.registerTask 'default', ['test']
 	grunt.registerTask 'test-all', ['testem:run:main', 'notify:test']
