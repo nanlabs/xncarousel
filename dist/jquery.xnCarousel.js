@@ -983,51 +983,48 @@ function obtainCSS(rule) {
 MediaQueryWatcher.prototype = {
 
  addMediaQueriesListener : function (styleSheet, mediaChangeHandler) {
-    var rules, actualAppliedRules = ["noMediaRule"], mql;
-    if (styleSheet) {
-      rules = styleSheet.cssRules;
-      for (var j = 0; j < rules.length; j += 1) {
-        if (rules[j].constructor === window.CSSMediaRule) {
-            this.mediaQueriesRules[rules[j].media.mediaText] = this.mediaQueriesRules[rules[j].media.mediaText] || {};
-            $.extend(this.mediaQueriesRules[rules[j].media.mediaText], obtainCSSValuesFromRule(rules[j].cssRules));
-            mql = window.matchMedia(rules[j].media.mediaText);
-            if (mql.matches === true) {
-              actualAppliedRules.push(rules[j].media.mediaText); 
-            }
-            mql.addListener(mediaChangeHandler);
-        } else {
-            this.mediaQueriesRules["noMediaRule"] = this.mediaQueriesRules["noMediaRule"] || {};
-            $.extend(this.mediaQueriesRules["noMediaRule"], obtainCSS(rules[j]));
-        }
+    var rules, actualAppliedRule = "noMediaRule", mql;
+   if (styleSheet) {
+    rules = styleSheet.cssRules;
+    for (var j = 0; j < rules.length; j += 1) {
+      if (rules[j].constructor === window.CSSMediaRule) {
+          this.mediaQueriesRules[rules[j].media.mediaText] = this.mediaQueriesRules[rules[j].media.mediaText] || {};
+          $.extend(this.mediaQueriesRules[rules[j].media.mediaText], obtainCSSValuesFromRule(rules[j].cssRules));
+          mql = window.matchMedia(rules[j].media.mediaText);
+          if (mql.matches === true) {
+            actualAppliedRule = rules[j].media.mediaText; 
+          }
+          mql.addListener(mediaChangeHandler);
+      } else {
+          this.mediaQueriesRules["noMediaRule"] = this.mediaQueriesRules["noMediaRule"] || {};
+          $.extend(this.mediaQueriesRules["noMediaRule"], obtainCSS(rules[j]));
       }
     }
-    
-    return actualAppliedRules;
+  }
+    return actualAppliedRule;
   },
 
   //gets the target CSS properties from a @mediaData for the indicated selectors in descending priority order.
   getMediaQueryProperties : function (mediaData, selectors, targetProperties) {
     var propertiesObject = {}, itemsRemoved = 0;
 
-    if (typeof(mediaData) !== 'undefined') {
-      $.each(selectors, function (index, selector) {
-        var property, propertyPosition;
-        if (typeof(mediaData[selector]) !== 'undefined') {
-          $.each(mediaData[selector], function(i, val) {
-            property = val.property.split(" ").join("");
-            propertyPosition = targetProperties.indexOf(property);
-            if (propertyPosition !== -1) {
-              propertiesObject[property] = val.value.split(" ").join("");
-              targetProperties.splice(propertyPosition - itemsRemoved, 1);
-              itemsRemoved += 1;
-            }
-          });
-        }
-        if (targetProperties.length === 0) {
-          return false;
-        }
-      });
-    }
+    $.each(selectors, function (index, selector) {
+      var property, propertyPosition;
+      if (typeof(mediaData[selector]) !== 'undefined') {
+        $.each(mediaData[selector], function(i, val) {
+          property = val.property.split(" ").join("");
+          propertyPosition = targetProperties.indexOf(property);
+          if (propertyPosition !== -1) {
+            propertiesObject[property] = val.value.split(" ").join("");
+            targetProperties.splice(propertyPosition - itemsRemoved, 1);
+            itemsRemoved += 1;
+          }
+        });
+      }
+      if (targetProperties.length === 0) {
+        return false;
+      }
+    });
 
     return propertiesObject;
   }
@@ -1036,9 +1033,9 @@ MediaQueryWatcher.prototype = {
 
 // Exports the class
 module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":31,"./lib/matchMedia.addListener":30,"jquery":"flRT/1"}],"class":[function(require,module,exports){
-module.exports=require('w6O997');
-},{}],"w6O997":[function(require,module,exports){
+},{"./lib/matchMedia":31,"./lib/matchMedia.addListener":30,"jquery":"lrHQu6"}],"class":[function(require,module,exports){
+module.exports=require('hHRmiF');
+},{}],"hHRmiF":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1497,7 +1494,7 @@ module.exports = Class.extend({
 
 });
 
-},{"browsernizr":1,"browsernizr/test/css/transitions":28,"class":"w6O997"}],37:[function(require,module,exports){
+},{"browsernizr":1,"browsernizr/test/css/transitions":28,"class":"hHRmiF"}],37:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -1659,7 +1656,7 @@ module.exports = Class.extend({
 	}
 });
 
-},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"w6O997","jquery":"flRT/1"}],38:[function(require,module,exports){
+},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"hHRmiF","jquery":"lrHQu6"}],38:[function(require,module,exports){
 var AbstractStrategy = require('./abstract-strategy');
 
 module.exports = AbstractStrategy.extend({
@@ -2872,7 +2869,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":50,"./pagination/paging-module":53,"./responsive-module":54,"./util":55,"class":"w6O997","jquery":"flRT/1"}],42:[function(require,module,exports){
+},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":50,"./pagination/paging-module":53,"./responsive-module":54,"./util":55,"class":"hHRmiF","jquery":"lrHQu6"}],42:[function(require,module,exports){
 /**
 * Returns a function which calls the specified function in the specified
 * scope.
@@ -3325,13 +3322,13 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"w6O997","jquery":"flRT/1"}],44:[function(require,module,exports){
+},{"class":"hHRmiF","jquery":"lrHQu6"}],44:[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
 require('jquery-plugin-wrapper').wrap("xnCarousel", require('./carousel'), require('jquery'));
 
-},{"./carousel":41,"jquery":"flRT/1","jquery-plugin-wrapper":29}],"flRT/1":[function(require,module,exports){
+},{"./carousel":41,"jquery":"lrHQu6","jquery-plugin-wrapper":29}],"lrHQu6":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
@@ -3339,7 +3336,7 @@ require('jquery-plugin-wrapper').wrap("xnCarousel", require('./carousel'), requi
 module.exports = jQuery;
 
 },{}],"jquery":[function(require,module,exports){
-module.exports=require('flRT/1');
+module.exports=require('lrHQu6');
 },{}],47:[function(require,module,exports){
 var Class = require('class');
 
@@ -3357,7 +3354,7 @@ module.exports = Class.extend({
 	
 });
 
-},{"class":"w6O997"}],48:[function(require,module,exports){
+},{"class":"hHRmiF"}],48:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3405,7 +3402,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":47,"./spinner":51,"jquery":"flRT/1"}],49:[function(require,module,exports){
+},{"./abstract-strategy":47,"./spinner":51,"jquery":"lrHQu6"}],49:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3453,7 +3450,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":47,"./spinner":51,"jquery":"flRT/1"}],50:[function(require,module,exports){
+},{"./abstract-strategy":47,"./spinner":51,"jquery":"lrHQu6"}],50:[function(require,module,exports){
 var Class = require('class');
 
 var LazyStrategy = require('./lazy-strategy');
@@ -3535,7 +3532,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./eager-strategy":48,"./lazy-strategy":49,"class":"w6O997"}],51:[function(require,module,exports){
+},{"./eager-strategy":48,"./lazy-strategy":49,"class":"hHRmiF"}],51:[function(require,module,exports){
 var Class = require('class'),
 SpinJs = require('spin.js'),
 $ = require('jquery');
@@ -3642,7 +3639,7 @@ module.exports = Class.extend({
     }
 });
 
-},{"class":"w6O997","jquery":"flRT/1","spin.js":35}],52:[function(require,module,exports){
+},{"class":"hHRmiF","jquery":"lrHQu6","spin.js":35}],52:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -3746,7 +3743,7 @@ module.exports = Class.extend({
 
 });
 
-},{"class":"w6O997","jquery":"flRT/1"}],53:[function(require,module,exports){
+},{"class":"hHRmiF","jquery":"lrHQu6"}],53:[function(require,module,exports){
 var Class = require('class');
 var PaginationIndicator = require('./paging-indicator.js');
 
@@ -4008,7 +4005,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./paging-indicator.js":52,"class":"w6O997"}],54:[function(require,module,exports){
+},{"./paging-indicator.js":52,"class":"hHRmiF"}],54:[function(require,module,exports){
 var Class = require('class'),
 MediaQueryWatcher = require('mediaquerywatcher'),
 $ = require('jquery');
@@ -4163,7 +4160,7 @@ module.exports = Class.extend({
 	}
 	
 });
-},{"class":"w6O997","jquery":"flRT/1","mediaquerywatcher":32}],55:[function(require,module,exports){
+},{"class":"hHRmiF","jquery":"lrHQu6","mediaquerywatcher":32}],55:[function(require,module,exports){
 exports.getDependency = function(dependencies, name, defaultDep) {
 	dependencies = dependencies || {};
 	return dependencies[name] || defaultDep;

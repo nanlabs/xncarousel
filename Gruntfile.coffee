@@ -31,8 +31,9 @@ module.exports = (grunt) ->
 		umd:
 				default:
 						src: 'dist/xnCarousel.js'
-						objectToExport: "require(\'xnCarousel\')"
+						objectToExport: "require('xnCarousel')"
 						globalAlias: 'xnCarousel'
+						template: 'template/umd/umd.hbs'
 
 		browserify:
 			src:
@@ -181,7 +182,7 @@ module.exports = (grunt) ->
 	grunt.registerTask 'default', ['test']
 	grunt.registerTask 'test-all', ['testem:run:main', 'notify:test']
 	grunt.registerTask 'coverage', ['compile', 'open:coverage', 'connect:demo']
-	grunt.registerTask 'build', ['less', 'uglify', 'copy:less', 'notify:build']
+	grunt.registerTask 'build', ['less', 'copy:less', 'notify:build']
 	grunt.registerTask 'pre-commit', ['compile', 'testem:ci:main', 'build', 'clean:tmp']
 	grunt.registerTask 'dev', ['compile', 'connect:dev', 'notify:server', 'open:dev', 'watch']
 	grunt.registerTask 'demo',
