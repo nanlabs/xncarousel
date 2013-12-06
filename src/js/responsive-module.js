@@ -133,22 +133,52 @@ module.exports = Class.extend({
 		return exprResult !== null ? exprResult :  this._getMediaQueryMinWidth(mediaRule);
 	},
 
-		//Parses the media query to obtain width values.
+	//Return unit value ("px", "%", "em" for re-use correct one when translating)
+  _getUnit : function (val){
+    return val.match(/\D+$/);
+  },
+
+	//Remove 'px' and other artifacts
+  _cleanValue : function (val) {
+    return parseFloat(val.replace(this._getUnit(val), ''));
+  },
+
+	_getPxSize : function (value, unit) {
+		switch(unit)
+		{
+		case "px":
+			return value;
+		case "em":
+			return value * 16;
+		case "rem":
+			return value * 16;
+		}
+	},
+
+	//Parses the media query to obtain width values.
 	_getMediaQueryMinWidth : function (mediaRule) {
-		var minWidthMediaRuleExpr = /(min-width|min-device-width):\s?([0-9]+)/gi,
+		var minWidthMediaRuleExpr = /(min-width|min-device-width)\s*:\s*([0-9]+[^0-9]+)\)/gi,
 		exprResult;
 
 		exprResult = minWidthMediaRuleExpr.exec(mediaRule);
-		return exprResult !== null ? exprResult[2] : null;
+		if (exprResult !== null && typeof(exprResult[2] !== 'undefined')) {
+			return this._getPxSize(this._cleanValue(exprResult[2]), this._getUnit(exprResult[2])[0]);
+		} else {
+			return null;
+		}
 	},
 
 		//Parses the media query to obtain width values.
 	_getMediaQueryMaxWidth : function (mediaRule) {
-		var maxWidthMediaRuleExpr = /(max-width|max-device-width):\s?([0-9]+)/gi,
+		var maxWidthMediaRuleExpr = /(max-width|max-device-width)\s*:\s*([0-9]+[^0-9]+)\)/gi,
 		exprResult;
 
 		exprResult = maxWidthMediaRuleExpr.exec(mediaRule);
-		return exprResult !== null ? exprResult[2] : null;
+		if (exprResult !== null && typeof(exprResult[2] !== 'undefined')) {
+			return this._getPxSize(this._cleanValue(exprResult[2]), this._getUnit(exprResult[2])[0]);
+		} else {
+			return null;
+		}
 	},
 
 	//Recalculates viewport height of an indicated item to keep aspect ratio.
