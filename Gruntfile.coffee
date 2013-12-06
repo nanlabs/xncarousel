@@ -186,7 +186,7 @@ module.exports = (grunt) ->
 	grunt.registerTask 'default', ['test']
 	grunt.registerTask 'test-all', ['testem:run:main', 'notify:test']
 	grunt.registerTask 'coverage', ['compile', 'open:coverage', 'connect:demo']
-	grunt.registerTask 'build', ['less', 'copy:less', 'notify:build']
+	grunt.registerTask 'build', ['less', 'copy:less', 'uglify', 'notify:build']
 	grunt.registerTask 'pre-commit', ['compile', 'testem:ci:main', 'build', 'clean:tmp']
 	grunt.registerTask 'dev', ['compile', 'connect:dev', 'notify:server', 'open:dev', 'watch']
 	grunt.registerTask 'demo',
