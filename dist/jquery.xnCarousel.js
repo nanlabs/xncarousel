@@ -994,48 +994,51 @@ function obtainCSS(rule) {
 MediaQueryWatcher.prototype = {
 
  addMediaQueriesListener : function (styleSheet, mediaChangeHandler) {
-    var rules, actualAppliedRule = "noMediaRule", mql;
-   if (styleSheet) {
-    rules = styleSheet.cssRules;
-    for (var j = 0; j < rules.length; j += 1) {
-      if (rules[j].constructor === window.CSSMediaRule) {
-          this.mediaQueriesRules[rules[j].media.mediaText] = this.mediaQueriesRules[rules[j].media.mediaText] || {};
-          $.extend(this.mediaQueriesRules[rules[j].media.mediaText], obtainCSSValuesFromRule(rules[j].cssRules));
-          mql = window.matchMedia(rules[j].media.mediaText);
-          if (mql.matches === true) {
-            actualAppliedRule = rules[j].media.mediaText; 
-          }
-          mql.addListener(mediaChangeHandler);
-      } else {
-          this.mediaQueriesRules["noMediaRule"] = this.mediaQueriesRules["noMediaRule"] || {};
-          $.extend(this.mediaQueriesRules["noMediaRule"], obtainCSS(rules[j]));
+    var rules, actualAppliedRules = ["noMediaRule"], mql;
+    if (styleSheet) {
+      rules = styleSheet.cssRules;
+      for (var j = 0; j < rules.length; j += 1) {
+        if (rules[j].constructor === window.CSSMediaRule) {
+            this.mediaQueriesRules[rules[j].media.mediaText] = this.mediaQueriesRules[rules[j].media.mediaText] || {};
+            $.extend(this.mediaQueriesRules[rules[j].media.mediaText], obtainCSSValuesFromRule(rules[j].cssRules));
+            mql = window.matchMedia(rules[j].media.mediaText);
+            if (mql.matches === true) {
+              actualAppliedRules.push(rules[j].media.mediaText); 
+            }
+            mql.addListener(mediaChangeHandler);
+        } else {
+            this.mediaQueriesRules["noMediaRule"] = this.mediaQueriesRules["noMediaRule"] || {};
+            $.extend(this.mediaQueriesRules["noMediaRule"], obtainCSS(rules[j]));
+        }
       }
     }
-  }
-    return actualAppliedRule;
+    
+    return actualAppliedRules;
   },
 
   //gets the target CSS properties from a @mediaData for the indicated selectors in descending priority order.
   getMediaQueryProperties : function (mediaData, selectors, targetProperties) {
     var propertiesObject = {}, itemsRemoved = 0;
 
-    $.each(selectors, function (index, selector) {
-      var property, propertyPosition;
-      if (typeof(mediaData[selector]) !== 'undefined') {
-        $.each(mediaData[selector], function(i, val) {
-          property = val.property.split(" ").join("");
-          propertyPosition = targetProperties.indexOf(property);
-          if (propertyPosition !== -1) {
-            propertiesObject[property] = val.value.split(" ").join("");
-            targetProperties.splice(propertyPosition - itemsRemoved, 1);
-            itemsRemoved += 1;
-          }
-        });
-      }
-      if (targetProperties.length === 0) {
-        return false;
-      }
-    });
+    if (typeof(mediaData) !== 'undefined') {
+      $.each(selectors, function (index, selector) {
+        var property, propertyPosition;
+        if (typeof(mediaData[selector]) !== 'undefined') {
+          $.each(mediaData[selector], function(i, val) {
+            property = val.property.split(" ").join("");
+            propertyPosition = targetProperties.indexOf(property);
+            if (propertyPosition !== -1) {
+              propertiesObject[property] = val.value.split(" ").join("");
+              targetProperties.splice(propertyPosition - itemsRemoved, 1);
+              itemsRemoved += 1;
+            }
+          });
+        }
+        if (targetProperties.length === 0) {
+          return false;
+        }
+      });
+    }
 
     return propertiesObject;
   }
@@ -4030,12 +4033,14 @@ module.exports = Class.extend({
 		this.api = api;
 		this.$element = $element;
 		this.activeIntervals = activeIntervals;
-		var actualAppliedMediaRule;
+		var actualAppliedMediaRules;
 		this.mediaStylesProperties = {};
 		this.mediaQueryWatcher = new MediaQueryWatcher();
-		actualAppliedMediaRule = this.mediaQueryWatcher.addMediaQueriesListener(api.getStylesheet(), $.proxy(this._mediaChangedHandler, this));
-		this._setActualMediaProperties(actualAppliedMediaRule, ['height', 'width']);
-
+		actualAppliedMediaRules = this.mediaQueryWatcher.addMediaQueriesListener(api.getStylesheet(), $.proxy(this._mediaChangedHandler, this));
+		var self = this;
+		$.each(actualAppliedMediaRules, function(i, actualAppliedMediaRule){
+			self._setActualMediaProperties(actualAppliedMediaRule, ['height', 'width']);
+		});
 		this._windowResizedHandler();
 		$(window).resize($.proxy(this._windowResizedHandler, this));
 	},
@@ -4071,17 +4076,32 @@ module.exports = Class.extend({
 
 	//Whenever a media query changes, it gets the indicated CSS properties from a target stylesheet.
 	_mediaChangedHandler: function (mql) {
-		var actualAppliedMediaRule, media,
-		mediaQueriesRules = this.mediaQueryWatcher.mediaQueriesRules, exists = false;
+		var actualAppliedMediaRule, self = this,
+		mediaQueriesRules = this.mediaQueryWatcher.mediaQueriesRules, exists = false,
+		missingMediaProperties = ['height', 'width'];
 		
 		//we actually have to know if a media query does not exist for viewport actual state.
 		if (mql.matches === false) {
-			for (media in mediaQueriesRules) {
-				if (mediaQueriesRules.hasOwnProperty(media) === true) {
-					exists = this._mediaQueryMatches(media);
-					if (exists === true) {
-						break;
-					}
+			$.each(mediaQueriesRules, function(media) {
+				if (media !== "noMediaRule") {
+					exists = self._mediaQueryMatches(media);
+				}
+				return !exists;
+			});
+			
+			if (exists === true) {
+				$.each(mediaQueriesRules, function(media) {
+				if (media !== "noMediaRule") {
+					$.each(self.mediaQueryWatcher.getMediaQueryProperties(self.mediaQueryWatcher.mediaQueriesRules[media], self.api.getSelectors(self.$element), ['height', 'width']), function(property) {
+						if (missingMediaProperties.indexOf(property) !== -1) {
+							missingMediaProperties.splice(missingMediaProperties.indexOf(property), 1);
+						}
+					});
+				}
+				});
+				//If media queries cannot supply required properties it seeks in the stylesheet.
+				if (missingMediaProperties.length > 0) {
+					this._setActualMediaProperties("noMediaRule", missingMediaProperties);
 				}
 			}
 		}
@@ -4092,7 +4112,6 @@ module.exports = Class.extend({
 
 			this._setActualMediaProperties(actualAppliedMediaRule, ['height', 'width']);
 		
-			var self = this;
 			//defer execution so other action do not invalidate this one.
 			setTimeout(function(){
 				self._windowResizedHandler();
@@ -4103,15 +4122,16 @@ module.exports = Class.extend({
 	//Stores the selected CSS properties from a media query for the actual viewport size, to avoid continuous querying.
 	_setActualMediaProperties: function (actualAppliedMediaRule, targetProperties) {
 		var actualAppliedProperties;
-
+		
 		this.mediaStylesProperties.actualAppliedMediaRule = actualAppliedMediaRule;
 
-		if (typeof(this.mediaStylesProperties[actualAppliedMediaRule]) === 'undefined' && typeof(this.mediaQueryWatcher.mediaQueriesRules[actualAppliedMediaRule]) !== 'undefined') {
-			actualAppliedProperties = this.mediaQueryWatcher.getMediaQueryProperties(this.mediaQueryWatcher.mediaQueriesRules[actualAppliedMediaRule], this.api.getSelectors(this.$viewport), targetProperties);
-			this.mediaStylesProperties[actualAppliedMediaRule] = {};
-			this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties = actualAppliedProperties;
-			this.mediaStylesProperties[actualAppliedMediaRule].viewportWidth = this._getMediaQueryViewportWidth(actualAppliedMediaRule);
+		actualAppliedProperties = this.mediaQueryWatcher.getMediaQueryProperties(this.mediaQueryWatcher.mediaQueriesRules[actualAppliedMediaRule], this.api.getSelectors(this.$element), targetProperties);
+		if (actualAppliedProperties.height) {
+			this.mediaStylesProperties.viewportWidth = this._getMediaQueryViewportWidth(actualAppliedMediaRule);
 		}
+
+		this.mediaStylesProperties.actualAppliedProperties = this.mediaStylesProperties.actualAppliedProperties || {}; 
+		this.mediaStylesProperties.actualAppliedProperties = $.extend({}, this.mediaStylesProperties.actualAppliedProperties, actualAppliedProperties);
 	},
 
 	//Helper to determine wether a mediaQuery applies to the actual viewport size.
@@ -4135,38 +4155,66 @@ module.exports = Class.extend({
 		return exprResult !== null ? exprResult :  this._getMediaQueryMinWidth(mediaRule);
 	},
 
-		//Parses the media query to obtain width values.
+	//Return unit value ("px", "%", "em" for re-use correct one when translating)
+  _getUnit : function (val){
+    return val.match(/\D+$/);
+  },
+
+	//Remove 'px' and other artifacts
+  _cleanValue : function (val) {
+    return parseFloat(val.replace(this._getUnit(val), ''));
+  },
+
+	_getPxSize : function (value, unit) {
+		switch(unit)
+		{
+		case "px":
+			return value;
+		case "em":
+			return value * 16;
+		case "rem":
+			return value * 16;
+		}
+	},
+
+	//Parses the media query to obtain width values.
 	_getMediaQueryMinWidth : function (mediaRule) {
-		var minWidthMediaRuleExpr = /(min-width|min-device-width):\s?([0-9]+)/gi,
+		var minWidthMediaRuleExpr = /(min-width|min-device-width)\s*:\s*([0-9]+[^0-9]+)\)/gi,
 		exprResult;
 
 		exprResult = minWidthMediaRuleExpr.exec(mediaRule);
-		return exprResult !== null ? exprResult[2] : null;
+		if (exprResult !== null && typeof(exprResult[2] !== 'undefined')) {
+			return this._getPxSize(this._cleanValue(exprResult[2]), this._getUnit(exprResult[2])[0]);
+		} else {
+			return null;
+		}
 	},
 
 		//Parses the media query to obtain width values.
 	_getMediaQueryMaxWidth : function (mediaRule) {
-		var maxWidthMediaRuleExpr = /(max-width|max-device-width):\s?([0-9]+)/gi,
+		var maxWidthMediaRuleExpr = /(max-width|max-device-width)\s*:\s*([0-9]+[^0-9]+)\)/gi,
 		exprResult;
 
 		exprResult = maxWidthMediaRuleExpr.exec(mediaRule);
-		return exprResult !== null ? exprResult[2] : null;
+		if (exprResult !== null && typeof(exprResult[2] !== 'undefined')) {
+			return this._getPxSize(this._cleanValue(exprResult[2]), this._getUnit(exprResult[2])[0]);
+		} else {
+			return null;
+		}
 	},
 
 	//Recalculates viewport height of an indicated item to keep aspect ratio.
 	_windowResizedHandler: function () {
 		var actualAppliedMediaRule = this.mediaStylesProperties.actualAppliedMediaRule, height;
 		
-		if (typeof(this.mediaStylesProperties[actualAppliedMediaRule]) !== 'undefined') {
-			if (this._isActiveForViewportWidth(window.innerWidth) === true && (actualAppliedMediaRule !== "noMediaRule")) {
-					height = window.innerWidth * parseInt(this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.height, 10) / this.mediaStylesProperties[actualAppliedMediaRule].viewportWidth;
-			} else { //Default css behaviour
-					height = parseInt(this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.height, 10);
-			}
-			this.$element.css('height', height + "px");
-			if (this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.width) {
-				this.$element.css('width', this.mediaStylesProperties[actualAppliedMediaRule].actualAppliedProperties.width);
-			}
+		if (this._isActiveForViewportWidth(window.innerWidth) === true && (actualAppliedMediaRule !== "noMediaRule")) {
+				height = window.innerWidth * parseInt(this.mediaStylesProperties.actualAppliedProperties.height, 10) / this.mediaStylesProperties.viewportWidth;
+		} else { //Default css behaviour
+				height = parseInt(this.mediaStylesProperties.actualAppliedProperties.height, 10);
+		}
+		this.$element.css('height', height + "px");
+		if (this.mediaStylesProperties.actualAppliedProperties.width) {
+			this.$element.css('width', this.mediaStylesProperties.actualAppliedProperties.width);
 		}
 	}
 	
