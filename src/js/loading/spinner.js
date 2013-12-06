@@ -52,14 +52,14 @@ module.exports = Class.extend({
         height = 0; width = 0;
         if ($loadingElement[0].clientHeight > 0 && $spinner.parent().height() > 0) {
             height = $loadingElement[0].clientHeight * 100 / $spinner.parent().height();
-        } 
+        }
         if (height === 0 || height > 100) {
             height = 100;
         }
 
         if ($loadingElement[0].clientWidth > 0 && $spinner.parent().width() > 0) {
             width = $loadingElement[0].clientWidth * 100 / $spinner.parent().width();
-        } 
+        }
         if (width === 0 || width > 100) {
             width = 100;
         }

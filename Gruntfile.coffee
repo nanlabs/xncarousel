@@ -30,10 +30,15 @@ module.exports = (grunt) ->
 
 		umd:
 				default:
-						src: 'dist/xnCarousel.js'
-						objectToExport: "require('xnCarousel')"
+						src: 'dist/jquery.xnCarousel.js',
+						amdModuleId: 'xnCarousel',
+						objectToExport: 'null'
 						globalAlias: 'xnCarousel'
-						template: 'template/umd/umd.hbs'
+						template: 'template/umd/umd.hbs',
+						deps:
+							'default': ['jQuery']
+							amd: ['jquery']
+							cjs: ['jquery']
 
 		browserify:
 			src:
@@ -46,7 +51,6 @@ module.exports = (grunt) ->
 				src: 'src/js/jquery-wrapper.js',
 				dest: 'dist/<%= JQUERY_PLUGIN_JS %>.js'
 				options:
-					standalone: 'true'
 					alias: ['src/js/jquery.shim.js:jquery', 'node_modules/resig-class/index.js:class']
 			test:
 				src: 'test/automated/**/*.coffee'

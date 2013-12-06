@@ -440,7 +440,7 @@ module.exports = Class.extend({
 
 		if (typeof(items) === 'undefined'){
 			var $items = this.$viewport.find('.xn-items');
-			items = [];		
+			items = [];
 			$.each($items.children(), function(i, el){
 				items.push(el.outerHTML);
 			});
