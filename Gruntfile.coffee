@@ -139,7 +139,7 @@ module.exports = (grunt) ->
 					src: ['src/less/style.less'],
 					dest: 'dist'
 					rename: (dest) ->
-						"#{dest}/<%= OUTPUT_JS %>.less"
+						"#{dest}/jquery.<%= OUTPUT_JS %>.less"
 				]
 
 		connect:
