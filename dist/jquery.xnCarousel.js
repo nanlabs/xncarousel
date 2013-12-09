@@ -958,12 +958,16 @@ function obtainCSSValuesFromRule(cssRules) {
   var rules = {};
   $.each(cssRules, function(i, rule) {
     var values = obtainCSSValues(rule.selectorText, rule.cssText).split(';');
-    rules[rule.selectorText] = [];
-    $.each(values, function(i, value) {
-      if (CSSRuleRegex.test(value) === true) {
-        rules[rule.selectorText].push(getCSSRule(value));
-      }
+    
+    $.each(rule.selectorText.replace(/,\s+/g,',').split(','), function(i, selector) {
+      rules[selector] = [];
+      $.each(values, function(i, value) {
+        if (CSSRuleRegex.test(value) === true) {
+          rules[selector].push(getCSSRule(value));
+        }
+      });
     });
+          
   });
   return rules;
 }
@@ -1006,9 +1010,9 @@ MediaQueryWatcher.prototype = {
               actualAppliedRules.push(rules[j].media.mediaText); 
             }
             mql.addListener(mediaChangeHandler);
-        } else {
+        } else if (rules[j].constructor === window.CSSStyleRule) {
             this.mediaQueriesRules["noMediaRule"] = this.mediaQueriesRules["noMediaRule"] || {};
-            $.extend(this.mediaQueriesRules["noMediaRule"], obtainCSS(rules[j]));
+            $.extend(this.mediaQueriesRules["noMediaRule"], obtainCSSValuesFromRule([rules[j]]));
         }
       }
     }
@@ -1047,9 +1051,9 @@ MediaQueryWatcher.prototype = {
 
 // Exports the class
 module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":31,"./lib/matchMedia.addListener":30,"jquery":"6obL00"}],"class":[function(require,module,exports){
-module.exports=require('MFFfPr');
-},{}],"MFFfPr":[function(require,module,exports){
+},{"./lib/matchMedia":31,"./lib/matchMedia.addListener":30,"jquery":"H0VjM3"}],"class":[function(require,module,exports){
+module.exports=require('DSkb5a');
+},{}],"DSkb5a":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1508,7 +1512,7 @@ module.exports = Class.extend({
 
 });
 
-},{"browsernizr":1,"browsernizr/test/css/transitions":28,"class":"MFFfPr"}],37:[function(require,module,exports){
+},{"browsernizr":1,"browsernizr/test/css/transitions":28,"class":"DSkb5a"}],37:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -1670,7 +1674,7 @@ module.exports = Class.extend({
 	}
 });
 
-},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"MFFfPr","jquery":"6obL00"}],38:[function(require,module,exports){
+},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"DSkb5a","jquery":"H0VjM3"}],38:[function(require,module,exports){
 var AbstractStrategy = require('./abstract-strategy');
 
 module.exports = AbstractStrategy.extend({
@@ -2604,17 +2608,16 @@ module.exports = Class.extend({
 
 	//Retrieves the carousel selectors to search for CSS values by priority order.
 	_getCarouselSelectors: function () {
-		var classes = [], perm = [];
 
-		function getCombinations(chars) {
+		function getCombinations(chars, prefix, suffix) {
 			var result = [],
 			f = function(prefix, chars) {
 				for (var i = 0; i < chars.length; i++) {
 					result.push(prefix + chars[i]);
-					f(prefix + chars[i], chars.slice(i + 1));
+					f(prefix + chars[i] + suffix, chars.slice(i + 1));
 				}
 			};
-			f('', chars);
+			f(prefix, chars);
 			return result;
 		}
 
@@ -2639,36 +2642,57 @@ module.exports = Class.extend({
 
 
 		function permute(input) {
-		var permArr = [], usedChars = [], concatResult =[];
+			var permArr = [], usedChars = [], concatResult =[];
 
-		function main(input) {
-			var i, ch;
-			for (i = 0; i < input.length; i+= 1) {
-				ch = input.splice(i, 1)[0];
-				usedChars.push(ch);
-				if (input.length === 0) {
-					permArr.push(usedChars.slice());
+			function main(input) {
+				var i, ch;
+				for (i = 0; i < input.length; i+= 1) {
+					ch = input.splice(i, 1)[0];
+					usedChars.push(ch);
+					if (input.length === 0) {
+						permArr.push(usedChars.slice());
+					}
+					main(input);
+					input.splice(i, 0, ch);
+					usedChars.pop();
 				}
-				main(input);
-				input.splice(i, 0, ch);
-				usedChars.pop();
+				return permArr;
 			}
-			return permArr;
-		}
 
-		permArr = main(input);
-		$.each(permArr, function(i, val){
-			concatResult.push(val.join(''));
+			permArr = main(input);
+			$.each(permArr, function(i, val){
+				concatResult.push(val.join(''));
 			});
-		return concatResult;
+			return concatResult;
 		}
 
-		if (!this.carouselSelectors) {
-			if (typeof(this.$viewport.attr('class')) !== 'undefined') {
+		function cartProd(paramArray) {
+			var acum = paramArray[0];
+			if (paramArray.length > 1) {
+				$.each(paramArray, function(i){
+					if (i>0){
+						var aux = [];
+						$.each(acum, function(h, val){
+							if (paramArray.hasOwnProperty(i)) {
+								$.each(paramArray[i], function(j,valb){
+									aux.push(val + " " + valb);
+								});
+							}
+						});
+						acum = aux;
+					}
+				});
+			}
+			return acum;
+		}
+
+		function getClasses($element) {
+			var perm = [], classes;
+			if (typeof($element.attr('class')) !== 'undefined') {
 				//appends dots at the beggining of each word.
-				classes = (" " + this.$viewport.attr('class')).replace(/\s/g," .").split(" ");
+				classes = (" " + $element.attr('class')).replace(/\s/g," .").split(" ");
 				classes = classes.slice(1, classes.length);
-				classes = getCombinations(classes);
+				classes = getCombinations(classes, '', '');
 
 				$.each(classes, function(i, className) {
 					var classes = className.replace(/\./g, ",.").split(",");
@@ -2680,13 +2704,39 @@ module.exports = Class.extend({
 					}
 				});
 
-				classes = orderByRelevance(perm);
+				return orderByRelevance(perm);
 			}
+		}
 
-			if (typeof(this.$viewport.attr('id')) !== 'undefined') {
-				classes.unshift("#" + this.$viewport.attr('id'));
+		//Get carousel parents classes  
+		if (!this.carouselSelectors) {
+			var classes = [], i, results = [], parents = this.$viewport.parentsUntil('html'),
+			carouselSelectors = getClasses(this.$viewport);
+			if (parents && parents.length > 0) {
+				for (i = parents.length - 1; i >= 0; i--) {
+					if (parents.hasOwnProperty(i)) {
+						if (typeof($(parents[i]).attr('class')) !== 'undefined') {
+							classes.push(getClasses($(parents[i])));
+						}
+					}
+				}
+				if (classes.length > 0) {
+					//combinations of parents
+					var combinations = []; i = -1;
+					while ( combinations.push(i += 1) < classes.length ){}
+					combinations = getCombinations(combinations, '', '#');
+
+					//Get carousel classes  
+					var indexes;
+					$.each(combinations, function(i, val){
+						indexes = val.split('#');
+						indexes = indexes.map(function(index){return classes[index];});
+						indexes.push(carouselSelectors);
+						results = results.concat(cartProd(indexes));
+					});
+				}
 			}
-			this.carouselSelectors = classes;
+			this.carouselSelectors = results.concat(carouselSelectors);
 		}
 
 		return this.carouselSelectors;
@@ -2883,7 +2933,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":50,"./pagination/paging-module":53,"./responsive-module":54,"./util":55,"class":"MFFfPr","jquery":"6obL00"}],42:[function(require,module,exports){
+},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":50,"./pagination/paging-module":53,"./responsive-module":54,"./util":55,"class":"DSkb5a","jquery":"H0VjM3"}],42:[function(require,module,exports){
 /**
 * Returns a function which calls the specified function in the specified
 * scope.
@@ -3336,13 +3386,13 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"MFFfPr","jquery":"6obL00"}],44:[function(require,module,exports){
+},{"class":"DSkb5a","jquery":"H0VjM3"}],44:[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
 require('jquery-plugin-wrapper').wrap("xnCarousel", require('./carousel'), require('jquery'));
 
-},{"./carousel":41,"jquery":"6obL00","jquery-plugin-wrapper":29}],"6obL00":[function(require,module,exports){
+},{"./carousel":41,"jquery":"H0VjM3","jquery-plugin-wrapper":29}],"H0VjM3":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
@@ -3350,7 +3400,7 @@ require('jquery-plugin-wrapper').wrap("xnCarousel", require('./carousel'), requi
 module.exports = jQuery;
 
 },{}],"jquery":[function(require,module,exports){
-module.exports=require('6obL00');
+module.exports=require('H0VjM3');
 },{}],47:[function(require,module,exports){
 var Class = require('class');
 
@@ -3368,7 +3418,7 @@ module.exports = Class.extend({
 	
 });
 
-},{"class":"MFFfPr"}],48:[function(require,module,exports){
+},{"class":"DSkb5a"}],48:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3416,7 +3466,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":47,"./spinner":51,"jquery":"6obL00"}],49:[function(require,module,exports){
+},{"./abstract-strategy":47,"./spinner":51,"jquery":"H0VjM3"}],49:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3464,7 +3514,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":47,"./spinner":51,"jquery":"6obL00"}],50:[function(require,module,exports){
+},{"./abstract-strategy":47,"./spinner":51,"jquery":"H0VjM3"}],50:[function(require,module,exports){
 var Class = require('class');
 
 var LazyStrategy = require('./lazy-strategy');
@@ -3546,7 +3596,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./eager-strategy":48,"./lazy-strategy":49,"class":"MFFfPr"}],51:[function(require,module,exports){
+},{"./eager-strategy":48,"./lazy-strategy":49,"class":"DSkb5a"}],51:[function(require,module,exports){
 var Class = require('class'),
 SpinJs = require('spin.js'),
 $ = require('jquery');
@@ -3653,7 +3703,7 @@ module.exports = Class.extend({
     }
 });
 
-},{"class":"MFFfPr","jquery":"6obL00","spin.js":35}],52:[function(require,module,exports){
+},{"class":"DSkb5a","jquery":"H0VjM3","spin.js":35}],52:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -3757,7 +3807,7 @@ module.exports = Class.extend({
 
 });
 
-},{"class":"MFFfPr","jquery":"6obL00"}],53:[function(require,module,exports){
+},{"class":"DSkb5a","jquery":"H0VjM3"}],53:[function(require,module,exports){
 var Class = require('class');
 var PaginationIndicator = require('./paging-indicator.js');
 
@@ -4019,7 +4069,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./paging-indicator.js":52,"class":"MFFfPr"}],54:[function(require,module,exports){
+},{"./paging-indicator.js":52,"class":"DSkb5a"}],54:[function(require,module,exports){
 var Class = require('class'),
 MediaQueryWatcher = require('mediaquerywatcher'),
 $ = require('jquery');
@@ -4030,14 +4080,14 @@ $ = require('jquery');
 */
 module.exports = Class.extend({
 	init: function (api, $element, activeIntervals) {
+		var actualAppliedMediaRules, self = this;
 		this.api = api;
 		this.$element = $element;
 		this.activeIntervals = activeIntervals;
-		var actualAppliedMediaRules;
 		this.mediaStylesProperties = {};
 		this.mediaQueryWatcher = new MediaQueryWatcher();
 		actualAppliedMediaRules = this.mediaQueryWatcher.addMediaQueriesListener(api.getStylesheet(), $.proxy(this._mediaChangedHandler, this));
-		var self = this;
+		this.mediaStylesProperties.actualAppliedProperties = {}; 
 		$.each(actualAppliedMediaRules, function(i, actualAppliedMediaRule){
 			self._setActualMediaProperties(actualAppliedMediaRule, ['height', 'width']);
 		});
@@ -4076,47 +4126,35 @@ module.exports = Class.extend({
 
 	//Whenever a media query changes, it gets the indicated CSS properties from a target stylesheet.
 	_mediaChangedHandler: function (mql) {
-		var actualAppliedMediaRule, self = this,
-		mediaQueriesRules = this.mediaQueryWatcher.mediaQueriesRules, exists = false,
-		missingMediaProperties = ['height', 'width'];
+		var self = this,
+		mediaQueriesRules = this.mediaQueryWatcher.mediaQueriesRules, exists = false;
 		
 		//we actually have to know if a media query does not exist for viewport actual state.
 		if (mql.matches === false) {
 			$.each(mediaQueriesRules, function(media) {
 				if (media !== "noMediaRule") {
-					exists = self._mediaQueryMatches(media);
+					exists = self._mediaQueryMatchesForCarousel(media);
 				}
 				return !exists;
 			});
-			
-			if (exists === true) {
-				$.each(mediaQueriesRules, function(media) {
-				if (media !== "noMediaRule") {
-					$.each(self.mediaQueryWatcher.getMediaQueryProperties(self.mediaQueryWatcher.mediaQueriesRules[media], self.api.getSelectors(self.$element), ['height', 'width']), function(property) {
-						if (missingMediaProperties.indexOf(property) !== -1) {
-							missingMediaProperties.splice(missingMediaProperties.indexOf(property), 1);
-						}
-					});
-				}
-				});
-				//If media queries cannot supply required properties it seeks in the stylesheet.
-				if (missingMediaProperties.length > 0) {
-					this._setActualMediaProperties("noMediaRule", missingMediaProperties);
-				}
-			}
 		}
 
 		if (mql.matches === true || exists === false) {
-			
-			actualAppliedMediaRule = mql.matches === false ? "noMediaRule" : mql.media;
-
-			this._setActualMediaProperties(actualAppliedMediaRule, ['height', 'width']);
-		
-			//defer execution so other action do not invalidate this one.
-			setTimeout(function(){
-				self._windowResizedHandler();
-			},0);
+			if (mql.matches === true && this._mediaQueryMatchesForCarousel(mql.media) === false) {
+				return;
+			}
+			this.mediaStylesProperties.actualAppliedProperties = {};
+			this._setActualMediaProperties("noMediaRule", ['height', 'width']);
 		}
+
+		if (mql.matches === true) {
+			this._setActualMediaProperties(mql.media, ['height', 'width']);
+		}
+		
+		//defer execution so other action do not invalidate this one.
+		setTimeout(function(){
+			self._windowResizedHandler();
+		},0);
 	},
 
 	//Stores the selected CSS properties from a media query for the actual viewport size, to avoid continuous querying.
@@ -4125,27 +4163,42 @@ module.exports = Class.extend({
 		
 		this.mediaStylesProperties.actualAppliedMediaRule = actualAppliedMediaRule;
 
-		actualAppliedProperties = this.mediaQueryWatcher.getMediaQueryProperties(this.mediaQueryWatcher.mediaQueriesRules[actualAppliedMediaRule], this.api.getSelectors(this.$element), targetProperties);
-		if (actualAppliedProperties.height) {
-			this.mediaStylesProperties.viewportWidth = this._getMediaQueryViewportWidth(actualAppliedMediaRule);
-		}
-
-		this.mediaStylesProperties.actualAppliedProperties = this.mediaStylesProperties.actualAppliedProperties || {}; 
+		actualAppliedProperties = this.mediaQueryWatcher.getMediaQueryProperties(this.mediaQueryWatcher.mediaQueriesRules[actualAppliedMediaRule], this.api.getSelectors(), targetProperties);
+		this.mediaStylesProperties.viewportWidth = this._getMediaQueryViewportWidth(actualAppliedMediaRule);
+		
 		this.mediaStylesProperties.actualAppliedProperties = $.extend({}, this.mediaStylesProperties.actualAppliedProperties, actualAppliedProperties);
 	},
 
 	//Helper to determine wether a mediaQuery applies to the actual viewport size.
-	_mediaQueryMatches: function (mediaRule) {
+	_mediaQueryMatchesForCarousel: function (mediaRule) {
+		var self = this;
+
+		function matchesForCarousel(mediaRule) {
+			var mediaData = self.mediaQueryWatcher.mediaQueriesRules[mediaRule],
+			exists = false;
+		
+			$.each(mediaData, function(selector) {
+				$.each(selector.replace(/,\s+/g,',').split(','), function(i, selector) {
+					if (self.api.getSelectors().indexOf(selector) !== -1) {
+						exists =true;
+					}
+					return !exists;
+				});
+				return !exists;
+			});
+			return exists;
+		}
+
 		var min = this._getMediaQueryMinWidth(mediaRule),
 		max = this._getMediaQueryMaxWidth(mediaRule),
 		viewportWidth = window.innerWidth;
 		
 		if (min !== null && max !== null) {
-			return (viewportWidth >= min && viewportWidth <= max) ? true : false;
+			return ((viewportWidth >= min && viewportWidth <= max) && matchesForCarousel(mediaRule) === true ) ? true : false;
 		} else if (min !== null) {
-			return (viewportWidth >= min) ? true : false;
+			return (viewportWidth >= min && matchesForCarousel(mediaRule) === true ) ? true : false;
 		} else {
-			return (viewportWidth <= max) ? true : false;
+			return (viewportWidth <= max && matchesForCarousel(mediaRule) === true ) ? true : false;
 		}
 	},
 
@@ -4207,19 +4260,21 @@ module.exports = Class.extend({
 	_windowResizedHandler: function () {
 		var actualAppliedMediaRule = this.mediaStylesProperties.actualAppliedMediaRule, height;
 		
-		if (this._isActiveForViewportWidth(window.innerWidth) === true && (actualAppliedMediaRule !== "noMediaRule")) {
-				height = window.innerWidth * parseInt(this.mediaStylesProperties.actualAppliedProperties.height, 10) / this.mediaStylesProperties.viewportWidth;
-		} else { //Default css behaviour
-				height = parseInt(this.mediaStylesProperties.actualAppliedProperties.height, 10);
+		if (this.mediaStylesProperties.actualAppliedProperties.height) {
+			if (this._isActiveForViewportWidth(window.innerWidth) === true && (actualAppliedMediaRule !== "noMediaRule")) {
+					height = window.innerWidth * parseInt(this.mediaStylesProperties.actualAppliedProperties.height, 10) / this.mediaStylesProperties.viewportWidth;
+			} else { //Default css behaviour
+					height = parseInt(this.mediaStylesProperties.actualAppliedProperties.height, 10);
+			}
+			this.$element.css('height', height + "px");
 		}
-		this.$element.css('height', height + "px");
 		if (this.mediaStylesProperties.actualAppliedProperties.width) {
 			this.$element.css('width', this.mediaStylesProperties.actualAppliedProperties.width);
 		}
 	}
 	
 });
-},{"class":"MFFfPr","jquery":"6obL00","mediaquerywatcher":32}],55:[function(require,module,exports){
+},{"class":"DSkb5a","jquery":"H0VjM3","mediaquerywatcher":32}],55:[function(require,module,exports){
 exports.getDependency = function(dependencies, name, defaultDep) {
 	dependencies = dependencies || {};
 	return dependencies[name] || defaultDep;

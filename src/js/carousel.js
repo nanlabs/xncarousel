@@ -776,17 +776,16 @@ module.exports = Class.extend({
 
 	//Retrieves the carousel selectors to search for CSS values by priority order.
 	_getCarouselSelectors: function () {
-		var classes = [], perm = [];
 
-		function getCombinations(chars) {
+		function getCombinations(chars, prefix, suffix) {
 			var result = [],
 			f = function(prefix, chars) {
 				for (var i = 0; i < chars.length; i++) {
 					result.push(prefix + chars[i]);
-					f(prefix + chars[i], chars.slice(i + 1));
+					f(prefix + chars[i] + suffix, chars.slice(i + 1));
 				}
 			};
-			f('', chars);
+			f(prefix, chars);
 			return result;
 		}
 
@@ -811,36 +810,57 @@ module.exports = Class.extend({
 
 
 		function permute(input) {
-		var permArr = [], usedChars = [], concatResult =[];
+			var permArr = [], usedChars = [], concatResult =[];
 
-		function main(input) {
-			var i, ch;
-			for (i = 0; i < input.length; i+= 1) {
-				ch = input.splice(i, 1)[0];
-				usedChars.push(ch);
-				if (input.length === 0) {
-					permArr.push(usedChars.slice());
+			function main(input) {
+				var i, ch;
+				for (i = 0; i < input.length; i+= 1) {
+					ch = input.splice(i, 1)[0];
+					usedChars.push(ch);
+					if (input.length === 0) {
+						permArr.push(usedChars.slice());
+					}
+					main(input);
+					input.splice(i, 0, ch);
+					usedChars.pop();
 				}
-				main(input);
-				input.splice(i, 0, ch);
-				usedChars.pop();
+				return permArr;
 			}
-			return permArr;
-		}
 
-		permArr = main(input);
-		$.each(permArr, function(i, val){
-			concatResult.push(val.join(''));
+			permArr = main(input);
+			$.each(permArr, function(i, val){
+				concatResult.push(val.join(''));
 			});
-		return concatResult;
+			return concatResult;
 		}
 
-		if (!this.carouselSelectors) {
-			if (typeof(this.$viewport.attr('class')) !== 'undefined') {
+		function cartProd(paramArray) {
+			var acum = paramArray[0];
+			if (paramArray.length > 1) {
+				$.each(paramArray, function(i){
+					if (i>0){
+						var aux = [];
+						$.each(acum, function(h, val){
+							if (paramArray.hasOwnProperty(i)) {
+								$.each(paramArray[i], function(j,valb){
+									aux.push(val + " " + valb);
+								});
+							}
+						});
+						acum = aux;
+					}
+				});
+			}
+			return acum;
+		}
+
+		function getClasses($element) {
+			var perm = [], classes;
+			if (typeof($element.attr('class')) !== 'undefined') {
 				//appends dots at the beggining of each word.
-				classes = (" " + this.$viewport.attr('class')).replace(/\s/g," .").split(" ");
+				classes = (" " + $element.attr('class')).replace(/\s/g," .").split(" ");
 				classes = classes.slice(1, classes.length);
-				classes = getCombinations(classes);
+				classes = getCombinations(classes, '', '');
 
 				$.each(classes, function(i, className) {
 					var classes = className.replace(/\./g, ",.").split(",");
@@ -852,13 +872,39 @@ module.exports = Class.extend({
 					}
 				});
 
-				classes = orderByRelevance(perm);
+				return orderByRelevance(perm);
 			}
+		}
 
-			if (typeof(this.$viewport.attr('id')) !== 'undefined') {
-				classes.unshift("#" + this.$viewport.attr('id'));
+		//Get carousel parents classes  
+		if (!this.carouselSelectors) {
+			var classes = [], i, results = [], parents = this.$viewport.parentsUntil('html'),
+			carouselSelectors = getClasses(this.$viewport);
+			if (parents && parents.length > 0) {
+				for (i = parents.length - 1; i >= 0; i--) {
+					if (parents.hasOwnProperty(i)) {
+						if (typeof($(parents[i]).attr('class')) !== 'undefined') {
+							classes.push(getClasses($(parents[i])));
+						}
+					}
+				}
+				if (classes.length > 0) {
+					//combinations of parents
+					var combinations = []; i = -1;
+					while ( combinations.push(i += 1) < classes.length ){}
+					combinations = getCombinations(combinations, '', '#');
+
+					//Get carousel classes  
+					var indexes;
+					$.each(combinations, function(i, val){
+						indexes = val.split('#');
+						indexes = indexes.map(function(index){return classes[index];});
+						indexes.push(carouselSelectors);
+						results = results.concat(cartProd(indexes));
+					});
+				}
 			}
-			this.carouselSelectors = classes;
+			this.carouselSelectors = results.concat(carouselSelectors);
 		}
 
 		return this.carouselSelectors;

@@ -8,14 +8,14 @@ $ = require('jquery');
 */
 module.exports = Class.extend({
 	init: function (api, $element, activeIntervals) {
+		var actualAppliedMediaRules, self = this;
 		this.api = api;
 		this.$element = $element;
 		this.activeIntervals = activeIntervals;
-		var actualAppliedMediaRules;
 		this.mediaStylesProperties = {};
 		this.mediaQueryWatcher = new MediaQueryWatcher();
 		actualAppliedMediaRules = this.mediaQueryWatcher.addMediaQueriesListener(api.getStylesheet(), $.proxy(this._mediaChangedHandler, this));
-		var self = this;
+		this.mediaStylesProperties.actualAppliedProperties = {}; 
 		$.each(actualAppliedMediaRules, function(i, actualAppliedMediaRule){
 			self._setActualMediaProperties(actualAppliedMediaRule, ['height', 'width']);
 		});
@@ -54,47 +54,35 @@ module.exports = Class.extend({
 
 	//Whenever a media query changes, it gets the indicated CSS properties from a target stylesheet.
 	_mediaChangedHandler: function (mql) {
-		var actualAppliedMediaRule, self = this,
-		mediaQueriesRules = this.mediaQueryWatcher.mediaQueriesRules, exists = false,
-		missingMediaProperties = ['height', 'width'];
+		var self = this,
+		mediaQueriesRules = this.mediaQueryWatcher.mediaQueriesRules, exists = false;
 		
 		//we actually have to know if a media query does not exist for viewport actual state.
 		if (mql.matches === false) {
 			$.each(mediaQueriesRules, function(media) {
 				if (media !== "noMediaRule") {
-					exists = self._mediaQueryMatches(media);
+					exists = self._mediaQueryMatchesForCarousel(media);
 				}
 				return !exists;
 			});
-			
-			if (exists === true) {
-				$.each(mediaQueriesRules, function(media) {
-				if (media !== "noMediaRule") {
-					$.each(self.mediaQueryWatcher.getMediaQueryProperties(self.mediaQueryWatcher.mediaQueriesRules[media], self.api.getSelectors(self.$element), ['height', 'width']), function(property) {
-						if (missingMediaProperties.indexOf(property) !== -1) {
-							missingMediaProperties.splice(missingMediaProperties.indexOf(property), 1);
-						}
-					});
-				}
-				});
-				//If media queries cannot supply required properties it seeks in the stylesheet.
-				if (missingMediaProperties.length > 0) {
-					this._setActualMediaProperties("noMediaRule", missingMediaProperties);
-				}
-			}
 		}
 
 		if (mql.matches === true || exists === false) {
-			
-			actualAppliedMediaRule = mql.matches === false ? "noMediaRule" : mql.media;
-
-			this._setActualMediaProperties(actualAppliedMediaRule, ['height', 'width']);
-		
-			//defer execution so other action do not invalidate this one.
-			setTimeout(function(){
-				self._windowResizedHandler();
-			},0);
+			if (mql.matches === true && this._mediaQueryMatchesForCarousel(mql.media) === false) {
+				return;
+			}
+			this.mediaStylesProperties.actualAppliedProperties = {};
+			this._setActualMediaProperties("noMediaRule", ['height', 'width']);
 		}
+
+		if (mql.matches === true) {
+			this._setActualMediaProperties(mql.media, ['height', 'width']);
+		}
+		
+		//defer execution so other action do not invalidate this one.
+		setTimeout(function(){
+			self._windowResizedHandler();
+		},0);
 	},
 
 	//Stores the selected CSS properties from a media query for the actual viewport size, to avoid continuous querying.
@@ -103,27 +91,42 @@ module.exports = Class.extend({
 		
 		this.mediaStylesProperties.actualAppliedMediaRule = actualAppliedMediaRule;
 
-		actualAppliedProperties = this.mediaQueryWatcher.getMediaQueryProperties(this.mediaQueryWatcher.mediaQueriesRules[actualAppliedMediaRule], this.api.getSelectors(this.$element), targetProperties);
-		if (actualAppliedProperties.height) {
-			this.mediaStylesProperties.viewportWidth = this._getMediaQueryViewportWidth(actualAppliedMediaRule);
-		}
-
-		this.mediaStylesProperties.actualAppliedProperties = this.mediaStylesProperties.actualAppliedProperties || {}; 
+		actualAppliedProperties = this.mediaQueryWatcher.getMediaQueryProperties(this.mediaQueryWatcher.mediaQueriesRules[actualAppliedMediaRule], this.api.getSelectors(), targetProperties);
+		this.mediaStylesProperties.viewportWidth = this._getMediaQueryViewportWidth(actualAppliedMediaRule);
+		
 		this.mediaStylesProperties.actualAppliedProperties = $.extend({}, this.mediaStylesProperties.actualAppliedProperties, actualAppliedProperties);
 	},
 
 	//Helper to determine wether a mediaQuery applies to the actual viewport size.
-	_mediaQueryMatches: function (mediaRule) {
+	_mediaQueryMatchesForCarousel: function (mediaRule) {
+		var self = this;
+
+		function matchesForCarousel(mediaRule) {
+			var mediaData = self.mediaQueryWatcher.mediaQueriesRules[mediaRule],
+			exists = false;
+		
+			$.each(mediaData, function(selector) {
+				$.each(selector.replace(/,\s+/g,',').split(','), function(i, selector) {
+					if (self.api.getSelectors().indexOf(selector) !== -1) {
+						exists =true;
+					}
+					return !exists;
+				});
+				return !exists;
+			});
+			return exists;
+		}
+
 		var min = this._getMediaQueryMinWidth(mediaRule),
 		max = this._getMediaQueryMaxWidth(mediaRule),
 		viewportWidth = window.innerWidth;
 		
 		if (min !== null && max !== null) {
-			return (viewportWidth >= min && viewportWidth <= max) ? true : false;
+			return ((viewportWidth >= min && viewportWidth <= max) && matchesForCarousel(mediaRule) === true ) ? true : false;
 		} else if (min !== null) {
-			return (viewportWidth >= min) ? true : false;
+			return (viewportWidth >= min && matchesForCarousel(mediaRule) === true ) ? true : false;
 		} else {
-			return (viewportWidth <= max) ? true : false;
+			return (viewportWidth <= max && matchesForCarousel(mediaRule) === true ) ? true : false;
 		}
 	},
 
@@ -185,12 +188,14 @@ module.exports = Class.extend({
 	_windowResizedHandler: function () {
 		var actualAppliedMediaRule = this.mediaStylesProperties.actualAppliedMediaRule, height;
 		
-		if (this._isActiveForViewportWidth(window.innerWidth) === true && (actualAppliedMediaRule !== "noMediaRule")) {
-				height = window.innerWidth * parseInt(this.mediaStylesProperties.actualAppliedProperties.height, 10) / this.mediaStylesProperties.viewportWidth;
-		} else { //Default css behaviour
-				height = parseInt(this.mediaStylesProperties.actualAppliedProperties.height, 10);
+		if (this.mediaStylesProperties.actualAppliedProperties.height) {
+			if (this._isActiveForViewportWidth(window.innerWidth) === true && (actualAppliedMediaRule !== "noMediaRule")) {
+					height = window.innerWidth * parseInt(this.mediaStylesProperties.actualAppliedProperties.height, 10) / this.mediaStylesProperties.viewportWidth;
+			} else { //Default css behaviour
+					height = parseInt(this.mediaStylesProperties.actualAppliedProperties.height, 10);
+			}
+			this.$element.css('height', height + "px");
 		}
-		this.$element.css('height', height + "px");
 		if (this.mediaStylesProperties.actualAppliedProperties.width) {
 			this.$element.css('width', this.mediaStylesProperties.actualAppliedProperties.width);
 		}
