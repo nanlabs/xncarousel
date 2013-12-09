@@ -32,7 +32,7 @@ module.exports = (grunt) ->
 				default:
 						src: 'dist/jquery.xnCarousel.js',
 						amdModuleId: 'xnCarousel',
-						objectToExport: 'null'
+						objectToExport: 'wrapper'
 						globalAlias: 'xnCarousel'
 						template: 'template/umd/umd.hbs',
 						deps:
@@ -51,7 +51,7 @@ module.exports = (grunt) ->
 				src: 'src/js/jquery-wrapper.js',
 				dest: 'dist/<%= JQUERY_PLUGIN_JS %>.js'
 				options:
-					alias: ['src/js/jquery.shim.js:jquery', 'node_modules/resig-class/index.js:class']
+					alias: ['src/js/jquery-wrapper.js:wrapper', 'src/js/jquery.shim.js:jquery', 'node_modules/resig-class/index.js:class']
 			test:
 				src: 'test/automated/**/*.coffee'
 				dest: 'tmp/automated-tests.js'

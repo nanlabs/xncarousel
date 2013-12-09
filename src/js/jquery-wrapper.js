@@ -1,4 +1,6 @@
 /**
  * jQuery plugin wrapper
  */
-require('jquery-plugin-wrapper').wrap("xnCarousel", require('./carousel'), require('jquery'));
+var Carousel = require('./carousel');
+require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
+module.exports = Carousel;

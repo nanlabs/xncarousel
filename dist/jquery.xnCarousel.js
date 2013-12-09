@@ -1051,9 +1051,9 @@ MediaQueryWatcher.prototype = {
 
 // Exports the class
 module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":31,"./lib/matchMedia.addListener":30,"jquery":"H0VjM3"}],"class":[function(require,module,exports){
-module.exports=require('DSkb5a');
-},{}],"DSkb5a":[function(require,module,exports){
+},{"./lib/matchMedia":31,"./lib/matchMedia.addListener":30,"jquery":"6obL00"}],"class":[function(require,module,exports){
+module.exports=require('MFFfPr');
+},{}],"MFFfPr":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1512,7 +1512,7 @@ module.exports = Class.extend({
 
 });
 
-},{"browsernizr":1,"browsernizr/test/css/transitions":28,"class":"DSkb5a"}],37:[function(require,module,exports){
+},{"browsernizr":1,"browsernizr/test/css/transitions":28,"class":"MFFfPr"}],37:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -1674,7 +1674,7 @@ module.exports = Class.extend({
 	}
 });
 
-},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"DSkb5a","jquery":"H0VjM3"}],38:[function(require,module,exports){
+},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"MFFfPr","jquery":"6obL00"}],38:[function(require,module,exports){
 var AbstractStrategy = require('./abstract-strategy');
 
 module.exports = AbstractStrategy.extend({
@@ -2933,7 +2933,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":50,"./pagination/paging-module":53,"./responsive-module":54,"./util":55,"class":"DSkb5a","jquery":"H0VjM3"}],42:[function(require,module,exports){
+},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":51,"./pagination/paging-module":54,"./responsive-module":55,"./util":56,"class":"MFFfPr","jquery":"6obL00"}],42:[function(require,module,exports){
 /**
 * Returns a function which calls the specified function in the specified
 * scope.
@@ -3180,7 +3180,7 @@ var execute = function() {
 };
 
 module.exports = execute;
-},{"./util":55}],43:[function(require,module,exports){
+},{"./util":56}],43:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -3386,22 +3386,26 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"DSkb5a","jquery":"H0VjM3"}],44:[function(require,module,exports){
+},{"class":"MFFfPr","jquery":"6obL00"}],"8VJE8H":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
-require('jquery-plugin-wrapper').wrap("xnCarousel", require('./carousel'), require('jquery'));
+var Carousel = require('./carousel');
+require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
+module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"H0VjM3","jquery-plugin-wrapper":29}],"H0VjM3":[function(require,module,exports){
+},{"./carousel":41,"jquery":"6obL00","jquery-plugin-wrapper":29}],"wrapper":[function(require,module,exports){
+module.exports=require('8VJE8H');
+},{}],"jquery":[function(require,module,exports){
+module.exports=require('6obL00');
+},{}],"6obL00":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
  */
 module.exports = jQuery;
 
-},{}],"jquery":[function(require,module,exports){
-module.exports=require('H0VjM3');
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 var Class = require('class');
 
 module.exports = Class.extend({
@@ -3418,7 +3422,7 @@ module.exports = Class.extend({
 	
 });
 
-},{"class":"DSkb5a"}],48:[function(require,module,exports){
+},{"class":"MFFfPr"}],49:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3466,7 +3470,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":47,"./spinner":51,"jquery":"H0VjM3"}],49:[function(require,module,exports){
+},{"./abstract-strategy":48,"./spinner":52,"jquery":"6obL00"}],50:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3514,7 +3518,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":47,"./spinner":51,"jquery":"H0VjM3"}],50:[function(require,module,exports){
+},{"./abstract-strategy":48,"./spinner":52,"jquery":"6obL00"}],51:[function(require,module,exports){
 var Class = require('class');
 
 var LazyStrategy = require('./lazy-strategy');
@@ -3596,7 +3600,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./eager-strategy":48,"./lazy-strategy":49,"class":"DSkb5a"}],51:[function(require,module,exports){
+},{"./eager-strategy":49,"./lazy-strategy":50,"class":"MFFfPr"}],52:[function(require,module,exports){
 var Class = require('class'),
 SpinJs = require('spin.js'),
 $ = require('jquery');
@@ -3703,7 +3707,7 @@ module.exports = Class.extend({
     }
 });
 
-},{"class":"DSkb5a","jquery":"H0VjM3","spin.js":35}],52:[function(require,module,exports){
+},{"class":"MFFfPr","jquery":"6obL00","spin.js":35}],53:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -3807,7 +3811,7 @@ module.exports = Class.extend({
 
 });
 
-},{"class":"DSkb5a","jquery":"H0VjM3"}],53:[function(require,module,exports){
+},{"class":"MFFfPr","jquery":"6obL00"}],54:[function(require,module,exports){
 var Class = require('class');
 var PaginationIndicator = require('./paging-indicator.js');
 
@@ -4069,7 +4073,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./paging-indicator.js":52,"class":"DSkb5a"}],54:[function(require,module,exports){
+},{"./paging-indicator.js":53,"class":"MFFfPr"}],55:[function(require,module,exports){
 var Class = require('class'),
 MediaQueryWatcher = require('mediaquerywatcher'),
 $ = require('jquery');
@@ -4274,7 +4278,7 @@ module.exports = Class.extend({
 	}
 	
 });
-},{"class":"DSkb5a","jquery":"H0VjM3","mediaquerywatcher":32}],55:[function(require,module,exports){
+},{"class":"MFFfPr","jquery":"6obL00","mediaquerywatcher":32}],56:[function(require,module,exports){
 exports.getDependency = function(dependencies, name, defaultDep) {
 	dependencies = dependencies || {};
 	return dependencies[name] || defaultDep;
@@ -4368,6 +4372,7 @@ exports.isIE = function() {
   return (myNav.indexOf('msie') !== -1) ? parseInt(myNav.split('msie')[1], 10) : false;
 };
 
-},{}]},{},[44])
+},{}]},{},["8VJE8H"])
 ;
+return require('wrapper');
 }));

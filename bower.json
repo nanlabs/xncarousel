@@ -1,7 +1,7 @@
 {
 	"name": "xnCarousel",
 	"version": "0.1.0",
-	"main": ["dist/jquery.xnCarousel.min.js", "dist/jquery.xnCarousel.min.css"],
+	"main": ["dist/jquery.xnCarousel.min.js", "dist/jquery.xnCarousel.min.css", "jquery.xnCarousel.less"],
 	"private": true,
 	"ignore": [
 		"*",
