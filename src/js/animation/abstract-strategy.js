@@ -20,6 +20,8 @@ module.exports = Class.extend({
 
 	calculateItemOffset: function() {},
 
+	animatePartial: function() {},
+
 	getPixels: function ($element, cssAttr) {
 		var stringValue = $element[0].style[cssAttr];
 		if (stringValue[stringValue.length - 1] === '%') {

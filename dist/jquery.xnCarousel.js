@@ -1,15 +1,4 @@
-(function(root, factory) {
-    if(typeof exports === 'object') {
-        module.exports = factory(require('jquery'));
-    }
-    else if(typeof define === 'function' && define.amd) {
-        define('xnCarousel', ['jquery'], factory);
-    }
-    else {
-        root.xnCarousel = factory(root.jQuery);
-    }
-}(this, function(jQuery) {
-var require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Modernizr = require('./lib/Modernizr'),
     ModernizrProto = require('./lib/ModernizrProto'),
     classes = require('./lib/classes'),
@@ -1520,19 +1509,19 @@ var FadeStrategy = require('./fade-strategy');
 var SliderStrategy = require('./slider-strategy');
 var NoAnimationStrategy = require('./no-animation-strategy');
 
-/** 
+/**
  *	Module to control the carousel animation.
  *  Supports multiple animation types such as: slider, fade and none.
  *
- * @module carousel/animation 
+ * @module carousel/animation
  */
 module.exports = Class.extend({
 
 	/**
 	 * Initializes the animation module
 	 *
-	 * @param {Object} api Carousel API  
-	 * @param {object} options to initialize the module	 
+	 * @param {Object} api Carousel API
+	 * @param {object} options to initialize the module
 	 * @this {AnimationModule}
 	 */
 	init: function (api, options) {
@@ -1553,7 +1542,7 @@ module.exports = Class.extend({
 	 * Animates page transitions from pageFrom to pageTo
 	 *
 	 * @param {number} pageFrom Starting page to animate
-	 * @param {number} pageTo Ending page to animate	 
+	 * @param {number} pageTo Ending page to animate
 	 * @this {AnimationModule}
 	 */
 	animate: function (pageFrom, pageTo) {
@@ -1592,7 +1581,7 @@ module.exports = Class.extend({
 	/**
 	 * Sets the specified item to visible
 	 *
-	 * @param {Object} $item Jquery item element to be shown	 
+	 * @param {Object} $item Jquery item element to be shown
 	 * @this {AnimationModule}
 	 */
 	setItemVisible: function ($item) {
@@ -1642,6 +1631,14 @@ module.exports = Class.extend({
 	 */
 	supportsTouch: function() {
 		return this.animationStrategy.supportsTouch();
+	},
+
+	animatePartial: function() {
+		this.animationStrategy.animatePartial();
+	},
+
+	animateDragFinish: function() {
+
 	},
 
 	/**
@@ -2376,8 +2373,8 @@ module.exports = Class.extend({
 	_initDraggingModule: function () {
 
 		var dragModuleOptions = {
-			duringDragging: $.proxy(this.updatePageWhileDragging, this),
-			afterDragging: $.proxy(this.updatePageAfterDragging, this)
+			onDrag: $.proxy(this.updatePageWhileDragging, this),
+			onDragFinish: $.proxy(this.updatePageAfterDragging, this)
 		};
 
 		this.dragModule = new DragSupport(this.$overview, dragModuleOptions);
@@ -2708,7 +2705,7 @@ module.exports = Class.extend({
 			}
 		}
 
-		//Get carousel parents classes  
+		//Get carousel parents classes
 		if (!this.carouselSelectors) {
 			var classes = [], i, results = [], parents = this.$viewport.parentsUntil('html'),
 			carouselSelectors = getClasses(this.$viewport);
@@ -2726,7 +2723,7 @@ module.exports = Class.extend({
 					while ( combinations.push(i += 1) < classes.length ){}
 					combinations = getCombinations(combinations, '', '#');
 
-					//Get carousel classes  
+					//Get carousel classes
 					var indexes;
 					$.each(combinations, function(i, val){
 						indexes = val.split('#');
@@ -2851,23 +2848,21 @@ module.exports = Class.extend({
 	 * Updates the page while the dragging action is being performed
 	 *
 	 * @this {Carousel}
-	 * @param {$object} $element - Event target
-	 * @param {number} diff - Difference with the dragging distance.
+	 * @param {number} offset - The amount dragged.
 	 */
-	updatePageWhileDragging: function ($element, diff) {
+	updatePageWhileDragging: function (dragAmount) {
 		var currentOffset = this._getCurrentOffset();
 
 		var overviewWidth = this.$overview.width();
 
-		diff = (diff / overviewWidth) * overviewWidth;
-		diff = diff * 100 / overviewWidth;
+		var dragPcn = dragAmount * 100 / overviewWidth;
 
-		var positionDifference = (currentOffset - diff);
+		var positionDifference = (currentOffset - dragPcn);
 
-		console.log('updatePageWhileDragging, currentOffset: ' + this.$overview[0].style.left + ', difference: ' + diff);
+		console.log('updatePageWhileDragging, currentOffset: ' + this.$overview[0].style.left + ', difference: ' + dragPcn);
 
 		if (positionDifference >= 30 || positionDifference > -(this.size.contentWidth + 30)) {
-			$element.css('left', positionDifference + '%');
+			this.$overview.css('left', positionDifference + '%');
 			this._updateNavigators();
 		}
 	},
@@ -3195,8 +3190,8 @@ var DragSupport = Class.extend({
 
   init: function($element, options) {
 
-    this.updatePageWhileDragging = options.duringDragging;
-    this.updatePageAfterDragging = options.afterDragging;
+    this.onDrag = options.onDrag;
+    this.onDragFinish = options.onDragFinish;
 
     this.$element = $element;
 
@@ -3288,9 +3283,9 @@ var DragSupport = Class.extend({
 			return false;
     }
 
-    console.debug('Move touch handler, pageX: ' + this.currentPageX);
+    console.debug('Move touch handler, pageX:', this.currentPageX);
 
-    this.updatePageWhileDragging(this.$element, diff);
+    this.onDrag(diff);
 
     this.finishDragging = true;
 
@@ -3324,7 +3319,7 @@ var DragSupport = Class.extend({
       // The user wants to select and item
       $(event.target).trigger('itemTouched');
     } else {
-      this.updatePageAfterDragging(this.initialPageX, eventData);
+      this.onDragFinish(this.initialPageX, eventData);
     }
   },
 
@@ -3349,7 +3344,7 @@ var DragSupport = Class.extend({
       // The user wants to select and item
       $(event.target).trigger('itemTouched');
     } else {
-      this.updatePageAfterDragging(this.initialPageX, event);
+      this.onDragFinish(this.initialPageX, event);
     }
 
     return false;
@@ -3386,7 +3381,9 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"MFFfPr","jquery":"6obL00"}],"8VJE8H":[function(require,module,exports){
+},{"class":"MFFfPr","jquery":"6obL00"}],"wrapper":[function(require,module,exports){
+module.exports=require('8VJE8H');
+},{}],"8VJE8H":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3394,9 +3391,7 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"6obL00","jquery-plugin-wrapper":29}],"wrapper":[function(require,module,exports){
-module.exports=require('8VJE8H');
-},{}],"jquery":[function(require,module,exports){
+},{"./carousel":41,"jquery":"6obL00","jquery-plugin-wrapper":29}],"jquery":[function(require,module,exports){
 module.exports=require('6obL00');
 },{}],"6obL00":[function(require,module,exports){
 /**
@@ -4374,5 +4369,3 @@ exports.isIE = function() {
 
 },{}]},{},["8VJE8H"])
 ;
-return require('wrapper');
-}));

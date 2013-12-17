@@ -12,8 +12,8 @@ var DragSupport = Class.extend({
 
   init: function($element, options) {
 
-    this.updatePageWhileDragging = options.duringDragging;
-    this.updatePageAfterDragging = options.afterDragging;
+    this.onDrag = options.onDrag;
+    this.onDragFinish = options.onDragFinish;
 
     this.$element = $element;
 
@@ -105,9 +105,9 @@ var DragSupport = Class.extend({
 			return false;
     }
 
-    console.debug('Move touch handler, pageX: ' + this.currentPageX);
+    console.debug('Move touch handler, pageX:', this.currentPageX);
 
-    this.updatePageWhileDragging(this.$element, diff);
+    this.onDrag(diff);
 
     this.finishDragging = true;
 
@@ -141,7 +141,7 @@ var DragSupport = Class.extend({
       // The user wants to select and item
       $(event.target).trigger('itemTouched');
     } else {
-      this.updatePageAfterDragging(this.initialPageX, eventData);
+      this.onDragFinish(this.initialPageX, eventData);
     }
   },
 
@@ -166,7 +166,7 @@ var DragSupport = Class.extend({
       // The user wants to select and item
       $(event.target).trigger('itemTouched');
     } else {
-      this.updatePageAfterDragging(this.initialPageX, event);
+      this.onDragFinish(this.initialPageX, event);
     }
 
     return false;
