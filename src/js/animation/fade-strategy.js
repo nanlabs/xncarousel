@@ -58,6 +58,10 @@ module.exports = AbstractStrategy.extend({
 
 	supportsTouch: function() {
 		return true;
+	},
+
+	animatePartial: function($overview, pcn, $currentItem) {
+		$currentItem.css('opacity', (1 - Math.abs(pcn)));
 	}
 
 });

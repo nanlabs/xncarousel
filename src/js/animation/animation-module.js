@@ -129,8 +129,9 @@ module.exports = Class.extend({
 		return this.animationStrategy.supportsTouch();
 	},
 
-	animatePartial: function(pcn) {
-		this.animationStrategy.animatePartial(this.$overview, pcn);
+	animatePartial: function(pcn, currentPage) {
+		var $currentItems = this.carouselApi.getItemsForPage(currentPage);
+		this.animationStrategy.animatePartial(this.$overview, pcn, $currentItems);
 	},
 
 	/**

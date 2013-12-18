@@ -1033,8 +1033,7 @@ module.exports = Class.extend({
 		console.log('updatePageWhileDragging, currentOffset: ' + this.$overview[0].style.left + ', difference: ' + dragPcn);
 
 		if (positionDifference >= 30 || positionDifference > -(this.size.contentWidth + 30)) {
-			//this.$overview.css('left', positionDifference + '%');
-			this.animationModule.animatePartial(positionDifference);
+			this.animationModule.animatePartial(positionDifference, this.pagingModule.getCurrentPage());
 			this._updateNavigators();
 		}
 	},

@@ -101,8 +101,8 @@ var DragSupport = Class.extend({
     this.currentPageX = eventData.pageX;
 
     if (diff === 0) {
-		// Skip this event, is duplicated
-		return false;
+			// Skip this event, is duplicated
+			return false;
     }
 
     console.debug('Move touch handler, pageX:', this.currentPageX);
