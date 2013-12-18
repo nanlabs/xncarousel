@@ -133,10 +133,6 @@ module.exports = Class.extend({
 		this.animationStrategy.animatePartial(this.$overview, pcn);
 	},
 
-	animateDragFinish: function() {
-
-	},
-
 	/**
 	 * Gets the set animation strategy type
 	 *
