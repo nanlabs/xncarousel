@@ -49,6 +49,10 @@ module.exports = Class.extend({
 		return Math.ceil(this.carouselApi.getItemCount() / this.pageSize);
 	},
 
+	updatePageSize: function (pageSize) {
+		this.pageSize = pageSize;
+	},
+
 	/**
 	 * Returns the page number from the specified item index
 	 *

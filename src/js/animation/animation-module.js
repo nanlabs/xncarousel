@@ -34,6 +34,10 @@ module.exports = Class.extend({
 		this.animationStrategy = this._getStrategy();
 	},
 
+	updatePageSize: function (pageSize) {
+		this.pageSize = pageSize;
+	},
+
 	/**
 	 * Animates page transitions from pageFrom to pageTo
 	 *
@@ -103,7 +107,7 @@ module.exports = Class.extend({
 	initItem: function ($item) {
 		var itemOffset = this.calculateItemOffset($item);
 		this.animationStrategy.initItem($item);
-		$item.css({'left': itemOffset + '%' });
+		$item.css({'left': itemOffset + this.size.unitType });
 	},
 
 	/**

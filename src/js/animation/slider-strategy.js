@@ -42,7 +42,7 @@ module.exports = AbstractStrategy.extend({
 			callback.call(self);
 		};
 
-		position = position + '%';
+		position = position + this.animationObject.size.unitType;
 
 		if (this.Modernizr.csstransitions === true) {
 			$overview.css('transition', 'left ' + this.animationObject.animationSpeed + 'ms ease-out');
@@ -58,7 +58,7 @@ module.exports = AbstractStrategy.extend({
 	},
 
 	calculateItemOffset: function($item) {
-		return this.animationObject.size.itemWidthPct * $item.index();
+		return this.animationObject.size.initialItemWidth * $item.index();
 	},
 
 	supportsTouch: function() {

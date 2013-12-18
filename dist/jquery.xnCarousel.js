@@ -1051,9 +1051,9 @@ MediaQueryWatcher.prototype = {
 
 // Exports the class
 module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":31,"./lib/matchMedia.addListener":30,"jquery":"6obL00"}],"class":[function(require,module,exports){
-module.exports=require('MFFfPr');
-},{}],"MFFfPr":[function(require,module,exports){
+},{"./lib/matchMedia":31,"./lib/matchMedia.addListener":30,"jquery":"H0VjM3"}],"class":[function(require,module,exports){
+module.exports=require('DSkb5a');
+},{}],"DSkb5a":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1512,7 +1512,7 @@ module.exports = Class.extend({
 
 });
 
-},{"browsernizr":1,"browsernizr/test/css/transitions":28,"class":"MFFfPr"}],37:[function(require,module,exports){
+},{"browsernizr":1,"browsernizr/test/css/transitions":28,"class":"DSkb5a"}],37:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -1547,6 +1547,10 @@ module.exports = Class.extend({
 		this.pagingAnimation = false;
 
 		this.animationStrategy = this._getStrategy();
+	},
+
+	updatePageSize: function (pageSize) {
+		this.pageSize = pageSize;
 	},
 
 	/**
@@ -1618,7 +1622,7 @@ module.exports = Class.extend({
 	initItem: function ($item) {
 		var itemOffset = this.calculateItemOffset($item);
 		this.animationStrategy.initItem($item);
-		$item.css({'left': itemOffset + '%' });
+		$item.css({'left': itemOffset + this.size.unitType });
 	},
 
 	/**
@@ -1674,7 +1678,7 @@ module.exports = Class.extend({
 	}
 });
 
-},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"MFFfPr","jquery":"6obL00"}],38:[function(require,module,exports){
+},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"DSkb5a","jquery":"H0VjM3"}],38:[function(require,module,exports){
 var AbstractStrategy = require('./abstract-strategy');
 
 module.exports = AbstractStrategy.extend({
@@ -1696,7 +1700,7 @@ module.exports = AbstractStrategy.extend({
 
 	calculateItemOffset: function($item) {
 		var itemPositionWithinPage = $item.index() % this.animationObject.pageSize;
-		return this.animationObject.size.itemWidthPct * itemPositionWithinPage;
+		return this.animationObject.size.initialItemWidth * itemPositionWithinPage;
 	},
 
 	_animateItem: function ($currentItem, $nextItem) {
@@ -1711,8 +1715,9 @@ module.exports = AbstractStrategy.extend({
 
 			$nextItem.css('transition', '');
 			$nextItem.css('-webkit-transition', '');
-
-			$currentItem.css('opacity', 0);
+			if ($currentItem.css('z-index') === '0') {
+				$currentItem.css('opacity', 0);
+			}
 			callback.call(self);
 		};
 
@@ -1804,7 +1809,7 @@ module.exports = AbstractStrategy.extend({
 			callback.call(self);
 		};
 
-		position = position + '%';
+		position = position + this.animationObject.size.unitType;
 
 		if (this.Modernizr.csstransitions === true) {
 			$overview.css('transition', 'left ' + this.animationObject.animationSpeed + 'ms ease-out');
@@ -1820,7 +1825,7 @@ module.exports = AbstractStrategy.extend({
 	},
 
 	calculateItemOffset: function($item) {
-		return this.animationObject.size.itemWidthPct * $item.index();
+		return this.animationObject.size.initialItemWidth * $item.index();
 	},
 
 	supportsTouch: function() {
@@ -1892,10 +1897,17 @@ module.exports = Class.extend({
 		this.size = {
 			contentWidth: 0,
 			overviewWidth: 0,
-			itemWidthPct: 100 / this.settings.pageSize
+			initialItemWidth: this.settings.itemWidth ? this.settings.itemWidth : 100 / this.settings.pageSize,
+			unitType: this.settings.itemWidth ? "px" : "%"
 		};
 
+		//When the items width is fixed we need to update the paginator as the viewport size changes.
+		if (this.settings.itemWidth){
+			this.settings.pageSize = Math.ceil(this.$viewport.width() / this.settings.itemWidth);
+			$(window).resize($.proxy(this._updatePaginator, this));
+		}
 		this._initPaginationModule();
+
 		this._initializeResponsiveModule(this.settings.responsive);
 
 		this.leftIndicatorClickHandler = $.proxy(this.leftIndicatorClickHandler, this);
@@ -1905,7 +1917,6 @@ module.exports = Class.extend({
 	},
 
 	//*****************************Public API***************************************
-
 
 	/**
 	 * Enables the specified event with the handler
@@ -2329,7 +2340,8 @@ module.exports = Class.extend({
 			container: this.$viewport,
 			getItemCount: $.proxy(this.getItemCount, this),
 			getItemsForPage: $.proxy(this._getDOMItemsForPage, this),
-			getItemsForCurrentPage: $.proxy(this._getDOMItemsForCurrentPage, this)
+			getItemsForCurrentPage: $.proxy(this._getDOMItemsForCurrentPage, this),
+			getContainerSize: $.proxy(this._getCarouselSize, this)
 		};
 
 		this.pagingModule = new PaginationModule(api, {
@@ -2340,6 +2352,27 @@ module.exports = Class.extend({
 				this.goToPage(pageIndex);
 			}, this)
 		});
+	},
+
+	_updatePaginator: function () {
+		var pageSize = Math.ceil(this.$viewport.width() / this.settings.itemWidth);
+		if (pageSize !== this.settings.pageSize)  {
+			var actualPage = this.pagingModule.getCurrentPage(),
+			self = this;
+			this.settings.pageSize = pageSize;
+			this.$viewport.find('.pagination').remove();
+			this.pagingModule.updatePageSize(pageSize);
+			this.animationModule.updatePageSize(pageSize);
+			this.animationModule.updateAfterRemoval(this.$viewport.find('.carousel-item'));
+			this.pagingModule.renderIndicator();
+			setTimeout(function () {
+				self.goToPage(actualPage);
+			}, 0);
+		}
+	},
+
+	_getCarouselSize: function () {
+		return this.size;
 	},
 
 	_initAnimationModule: function () {
@@ -2465,7 +2498,7 @@ module.exports = Class.extend({
 
 	_processAddedItem: function($item) {
 		this.animationModule.initItem($item);
-		$item.css({'width': this.size.itemWidthPct + "%"});
+		$item.css({'width': this.size.initialItemWidth + this.size.unitType});
 	},
 
 	_hasNextPage: function () {
@@ -2933,7 +2966,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":51,"./pagination/paging-module":54,"./responsive-module":55,"./util":56,"class":"MFFfPr","jquery":"6obL00"}],42:[function(require,module,exports){
+},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":51,"./pagination/paging-module":54,"./responsive-module":55,"./util":56,"class":"DSkb5a","jquery":"H0VjM3"}],42:[function(require,module,exports){
 /**
 * Returns a function which calls the specified function in the specified
 * scope.
@@ -3386,7 +3419,7 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"MFFfPr","jquery":"6obL00"}],"8VJE8H":[function(require,module,exports){
+},{"class":"DSkb5a","jquery":"H0VjM3"}],"52u7fV":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3394,11 +3427,11 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"6obL00","jquery-plugin-wrapper":29}],"wrapper":[function(require,module,exports){
-module.exports=require('8VJE8H');
+},{"./carousel":41,"jquery":"H0VjM3","jquery-plugin-wrapper":29}],"wrapper":[function(require,module,exports){
+module.exports=require('52u7fV');
 },{}],"jquery":[function(require,module,exports){
-module.exports=require('6obL00');
-},{}],"6obL00":[function(require,module,exports){
+module.exports=require('H0VjM3');
+},{}],"H0VjM3":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
@@ -3422,7 +3455,7 @@ module.exports = Class.extend({
 	
 });
 
-},{"class":"MFFfPr"}],49:[function(require,module,exports){
+},{"class":"DSkb5a"}],49:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3470,7 +3503,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":48,"./spinner":52,"jquery":"6obL00"}],50:[function(require,module,exports){
+},{"./abstract-strategy":48,"./spinner":52,"jquery":"H0VjM3"}],50:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3518,7 +3551,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":48,"./spinner":52,"jquery":"6obL00"}],51:[function(require,module,exports){
+},{"./abstract-strategy":48,"./spinner":52,"jquery":"H0VjM3"}],51:[function(require,module,exports){
 var Class = require('class');
 
 var LazyStrategy = require('./lazy-strategy');
@@ -3600,7 +3633,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./eager-strategy":49,"./lazy-strategy":50,"class":"MFFfPr"}],52:[function(require,module,exports){
+},{"./eager-strategy":49,"./lazy-strategy":50,"class":"DSkb5a"}],52:[function(require,module,exports){
 var Class = require('class'),
 SpinJs = require('spin.js'),
 $ = require('jquery');
@@ -3707,7 +3740,7 @@ module.exports = Class.extend({
     }
 });
 
-},{"class":"MFFfPr","jquery":"6obL00","spin.js":35}],53:[function(require,module,exports){
+},{"class":"DSkb5a","jquery":"H0VjM3","spin.js":35}],53:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -3811,7 +3844,7 @@ module.exports = Class.extend({
 
 });
 
-},{"class":"MFFfPr","jquery":"6obL00"}],54:[function(require,module,exports){
+},{"class":"DSkb5a","jquery":"H0VjM3"}],54:[function(require,module,exports){
 var Class = require('class');
 var PaginationIndicator = require('./paging-indicator.js');
 
@@ -3861,6 +3894,10 @@ module.exports = Class.extend({
 	 */
 	getPageCount: function () {
 		return Math.ceil(this.carouselApi.getItemCount() / this.pageSize);
+	},
+
+	updatePageSize: function (pageSize) {
+		this.pageSize = pageSize;
 	},
 
 	/**
@@ -4073,7 +4110,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./paging-indicator.js":53,"class":"MFFfPr"}],55:[function(require,module,exports){
+},{"./paging-indicator.js":53,"class":"DSkb5a"}],55:[function(require,module,exports){
 var Class = require('class'),
 MediaQueryWatcher = require('mediaquerywatcher'),
 $ = require('jquery');
@@ -4278,7 +4315,7 @@ module.exports = Class.extend({
 	}
 	
 });
-},{"class":"MFFfPr","jquery":"6obL00","mediaquerywatcher":32}],56:[function(require,module,exports){
+},{"class":"DSkb5a","jquery":"H0VjM3","mediaquerywatcher":32}],56:[function(require,module,exports){
 exports.getDependency = function(dependencies, name, defaultDep) {
 	dependencies = dependencies || {};
 	return dependencies[name] || defaultDep;
@@ -4372,7 +4409,7 @@ exports.isIE = function() {
   return (myNav.indexOf('msie') !== -1) ? parseInt(myNav.split('msie')[1], 10) : false;
 };
 
-},{}]},{},["8VJE8H"])
+},{}]},{},["52u7fV"])
 ;
 return require('wrapper');
 }));

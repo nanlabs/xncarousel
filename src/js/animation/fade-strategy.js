@@ -19,7 +19,7 @@ module.exports = AbstractStrategy.extend({
 
 	calculateItemOffset: function($item) {
 		var itemPositionWithinPage = $item.index() % this.animationObject.pageSize;
-		return this.animationObject.size.itemWidthPct * itemPositionWithinPage;
+		return this.animationObject.size.initialItemWidth * itemPositionWithinPage;
 	},
 
 	_animateItem: function ($currentItem, $nextItem) {
@@ -34,8 +34,9 @@ module.exports = AbstractStrategy.extend({
 
 			$nextItem.css('transition', '');
 			$nextItem.css('-webkit-transition', '');
-
-			$currentItem.css('opacity', 0);
+			if ($currentItem.css('z-index') === '0') {
+				$currentItem.css('opacity', 0);
+			}
 			callback.call(self);
 		};
 

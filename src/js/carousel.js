@@ -60,10 +60,17 @@ module.exports = Class.extend({
 		this.size = {
 			contentWidth: 0,
 			overviewWidth: 0,
-			itemWidthPct: 100 / this.settings.pageSize
+			initialItemWidth: this.settings.itemWidth ? this.settings.itemWidth : 100 / this.settings.pageSize,
+			unitType: this.settings.itemWidth ? "px" : "%"
 		};
 
+		//When the items width is fixed we need to update the paginator as the viewport size changes.
+		if (this.settings.itemWidth){
+			this.settings.pageSize = Math.ceil(this.$viewport.width() / this.settings.itemWidth);
+			$(window).resize($.proxy(this._updatePaginator, this));
+		}
 		this._initPaginationModule();
+
 		this._initializeResponsiveModule(this.settings.responsive);
 
 		this.leftIndicatorClickHandler = $.proxy(this.leftIndicatorClickHandler, this);
@@ -73,7 +80,6 @@ module.exports = Class.extend({
 	},
 
 	//*****************************Public API***************************************
-
 
 	/**
 	 * Enables the specified event with the handler
@@ -497,7 +503,8 @@ module.exports = Class.extend({
 			container: this.$viewport,
 			getItemCount: $.proxy(this.getItemCount, this),
 			getItemsForPage: $.proxy(this._getDOMItemsForPage, this),
-			getItemsForCurrentPage: $.proxy(this._getDOMItemsForCurrentPage, this)
+			getItemsForCurrentPage: $.proxy(this._getDOMItemsForCurrentPage, this),
+			getContainerSize: $.proxy(this._getCarouselSize, this)
 		};
 
 		this.pagingModule = new PaginationModule(api, {
@@ -508,6 +515,27 @@ module.exports = Class.extend({
 				this.goToPage(pageIndex);
 			}, this)
 		});
+	},
+
+	_updatePaginator: function () {
+		var pageSize = Math.ceil(this.$viewport.width() / this.settings.itemWidth);
+		if (pageSize !== this.settings.pageSize)  {
+			var actualPage = this.pagingModule.getCurrentPage(),
+			self = this;
+			this.settings.pageSize = pageSize;
+			this.$viewport.find('.pagination').remove();
+			this.pagingModule.updatePageSize(pageSize);
+			this.animationModule.updatePageSize(pageSize);
+			this.animationModule.updateAfterRemoval(this.$viewport.find('.carousel-item'));
+			this.pagingModule.renderIndicator();
+			setTimeout(function () {
+				self.goToPage(actualPage);
+			}, 0);
+		}
+	},
+
+	_getCarouselSize: function () {
+		return this.size;
 	},
 
 	_initAnimationModule: function () {
@@ -633,7 +661,7 @@ module.exports = Class.extend({
 
 	_processAddedItem: function($item) {
 		this.animationModule.initItem($item);
-		$item.css({'width': this.size.itemWidthPct + "%"});
+		$item.css({'width': this.size.initialItemWidth + this.size.unitType});
 	},
 
 	_hasNextPage: function () {
