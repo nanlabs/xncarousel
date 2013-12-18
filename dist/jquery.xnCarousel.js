@@ -1752,7 +1752,7 @@ var NoAnimationStrategy = SliderStrategy.extend({
 		var callback = this.animationObject.afterAnimation;
 		var self = this.animationObject;
 
-		$overview.css('left', position + '%');
+		$overview.css('left', position + this.animationObject.size.unitType);
 
 		callback.call(self);
 	},
@@ -2365,6 +2365,7 @@ module.exports = Class.extend({
 			this.animationModule.updatePageSize(pageSize);
 			this.animationModule.updateAfterRemoval(this.$viewport.find('.carousel-item'));
 			this.pagingModule.renderIndicator();
+			this.pagingModule.pagingIndicator.select(actualPage);
 			setTimeout(function () {
 				self.goToPage(actualPage);
 			}, 0);
@@ -3419,7 +3420,9 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"DSkb5a","jquery":"H0VjM3"}],"52u7fV":[function(require,module,exports){
+},{"class":"DSkb5a","jquery":"H0VjM3"}],"wrapper":[function(require,module,exports){
+module.exports=require('52u7fV');
+},{}],"52u7fV":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3427,9 +3430,7 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"H0VjM3","jquery-plugin-wrapper":29}],"wrapper":[function(require,module,exports){
-module.exports=require('52u7fV');
-},{}],"jquery":[function(require,module,exports){
+},{"./carousel":41,"jquery":"H0VjM3","jquery-plugin-wrapper":29}],"jquery":[function(require,module,exports){
 module.exports=require('H0VjM3');
 },{}],"H0VjM3":[function(require,module,exports){
 /**

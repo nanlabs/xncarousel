@@ -6,7 +6,7 @@ var NoAnimationStrategy = SliderStrategy.extend({
 		var callback = this.animationObject.afterAnimation;
 		var self = this.animationObject;
 
-		$overview.css('left', position + '%');
+		$overview.css('left', position + this.animationObject.size.unitType);
 
 		callback.call(self);
 	},

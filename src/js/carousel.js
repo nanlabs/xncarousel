@@ -528,6 +528,7 @@ module.exports = Class.extend({
 			this.animationModule.updatePageSize(pageSize);
 			this.animationModule.updateAfterRemoval(this.$viewport.find('.carousel-item'));
 			this.pagingModule.renderIndicator();
+			this.pagingModule.pagingIndicator.select(actualPage);
 			setTimeout(function () {
 				self.goToPage(actualPage);
 			}, 0);
