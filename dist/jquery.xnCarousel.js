@@ -1488,6 +1488,8 @@ module.exports = Class.extend({
 
 	calculateItemOffset: function() {},
 
+	animatePartial: function() {},
+
 	getPixels: function ($element, cssAttr) {
 		var stringValue = $element[0].style[cssAttr];
 		if (stringValue[stringValue.length - 1] === '%') {
@@ -1633,8 +1635,8 @@ module.exports = Class.extend({
 		return this.animationStrategy.supportsTouch();
 	},
 
-	animatePartial: function() {
-		this.animationStrategy.animatePartial();
+	animatePartial: function(pcn) {
+		this.animationStrategy.animatePartial(this.$overview, pcn);
 	},
 
 	animateDragFinish: function() {
@@ -1731,8 +1733,9 @@ module.exports = AbstractStrategy.extend({
 	},
 
 	supportsTouch: function() {
-		return false;
+		return true;
 	}
+
 });
 
 },{"./abstract-strategy":36}],39:[function(require,module,exports){
@@ -1749,9 +1752,8 @@ var NoAnimationStrategy = SliderStrategy.extend({
 		callback.call(self);
 	},
 
-	supportsTouch: function () {
-		return false;
-	}
+	animatePartial: function() {}
+
 });
 
 module.exports = NoAnimationStrategy;
@@ -1822,6 +1824,10 @@ module.exports = AbstractStrategy.extend({
 
 	supportsTouch: function() {
 		return true;
+	},
+
+	animatePartial: function($overview, pcn) {
+		$overview.css('left', pcn + '%');
 	}
 
 });
@@ -2845,24 +2851,25 @@ module.exports = Class.extend({
 	},
 
 	/**
-	 * Updates the page while the dragging action is being performed
+	 * Handles the drag event
 	 *
 	 * @this {Carousel}
-	 * @param {number} offset - The amount dragged.
+	 * @param {number} amount - The amount dragged.
 	 */
-	updatePageWhileDragging: function (dragAmount) {
+	updatePageWhileDragging: function (amount) {
 		var currentOffset = this._getCurrentOffset();
 
 		var overviewWidth = this.$overview.width();
 
-		var dragPcn = dragAmount * 100 / overviewWidth;
+		var dragPcn = amount * 100 / overviewWidth;
 
 		var positionDifference = (currentOffset - dragPcn);
 
 		console.log('updatePageWhileDragging, currentOffset: ' + this.$overview[0].style.left + ', difference: ' + dragPcn);
 
 		if (positionDifference >= 30 || positionDifference > -(this.size.contentWidth + 30)) {
-			this.$overview.css('left', positionDifference + '%');
+			//this.$overview.css('left', positionDifference + '%');
+			this.animationModule.animatePartial(positionDifference);
 			this._updateNavigators();
 		}
 	},
@@ -3202,13 +3209,13 @@ var DragSupport = Class.extend({
     this.finishDragging = false;
 
     // Define proxies for each event handler to keep using this as the DragSupport instance.
-    this.startTouchHandlerProxy = $.proxy(this.startTouchHandler, this);
-    this.mouseDownHandlerProxy = $.proxy(this.mouseDownHandler, this);
+    this.startTouchHandler = $.proxy(this.startTouchHandler, this);
+    this.mouseDownHandler = $.proxy(this.mouseDownHandler, this);
 
-    this.dragHandlerProxy = $.proxy(this.dragHandler, this);
+    this.dragHandler = $.proxy(this.dragHandler, this);
 
-    this.endTouchHandlerProxy = $.proxy(this.endTouchHandler, this);
-    this.mouseUpHandlerProxy = $.proxy(this.mouseUpHandler, this);
+    this.endTouchHandler = $.proxy(this.endTouchHandler, this);
+    this.mouseUpHandler = $.proxy(this.mouseUpHandler, this);
 
     this._enableStartEvents();
   },
@@ -3230,13 +3237,13 @@ var DragSupport = Class.extend({
 
     var eventData = event.touches[0];
 
-    this.$element[0].ontouchmove = this.dragHandlerProxy;
-    this.$element[0].ontouchend = this.endTouchHandlerProxy;
-    this.$element[0].ontouchcancel = this.endTouchHandlerProxy;
+    this.$element[0].ontouchmove = this.dragHandler;
+    this.$element[0].ontouchend = this.endTouchHandler;
+    this.$element[0].ontouchcancel = this.endTouchHandler;
 
-    document.ontouchmove = this.dragHandlerProxy;
-    document.ontouchend = this.endTouchHandlerProxy;
-    document.ontouchcancel = this.endTouchHandlerProxy;
+    document.ontouchmove = this.dragHandler;
+    document.ontouchend = this.endTouchHandler;
+    document.ontouchcancel = this.endTouchHandler;
 
     console.debug('Start touch handler, pageX: ' + eventData.pageX);
 
@@ -3251,11 +3258,11 @@ var DragSupport = Class.extend({
 
     $( "body" ).addClass( "noSelect" );
 
-    this.$element.on('mousemove', this.dragHandlerProxy);
-    this.$element.on('mouseup', this.mouseUpHandlerProxy);
+    this.$element.on('mousemove', this.dragHandler);
+    this.$element.on('mouseup', this.mouseUpHandler);
 
-    $(document).on('mousemove', this.dragHandlerProxy);
-    $(document).on('mouseup', this.mouseUpHandlerProxy);
+    $(document).on('mousemove', this.dragHandler);
+    $(document).on('mouseup', this.mouseUpHandler);
 
     console.debug('Start touch handler, pageX: ' + event.pageX);
 
@@ -3279,8 +3286,8 @@ var DragSupport = Class.extend({
     this.currentPageX = eventData.pageX;
 
     if (diff === 0) {
-			// Skip this event, is duplicated
-			return false;
+		// Skip this event, is duplicated
+		return false;
     }
 
     console.debug('Move touch handler, pageX:', this.currentPageX);
@@ -3291,6 +3298,7 @@ var DragSupport = Class.extend({
 
     return false;
   },
+
 
   endTouchHandler: function(event) {
 
@@ -3334,10 +3342,10 @@ var DragSupport = Class.extend({
 
     $( "body" ).removeClass( "noSelect" );
 
-    this.$element.off('mousemove', this.dragHandlerProxy);
-    this.$element.off('mouseup', this.mouseUpHandlerProxy);
-    $(document).off('mousemove', this.dragHandlerProxy);
-    $(document).off('mouseup', this.mouseUpHandlerProxy);
+    this.$element.off('mousemove', this.dragHandler);
+    this.$element.off('mouseup', this.mouseUpHandler);
+    $(document).off('mousemove', this.dragHandler);
+    $(document).off('mouseup', this.mouseUpHandler);
 
     // If user is not dragging and the delay between touch down and up is small enough, consider it a 'click'
     if ( (diffPosition === 0) && (timeDiff > 0 && timeDiff < this.touchClickDelayMS) ) {
@@ -3352,9 +3360,9 @@ var DragSupport = Class.extend({
 
   _enableStartEvents: function() {
 		if (this.isTouchDevice()) {
-      this.$element[0].ontouchstart = this.startTouchHandlerProxy;
+      this.$element[0].ontouchstart = this.startTouchHandler;
     } else {
-      this.$element.on('mousedown', this.mouseDownHandlerProxy);
+      this.$element.on('mousedown', this.mouseDownHandler);
     }
   },
 
@@ -3362,7 +3370,7 @@ var DragSupport = Class.extend({
 		if (this.isTouchDevice()) {
       this.$element[0].ontouchstart = null;
     } else {
-      this.$element.off('mousedown', this.mouseDownHandlerProxy);
+      this.$element.off('mousedown', this.mouseDownHandler);
     }
   },
 
@@ -3381,9 +3389,7 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"MFFfPr","jquery":"6obL00"}],"wrapper":[function(require,module,exports){
-module.exports=require('8VJE8H');
-},{}],"8VJE8H":[function(require,module,exports){
+},{"class":"MFFfPr","jquery":"6obL00"}],"8VJE8H":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3391,7 +3397,9 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"6obL00","jquery-plugin-wrapper":29}],"jquery":[function(require,module,exports){
+},{"./carousel":41,"jquery":"6obL00","jquery-plugin-wrapper":29}],"wrapper":[function(require,module,exports){
+module.exports=require('8VJE8H');
+},{}],"jquery":[function(require,module,exports){
 module.exports=require('6obL00');
 },{}],"6obL00":[function(require,module,exports){
 /**

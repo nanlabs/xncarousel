@@ -1016,17 +1016,17 @@ module.exports = Class.extend({
 	},
 
 	/**
-	 * Updates the page while the dragging action is being performed
+	 * Handles the drag event and delegates the page update to the animation module
 	 *
 	 * @this {Carousel}
-	 * @param {number} offset - The amount dragged.
+	 * @param {number} amount - The amount dragged.
 	 */
-	updatePageWhileDragging: function (dragAmount) {
+	updatePageWhileDragging: function (amount) {
 		var currentOffset = this._getCurrentOffset();
 
 		var overviewWidth = this.$overview.width();
 
-		var dragPcn = dragAmount * 100 / overviewWidth;
+		var dragPcn = amount * 100 / overviewWidth;
 
 		var positionDifference = (currentOffset - dragPcn);
 

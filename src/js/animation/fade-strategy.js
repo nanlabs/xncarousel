@@ -57,10 +57,7 @@ module.exports = AbstractStrategy.extend({
 	},
 
 	supportsTouch: function() {
-		return false;
-	},
-
-	animatePartial: function($overview, pcn) {
-		$overview.css('left', positionDifference + '%');
+		return true;
 	}
+
 });

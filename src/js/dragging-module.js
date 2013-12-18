@@ -24,13 +24,13 @@ var DragSupport = Class.extend({
     this.finishDragging = false;
 
     // Define proxies for each event handler to keep using this as the DragSupport instance.
-    this.startTouchHandlerProxy = $.proxy(this.startTouchHandler, this);
-    this.mouseDownHandlerProxy = $.proxy(this.mouseDownHandler, this);
+    this.startTouchHandler = $.proxy(this.startTouchHandler, this);
+    this.mouseDownHandler = $.proxy(this.mouseDownHandler, this);
 
-    this.dragHandlerProxy = $.proxy(this.dragHandler, this);
+    this.dragHandler = $.proxy(this.dragHandler, this);
 
-    this.endTouchHandlerProxy = $.proxy(this.endTouchHandler, this);
-    this.mouseUpHandlerProxy = $.proxy(this.mouseUpHandler, this);
+    this.endTouchHandler = $.proxy(this.endTouchHandler, this);
+    this.mouseUpHandler = $.proxy(this.mouseUpHandler, this);
 
     this._enableStartEvents();
   },
@@ -52,13 +52,13 @@ var DragSupport = Class.extend({
 
     var eventData = event.touches[0];
 
-    this.$element[0].ontouchmove = this.dragHandlerProxy;
-    this.$element[0].ontouchend = this.endTouchHandlerProxy;
-    this.$element[0].ontouchcancel = this.endTouchHandlerProxy;
+    this.$element[0].ontouchmove = this.dragHandler;
+    this.$element[0].ontouchend = this.endTouchHandler;
+    this.$element[0].ontouchcancel = this.endTouchHandler;
 
-    document.ontouchmove = this.dragHandlerProxy;
-    document.ontouchend = this.endTouchHandlerProxy;
-    document.ontouchcancel = this.endTouchHandlerProxy;
+    document.ontouchmove = this.dragHandler;
+    document.ontouchend = this.endTouchHandler;
+    document.ontouchcancel = this.endTouchHandler;
 
     console.debug('Start touch handler, pageX: ' + eventData.pageX);
 
@@ -73,11 +73,11 @@ var DragSupport = Class.extend({
 
     $( "body" ).addClass( "noSelect" );
 
-    this.$element.on('mousemove', this.dragHandlerProxy);
-    this.$element.on('mouseup', this.mouseUpHandlerProxy);
+    this.$element.on('mousemove', this.dragHandler);
+    this.$element.on('mouseup', this.mouseUpHandler);
 
-    $(document).on('mousemove', this.dragHandlerProxy);
-    $(document).on('mouseup', this.mouseUpHandlerProxy);
+    $(document).on('mousemove', this.dragHandler);
+    $(document).on('mouseup', this.mouseUpHandler);
 
     console.debug('Start touch handler, pageX: ' + event.pageX);
 
@@ -101,8 +101,8 @@ var DragSupport = Class.extend({
     this.currentPageX = eventData.pageX;
 
     if (diff === 0) {
-			// Skip this event, is duplicated
-			return false;
+		// Skip this event, is duplicated
+		return false;
     }
 
     console.debug('Move touch handler, pageX:', this.currentPageX);
@@ -113,6 +113,7 @@ var DragSupport = Class.extend({
 
     return false;
   },
+
 
   endTouchHandler: function(event) {
 
@@ -156,10 +157,10 @@ var DragSupport = Class.extend({
 
     $( "body" ).removeClass( "noSelect" );
 
-    this.$element.off('mousemove', this.dragHandlerProxy);
-    this.$element.off('mouseup', this.mouseUpHandlerProxy);
-    $(document).off('mousemove', this.dragHandlerProxy);
-    $(document).off('mouseup', this.mouseUpHandlerProxy);
+    this.$element.off('mousemove', this.dragHandler);
+    this.$element.off('mouseup', this.mouseUpHandler);
+    $(document).off('mousemove', this.dragHandler);
+    $(document).off('mouseup', this.mouseUpHandler);
 
     // If user is not dragging and the delay between touch down and up is small enough, consider it a 'click'
     if ( (diffPosition === 0) && (timeDiff > 0 && timeDiff < this.touchClickDelayMS) ) {
@@ -174,9 +175,9 @@ var DragSupport = Class.extend({
 
   _enableStartEvents: function() {
 		if (this.isTouchDevice()) {
-      this.$element[0].ontouchstart = this.startTouchHandlerProxy;
+      this.$element[0].ontouchstart = this.startTouchHandler;
     } else {
-      this.$element.on('mousedown', this.mouseDownHandlerProxy);
+      this.$element.on('mousedown', this.mouseDownHandler);
     }
   },
 
@@ -184,7 +185,7 @@ var DragSupport = Class.extend({
 		if (this.isTouchDevice()) {
       this.$element[0].ontouchstart = null;
     } else {
-      this.$element.off('mousedown', this.mouseDownHandlerProxy);
+      this.$element.off('mousedown', this.mouseDownHandler);
     }
   },
 

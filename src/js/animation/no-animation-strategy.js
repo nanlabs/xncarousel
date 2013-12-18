@@ -11,9 +11,8 @@ var NoAnimationStrategy = SliderStrategy.extend({
 		callback.call(self);
 	},
 
-	supportsTouch: function () {
-		return false;
-	}
+	animatePartial: function() {}
+
 });
 
 module.exports = NoAnimationStrategy;
