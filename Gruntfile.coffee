@@ -11,8 +11,7 @@ module.exports = (grunt) ->
 	## Metadata.
 		pkg: grunt.file.readJSON 'package.json'
 
-		OUTPUT_JS: '<%= pkg.name%>'
-		JQUERY_PLUGIN_JS: 'jquery.<%= OUTPUT_JS %>'
+		OUTPUT_JS: 'jquery.<%= pkg.name %>'
 		banner: '/*! <%= pkg.name %> - v<%=pkg.version%> - ' +
 		'<%= grunt.template.today("yyyy-mm-dd") %>\n' +
 		'<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
@@ -27,11 +26,11 @@ module.exports = (grunt) ->
 			server: options: { message: 'Server running' }
 			test: options: { message: 'Tests passed successfully' }
 			build: options: { message: 'Build Complete' }
+			build_no_tests: options: { message: 'Build Complete (WITHOUT TESTING)' }
 
 		umd:
 				default:
 						src: 'dist/jquery.xnCarousel.js',
-						amdModuleId: 'xnCarousel',
 						objectToExport: 'wrapper'
 						globalAlias: 'xnCarousel'
 						template: 'template/umd/umd.hbs',
@@ -42,14 +41,8 @@ module.exports = (grunt) ->
 
 		browserify:
 			src:
-				src: 'src/js/carousel.js'
-				dest: 'dist/<%= OUTPUT_JS %>.js'
-				options:
-					alias: ['src/js/jquery.shim.js:jquery', 'node_modules/resig-class/index.js:class', 'src/js/carousel.js:xnCarousel']
-					debug: true
-			plugin:
 				src: 'src/js/jquery-wrapper.js',
-				dest: 'dist/<%= JQUERY_PLUGIN_JS %>.js'
+				dest: 'dist/<%= OUTPUT_JS %>.js'
 				options:
 					alias: ['src/js/jquery-wrapper.js:wrapper', 'src/js/jquery.shim.js:jquery', 'node_modules/resig-class/index.js:class']
 			test:
@@ -69,19 +62,18 @@ module.exports = (grunt) ->
 		less:
 			dist:
 				options: yuicompress: true
-				files: ['dist/<%= OUTPUT_JS %>.min.css': 'src/less/style.less', 'dist/<%= JQUERY_PLUGIN_JS %>.min.css': 'src/less/style.less']
+				files: ['dist/<%= OUTPUT_JS %>.min.css': 'src/less/style.less']
 
 		uglify:
 			options:
 				banner: '<%= banner %>'
 			dist:
-				files: ['dist/<%= OUTPUT_JS %>.min.js': 'dist/<%= OUTPUT_JS %>.js', 'dist/<%= JQUERY_PLUGIN_JS %>.min.js': 'dist/<%= JQUERY_PLUGIN_JS %>.js']
+				files: ['dist/<%= OUTPUT_JS %>.min.js': 'dist/<%= OUTPUT_JS %>.js']
 
 	## Automated testing
 		testem:
 			main:
 				options:
-					before_tests: 'grunt compile'
 					src_files: ['<%= jshint.src.src %>', 'test/automated/**/*']
 					parallel: 8,
 					test_page: 'test/automated/runner.html',
@@ -139,7 +131,7 @@ module.exports = (grunt) ->
 					src: ['src/less/style.less'],
 					dest: 'dist'
 					rename: (dest) ->
-						"#{dest}/jquery.<%= OUTPUT_JS %>.less"
+						"#{dest}/<%= OUTPUT_JS %>.less"
 				]
 
 		connect:
@@ -161,33 +153,48 @@ module.exports = (grunt) ->
 			coverage:
 				path: "http://localhost:#{serverPort}/test/automated/code-coverage.html"
 
-	## These plugins provide necessary tasks.
+
+	## Aux Plugins.
 	grunt.loadNpmTasks 'grunt-contrib-clean'
 	grunt.loadNpmTasks 'grunt-contrib-copy'
+
+	# Compilation plugins
 	grunt.loadNpmTasks 'grunt-contrib-less'
 	grunt.loadNpmTasks 'grunt-contrib-uglify'
+	grunt.loadNpmTasks 'grunt-browserify'
+	grunt.loadNpmTasks 'grunt-umd'
+
+	## Used for linting
 	grunt.loadNpmTasks 'grunt-contrib-jshint'
 	grunt.loadNpmTasks 'grunt-coffeelint'
+
+	## Dev environment plugins
 	grunt.loadNpmTasks 'grunt-contrib-watch'
 	grunt.loadNpmTasks 'grunt-contrib-connect'
 	grunt.loadNpmTasks 'grunt-notify'
-	grunt.loadNpmTasks 'grunt-browserify'
-	grunt.loadNpmTasks 'grunt-umd'
 	grunt.loadNpmTasks 'grunt-open'
 
-	## Used for automated testing
-	grunt.loadNpmTasks 'grunt-contrib-testem'
-	grunt.loadNpmTasks 'grunt-mocha'
+	## Report pluings
 	grunt.loadNpmTasks 'grunt-jsdoc'
 
-	## Default task.
-	grunt.registerTask 'compile', ['clean', 'jshint', 'coffeelint', 'browserify', 'umd']
-	grunt.registerTask 'test', ['compile', 'mocha']
-	grunt.registerTask 'default', ['test']
-	grunt.registerTask 'test-all', ['testem:run:main', 'notify:test']
-	grunt.registerTask 'coverage', ['compile', 'open:coverage', 'connect:demo']
-	grunt.registerTask 'build', ['less', 'copy:less', 'uglify', 'notify:build']
-	grunt.registerTask 'pre-commit', ['compile', 'testem:ci:main', 'build', 'clean:tmp']
-	grunt.registerTask 'dev', ['compile', 'connect:dev', 'notify:server', 'open:dev', 'watch']
-	grunt.registerTask 'demo',
-		['compile', 'build', 'copy:demo', 'clean:tmp', 'notify:server', 'open:demo', 'connect:demo']
+	## Testing plugins
+	grunt.loadNpmTasks 'grunt-contrib-testem'
+	grunt.loadNpmTasks 'grunt-mocha'
+
+
+	## Internal tasks
+	grunt.registerTask '_compile', ['clean', 'jshint', 'coffeelint', 'browserify', 'umd']
+	grunt.registerTask '_package', ['less', 'copy:less', 'uglify', 'clean:tmp']
+
+	# Partial (dev) tasks
+	grunt.registerTask 'test', ['_compile', 'mocha', 'clean:tmp', 'notify:test']
+	grunt.registerTask 'test-browsers', ['_compile', 'testem:ci:main', 'clean:tmp', 'notify:test']
+	grunt.registerTask 'coverage', ['_compile', 'open:coverage', 'connect:demo']
+	grunt.registerTask 'dev', ['_compile', 'connect:dev', 'notify:server', 'open:dev', 'watch']
+
+	# Full build tasks
+	grunt.registerTask 'pre-commit', ['test-browsers', '_package', 'notify:build']
+	grunt.registerTask 'build-no-tests', ['_compile', '_package', 'notify:build_no_tests']
+
+	## Default task
+	grunt.registerTask 'default', ['test', '_package', 'notify:build']

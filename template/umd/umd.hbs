@@ -9,6 +9,7 @@
         root.{{globalAlias}} = factory({{{globalDependencies}}});
     }
 }(this, function({{dependencies}}) {
-var {{{code}}}
+var require = {};
+{{{code}}}
 return require('{{objectToExport}}');
 }));
