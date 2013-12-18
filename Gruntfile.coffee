@@ -28,23 +28,16 @@ module.exports = (grunt) ->
 			build: options: { message: 'Build Complete' }
 			build_no_tests: options: { message: 'Build Complete (WITHOUT TESTING)' }
 
-		umd:
-				default:
-						src: 'dist/jquery.xnCarousel.js',
-						objectToExport: 'wrapper'
-						globalAlias: 'xnCarousel'
-						template: 'template/umd/umd.hbs',
-						deps:
-							'default': ['jQuery']
-							amd: ['jquery']
-							cjs: ['jquery']
-
 		browserify:
 			src:
 				src: 'src/js/jquery-wrapper.js',
 				dest: 'dist/<%= OUTPUT_JS %>.js'
 				options:
 					alias: ['src/js/jquery-wrapper.js:wrapper', 'src/js/jquery.shim.js:jquery', 'node_modules/resig-class/index.js:class']
+					postBundleCB: (err, src, next) ->
+						src = "(function(window, jQuery) {\nvar require;\n#{src}\n})(this, jQuery);"
+						next(err, src)
+
 			test:
 				src: 'test/automated/**/*.coffee'
 				dest: 'tmp/automated-tests.js'
@@ -162,7 +155,6 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-less'
 	grunt.loadNpmTasks 'grunt-contrib-uglify'
 	grunt.loadNpmTasks 'grunt-browserify'
-	grunt.loadNpmTasks 'grunt-umd'
 
 	## Used for linting
 	grunt.loadNpmTasks 'grunt-contrib-jshint'
@@ -183,7 +175,7 @@ module.exports = (grunt) ->
 
 
 	## Internal tasks
-	grunt.registerTask '_compile', ['clean', 'jshint', 'coffeelint', 'browserify', 'umd']
+	grunt.registerTask '_compile', ['clean', 'jshint', 'coffeelint', 'browserify']
 	grunt.registerTask '_package', ['less', 'copy:less', 'uglify', 'clean:tmp']
 
 	# Partial (dev) tasks

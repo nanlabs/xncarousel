@@ -1,15 +1,5 @@
-(function(root, factory) {
-    if(typeof exports === 'object') {
-        module.exports = factory(require('jquery'));
-    }
-    else if(typeof define === 'function' && define.amd) {
-        define(['jquery'], factory);
-    }
-    else {
-        root.xnCarousel = factory(root.jQuery);
-    }
-}(this, function(jQuery) {
-var require = {};
+(function(window, jQuery) {
+var require;
 require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 //fgnass.github.com/spin.js#v1.3.2
 
@@ -1406,7 +1396,9 @@ MediaQueryWatcher.prototype = {
 
 // Exports the class
 module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"6obL00"}],"MFFfPr":[function(require,module,exports){
+},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"6obL00"}],"class":[function(require,module,exports){
+module.exports=require('MFFfPr');
+},{}],"MFFfPr":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1472,8 +1464,6 @@ module.exports = MediaQueryWatcher;
 })();
 
 module.exports = Class;
-},{}],"class":[function(require,module,exports){
-module.exports=require('MFFfPr');
 },{}],36:[function(require,module,exports){
 var Class = require('class');
 require('browsernizr/test/css/transitions');
@@ -3418,7 +3408,9 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"MFFfPr","jquery":"6obL00"}],"8VJE8H":[function(require,module,exports){
+},{"class":"MFFfPr","jquery":"6obL00"}],"wrapper":[function(require,module,exports){
+module.exports=require('8VJE8H');
+},{}],"8VJE8H":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3426,9 +3418,7 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"6obL00","jquery-plugin-wrapper":30}],"wrapper":[function(require,module,exports){
-module.exports=require('8VJE8H');
-},{}],"jquery":[function(require,module,exports){
+},{"./carousel":41,"jquery":"6obL00","jquery-plugin-wrapper":30}],"jquery":[function(require,module,exports){
 module.exports=require('6obL00');
 },{}],"6obL00":[function(require,module,exports){
 /**
@@ -4410,5 +4400,4 @@ exports.isIE = function() {
 
 },{}]},{},["8VJE8H"])
 ;
-return require('wrapper');
-}));
+})(this, jQuery);
