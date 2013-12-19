@@ -530,7 +530,8 @@ module.exports = Class.extend({
 			this.pagingModule.renderIndicator();
 			this.pagingModule.pagingIndicator.select(actualPage);
 			setTimeout(function () {
-				self.goToPage(actualPage);
+				var pageCount = self.$viewport.find('.pagination .item-container').children().length;
+				self.goToPage(actualPage < pageCount ? actualPage : pageCount - 1);
 			}, 0);
 		}
 	},
