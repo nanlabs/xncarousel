@@ -5,19 +5,19 @@ var FadeStrategy = require('./fade-strategy');
 var SliderStrategy = require('./slider-strategy');
 var NoAnimationStrategy = require('./no-animation-strategy');
 
-/** 
+/**
  *	Module to control the carousel animation.
  *  Supports multiple animation types such as: slider, fade and none.
  *
- * @module carousel/animation 
+ * @module carousel/animation
  */
 module.exports = Class.extend({
 
 	/**
 	 * Initializes the animation module
 	 *
-	 * @param {Object} api Carousel API  
-	 * @param {object} options to initialize the module	 
+	 * @param {Object} api Carousel API
+	 * @param {object} options to initialize the module
 	 * @this {AnimationModule}
 	 */
 	init: function (api, options) {
@@ -42,7 +42,7 @@ module.exports = Class.extend({
 	 * Animates page transitions from pageFrom to pageTo
 	 *
 	 * @param {number} pageFrom Starting page to animate
-	 * @param {number} pageTo Ending page to animate	 
+	 * @param {number} pageTo Ending page to animate
 	 * @this {AnimationModule}
 	 */
 	animate: function (pageFrom, pageTo) {
@@ -81,7 +81,7 @@ module.exports = Class.extend({
 	/**
 	 * Sets the specified item to visible
 	 *
-	 * @param {Object} $item Jquery item element to be shown	 
+	 * @param {Object} $item Jquery item element to be shown
 	 * @this {AnimationModule}
 	 */
 	setItemVisible: function ($item) {
@@ -131,6 +131,10 @@ module.exports = Class.extend({
 	 */
 	supportsTouch: function() {
 		return this.animationStrategy.supportsTouch();
+	},
+
+	animatePartial: function(pcn) {
+		this.animationStrategy.animatePartial(this.$overview, pcn, this.carouselApi.getItemsForCurrentPage());
 	},
 
 	/**

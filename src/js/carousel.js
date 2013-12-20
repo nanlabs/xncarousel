@@ -574,8 +574,8 @@ module.exports = Class.extend({
 	_initDraggingModule: function () {
 
 		var dragModuleOptions = {
-			duringDragging: $.proxy(this.updatePageWhileDragging, this),
-			afterDragging: $.proxy(this.updatePageAfterDragging, this)
+			onDrag: $.proxy(this.updatePageWhileDragging, this),
+			onDragFinish: $.proxy(this.updatePageAfterDragging, this)
 		};
 
 		this.dragModule = new DragSupport(this.$overview, dragModuleOptions);
@@ -906,7 +906,7 @@ module.exports = Class.extend({
 			}
 		}
 
-		//Get carousel parents classes  
+		//Get carousel parents classes
 		if (!this.carouselSelectors) {
 			var classes = [], i, results = [], parents = this.$viewport.parentsUntil('html'),
 			carouselSelectors = getClasses(this.$viewport);
@@ -924,7 +924,7 @@ module.exports = Class.extend({
 					while ( combinations.push(i += 1) < classes.length ){}
 					combinations = getCombinations(combinations, '', '#');
 
-					//Get carousel classes  
+					//Get carousel classes
 					var indexes;
 					$.each(combinations, function(i, val){
 						indexes = val.split('#');
@@ -1046,26 +1046,24 @@ module.exports = Class.extend({
 	},
 
 	/**
-	 * Updates the page while the dragging action is being performed
+	 * Handles the drag event and delegates the page update to the animation module
 	 *
 	 * @this {Carousel}
-	 * @param {$object} $element - Event target
-	 * @param {number} diff - Difference with the dragging distance.
+	 * @param {number} amount - The amount dragged.
 	 */
-	updatePageWhileDragging: function ($element, diff) {
+	updatePageWhileDragging: function (amount) {
 		var currentOffset = this._getCurrentOffset();
 
 		var overviewWidth = this.$overview.width();
 
-		diff = (diff / overviewWidth) * overviewWidth;
-		diff = diff * 100 / overviewWidth;
+		var dragPcn = amount * 100 / overviewWidth;
 
-		var positionDifference = (currentOffset - diff);
+		var positionDifference = (currentOffset - dragPcn);
 
-		console.log('updatePageWhileDragging, currentOffset: ' + this.$overview[0].style.left + ', difference: ' + diff);
+		console.log('updatePageWhileDragging, currentOffset: ' + this.$overview[0].style.left + ', difference: ' + dragPcn);
 
 		if (positionDifference >= 30 || positionDifference > -(this.size.contentWidth + 30)) {
-			$element.css('left', positionDifference + '%');
+			this.animationModule.animatePartial(positionDifference);
 			this._updateNavigators();
 		}
 	},

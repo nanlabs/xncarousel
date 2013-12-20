@@ -1396,9 +1396,9 @@ MediaQueryWatcher.prototype = {
 
 // Exports the class
 module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"H0VjM3"}],"class":[function(require,module,exports){
-module.exports=require('DSkb5a');
-},{}],"DSkb5a":[function(require,module,exports){
+},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"6obL00"}],"class":[function(require,module,exports){
+module.exports=require('MFFfPr');
+},{}],"MFFfPr":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1487,6 +1487,8 @@ module.exports = Class.extend({
 
 	calculateItemOffset: function() {},
 
+	animatePartial: function() {},
+
 	getPixels: function ($element, cssAttr) {
 		var stringValue = $element[0].style[cssAttr];
 		if (stringValue[stringValue.length - 1] === '%') {
@@ -1500,7 +1502,7 @@ module.exports = Class.extend({
 
 });
 
-},{"browsernizr":2,"browsernizr/test/css/transitions":29,"class":"DSkb5a"}],37:[function(require,module,exports){
+},{"browsernizr":2,"browsernizr/test/css/transitions":29,"class":"MFFfPr"}],37:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -1508,19 +1510,19 @@ var FadeStrategy = require('./fade-strategy');
 var SliderStrategy = require('./slider-strategy');
 var NoAnimationStrategy = require('./no-animation-strategy');
 
-/** 
+/**
  *	Module to control the carousel animation.
  *  Supports multiple animation types such as: slider, fade and none.
  *
- * @module carousel/animation 
+ * @module carousel/animation
  */
 module.exports = Class.extend({
 
 	/**
 	 * Initializes the animation module
 	 *
-	 * @param {Object} api Carousel API  
-	 * @param {object} options to initialize the module	 
+	 * @param {Object} api Carousel API
+	 * @param {object} options to initialize the module
 	 * @this {AnimationModule}
 	 */
 	init: function (api, options) {
@@ -1545,7 +1547,7 @@ module.exports = Class.extend({
 	 * Animates page transitions from pageFrom to pageTo
 	 *
 	 * @param {number} pageFrom Starting page to animate
-	 * @param {number} pageTo Ending page to animate	 
+	 * @param {number} pageTo Ending page to animate
 	 * @this {AnimationModule}
 	 */
 	animate: function (pageFrom, pageTo) {
@@ -1584,7 +1586,7 @@ module.exports = Class.extend({
 	/**
 	 * Sets the specified item to visible
 	 *
-	 * @param {Object} $item Jquery item element to be shown	 
+	 * @param {Object} $item Jquery item element to be shown
 	 * @this {AnimationModule}
 	 */
 	setItemVisible: function ($item) {
@@ -1636,6 +1638,10 @@ module.exports = Class.extend({
 		return this.animationStrategy.supportsTouch();
 	},
 
+	animatePartial: function(pcn) {
+		this.animationStrategy.animatePartial(this.$overview, pcn, this.carouselApi.getItemsForCurrentPage());
+	},
+
 	/**
 	 * Gets the set animation strategy type
 	 *
@@ -1666,7 +1672,7 @@ module.exports = Class.extend({
 	}
 });
 
-},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"DSkb5a","jquery":"H0VjM3"}],38:[function(require,module,exports){
+},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"MFFfPr","jquery":"6obL00"}],38:[function(require,module,exports){
 var AbstractStrategy = require('./abstract-strategy');
 
 module.exports = AbstractStrategy.extend({
@@ -1727,8 +1733,13 @@ module.exports = AbstractStrategy.extend({
 	},
 
 	supportsTouch: function() {
-		return false;
+		return true;
+	},
+
+	animatePartial: function($overview, pcn, $currentItem) {
+		$currentItem.css('opacity', (1 - Math.abs(pcn)));
 	}
+
 });
 
 },{"./abstract-strategy":36}],39:[function(require,module,exports){
@@ -1745,9 +1756,8 @@ var NoAnimationStrategy = SliderStrategy.extend({
 		callback.call(self);
 	},
 
-	supportsTouch: function () {
-		return false;
-	}
+	animatePartial: function() {}
+
 });
 
 module.exports = NoAnimationStrategy;
@@ -1831,11 +1841,15 @@ module.exports = AbstractStrategy.extend({
 
 	supportsTouch: function() {
 		return true;
+	},
+
+	animatePartial: function($overview, pcn) {
+		$overview.css('left', pcn + '%');
 	}
 
 });
 
-},{"./abstract-strategy":36,"jquery":"H0VjM3"}],41:[function(require,module,exports){
+},{"./abstract-strategy":36,"jquery":"6obL00"}],41:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 var util = require('./util');
@@ -2412,8 +2426,8 @@ module.exports = Class.extend({
 	_initDraggingModule: function () {
 
 		var dragModuleOptions = {
-			duringDragging: $.proxy(this.updatePageWhileDragging, this),
-			afterDragging: $.proxy(this.updatePageAfterDragging, this)
+			onDrag: $.proxy(this.updatePageWhileDragging, this),
+			onDragFinish: $.proxy(this.updatePageAfterDragging, this)
 		};
 
 		this.dragModule = new DragSupport(this.$overview, dragModuleOptions);
@@ -2744,7 +2758,7 @@ module.exports = Class.extend({
 			}
 		}
 
-		//Get carousel parents classes  
+		//Get carousel parents classes
 		if (!this.carouselSelectors) {
 			var classes = [], i, results = [], parents = this.$viewport.parentsUntil('html'),
 			carouselSelectors = getClasses(this.$viewport);
@@ -2762,7 +2776,7 @@ module.exports = Class.extend({
 					while ( combinations.push(i += 1) < classes.length ){}
 					combinations = getCombinations(combinations, '', '#');
 
-					//Get carousel classes  
+					//Get carousel classes
 					var indexes;
 					$.each(combinations, function(i, val){
 						indexes = val.split('#');
@@ -2884,26 +2898,24 @@ module.exports = Class.extend({
 	},
 
 	/**
-	 * Updates the page while the dragging action is being performed
+	 * Handles the drag event and delegates the page update to the animation module
 	 *
 	 * @this {Carousel}
-	 * @param {$object} $element - Event target
-	 * @param {number} diff - Difference with the dragging distance.
+	 * @param {number} amount - The amount dragged.
 	 */
-	updatePageWhileDragging: function ($element, diff) {
+	updatePageWhileDragging: function (amount) {
 		var currentOffset = this._getCurrentOffset();
 
 		var overviewWidth = this.$overview.width();
 
-		diff = (diff / overviewWidth) * overviewWidth;
-		diff = diff * 100 / overviewWidth;
+		var dragPcn = amount * 100 / overviewWidth;
 
-		var positionDifference = (currentOffset - diff);
+		var positionDifference = (currentOffset - dragPcn);
 
-		console.log('updatePageWhileDragging, currentOffset: ' + this.$overview[0].style.left + ', difference: ' + diff);
+		console.log('updatePageWhileDragging, currentOffset: ' + this.$overview[0].style.left + ', difference: ' + dragPcn);
 
 		if (positionDifference >= 30 || positionDifference > -(this.size.contentWidth + 30)) {
-			$element.css('left', positionDifference + '%');
+			this.animationModule.animatePartial(positionDifference);
 			this._updateNavigators();
 		}
 	},
@@ -2969,7 +2981,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":51,"./pagination/paging-module":54,"./responsive-module":55,"./util":56,"class":"DSkb5a","jquery":"H0VjM3"}],42:[function(require,module,exports){
+},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":51,"./pagination/paging-module":54,"./responsive-module":55,"./util":56,"class":"MFFfPr","jquery":"6obL00"}],42:[function(require,module,exports){
 /**
 * Returns a function which calls the specified function in the specified
 * scope.
@@ -3231,8 +3243,8 @@ var DragSupport = Class.extend({
 
   init: function($element, options) {
 
-    this.updatePageWhileDragging = options.duringDragging;
-    this.updatePageAfterDragging = options.afterDragging;
+    this.onDrag = options.onDrag;
+    this.onDragFinish = options.onDragFinish;
 
     this.$element = $element;
 
@@ -3243,13 +3255,13 @@ var DragSupport = Class.extend({
     this.finishDragging = false;
 
     // Define proxies for each event handler to keep using this as the DragSupport instance.
-    this.startTouchHandlerProxy = $.proxy(this.startTouchHandler, this);
-    this.mouseDownHandlerProxy = $.proxy(this.mouseDownHandler, this);
+    this.startTouchHandler = $.proxy(this.startTouchHandler, this);
+    this.mouseDownHandler = $.proxy(this.mouseDownHandler, this);
 
-    this.dragHandlerProxy = $.proxy(this.dragHandler, this);
+    this.dragHandler = $.proxy(this.dragHandler, this);
 
-    this.endTouchHandlerProxy = $.proxy(this.endTouchHandler, this);
-    this.mouseUpHandlerProxy = $.proxy(this.mouseUpHandler, this);
+    this.endTouchHandler = $.proxy(this.endTouchHandler, this);
+    this.mouseUpHandler = $.proxy(this.mouseUpHandler, this);
 
     this._enableStartEvents();
   },
@@ -3271,13 +3283,13 @@ var DragSupport = Class.extend({
 
     var eventData = event.touches[0];
 
-    this.$element[0].ontouchmove = this.dragHandlerProxy;
-    this.$element[0].ontouchend = this.endTouchHandlerProxy;
-    this.$element[0].ontouchcancel = this.endTouchHandlerProxy;
+    this.$element[0].ontouchmove = this.dragHandler;
+    this.$element[0].ontouchend = this.endTouchHandler;
+    this.$element[0].ontouchcancel = this.endTouchHandler;
 
-    document.ontouchmove = this.dragHandlerProxy;
-    document.ontouchend = this.endTouchHandlerProxy;
-    document.ontouchcancel = this.endTouchHandlerProxy;
+    document.ontouchmove = this.dragHandler;
+    document.ontouchend = this.endTouchHandler;
+    document.ontouchcancel = this.endTouchHandler;
 
     console.debug('Start touch handler, pageX: ' + eventData.pageX);
 
@@ -3292,11 +3304,11 @@ var DragSupport = Class.extend({
 
     $( "body" ).addClass( "noSelect" );
 
-    this.$element.on('mousemove', this.dragHandlerProxy);
-    this.$element.on('mouseup', this.mouseUpHandlerProxy);
+    this.$element.on('mousemove', this.dragHandler);
+    this.$element.on('mouseup', this.mouseUpHandler);
 
-    $(document).on('mousemove', this.dragHandlerProxy);
-    $(document).on('mouseup', this.mouseUpHandlerProxy);
+    $(document).on('mousemove', this.dragHandler);
+    $(document).on('mouseup', this.mouseUpHandler);
 
     console.debug('Start touch handler, pageX: ' + event.pageX);
 
@@ -3324,14 +3336,15 @@ var DragSupport = Class.extend({
 			return false;
     }
 
-    console.debug('Move touch handler, pageX: ' + this.currentPageX);
+    console.debug('Move touch handler, pageX:', this.currentPageX);
 
-    this.updatePageWhileDragging(this.$element, diff);
+    this.onDrag(diff);
 
     this.finishDragging = true;
 
     return false;
   },
+
 
   endTouchHandler: function(event) {
 
@@ -3360,7 +3373,7 @@ var DragSupport = Class.extend({
       // The user wants to select and item
       $(event.target).trigger('itemTouched');
     } else {
-      this.updatePageAfterDragging(this.initialPageX, eventData);
+      this.onDragFinish(this.initialPageX, eventData);
     }
   },
 
@@ -3375,17 +3388,17 @@ var DragSupport = Class.extend({
 
     $( "body" ).removeClass( "noSelect" );
 
-    this.$element.off('mousemove', this.dragHandlerProxy);
-    this.$element.off('mouseup', this.mouseUpHandlerProxy);
-    $(document).off('mousemove', this.dragHandlerProxy);
-    $(document).off('mouseup', this.mouseUpHandlerProxy);
+    this.$element.off('mousemove', this.dragHandler);
+    this.$element.off('mouseup', this.mouseUpHandler);
+    $(document).off('mousemove', this.dragHandler);
+    $(document).off('mouseup', this.mouseUpHandler);
 
     // If user is not dragging and the delay between touch down and up is small enough, consider it a 'click'
     if ( (diffPosition === 0) && (timeDiff > 0 && timeDiff < this.touchClickDelayMS) ) {
       // The user wants to select and item
       $(event.target).trigger('itemTouched');
     } else {
-      this.updatePageAfterDragging(this.initialPageX, event);
+      this.onDragFinish(this.initialPageX, event);
     }
 
     return false;
@@ -3393,9 +3406,9 @@ var DragSupport = Class.extend({
 
   _enableStartEvents: function() {
 		if (this.isTouchDevice()) {
-      this.$element[0].ontouchstart = this.startTouchHandlerProxy;
+      this.$element[0].ontouchstart = this.startTouchHandler;
     } else {
-      this.$element.on('mousedown', this.mouseDownHandlerProxy);
+      this.$element.on('mousedown', this.mouseDownHandler);
     }
   },
 
@@ -3403,7 +3416,7 @@ var DragSupport = Class.extend({
 		if (this.isTouchDevice()) {
       this.$element[0].ontouchstart = null;
     } else {
-      this.$element.off('mousedown', this.mouseDownHandlerProxy);
+      this.$element.off('mousedown', this.mouseDownHandler);
     }
   },
 
@@ -3422,9 +3435,9 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"DSkb5a","jquery":"H0VjM3"}],"wrapper":[function(require,module,exports){
-module.exports=require('52u7fV');
-},{}],"52u7fV":[function(require,module,exports){
+},{"class":"MFFfPr","jquery":"6obL00"}],"wrapper":[function(require,module,exports){
+module.exports=require('8VJE8H');
+},{}],"8VJE8H":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3432,7 +3445,7 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"H0VjM3","jquery-plugin-wrapper":30}],"H0VjM3":[function(require,module,exports){
+},{"./carousel":41,"jquery":"6obL00","jquery-plugin-wrapper":30}],"6obL00":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
@@ -3440,7 +3453,7 @@ module.exports = Carousel;
 module.exports = jQuery;
 
 },{}],"jquery":[function(require,module,exports){
-module.exports=require('H0VjM3');
+module.exports=require('6obL00');
 },{}],48:[function(require,module,exports){
 var Class = require('class');
 
@@ -3458,7 +3471,7 @@ module.exports = Class.extend({
 	
 });
 
-},{"class":"DSkb5a"}],49:[function(require,module,exports){
+},{"class":"MFFfPr"}],49:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3506,7 +3519,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":48,"./spinner":52,"jquery":"H0VjM3"}],50:[function(require,module,exports){
+},{"./abstract-strategy":48,"./spinner":52,"jquery":"6obL00"}],50:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3554,7 +3567,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":48,"./spinner":52,"jquery":"H0VjM3"}],51:[function(require,module,exports){
+},{"./abstract-strategy":48,"./spinner":52,"jquery":"6obL00"}],51:[function(require,module,exports){
 var Class = require('class');
 
 var LazyStrategy = require('./lazy-strategy');
@@ -3636,7 +3649,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./eager-strategy":49,"./lazy-strategy":50,"class":"DSkb5a"}],52:[function(require,module,exports){
+},{"./eager-strategy":49,"./lazy-strategy":50,"class":"MFFfPr"}],52:[function(require,module,exports){
 var Class = require('class'),
 SpinJs = require('../../../libs/spin.js'),
 $ = require('jquery');
@@ -3743,7 +3756,7 @@ module.exports = Class.extend({
     }
 });
 
-},{"../../../libs/spin.js":1,"class":"DSkb5a","jquery":"H0VjM3"}],53:[function(require,module,exports){
+},{"../../../libs/spin.js":1,"class":"MFFfPr","jquery":"6obL00"}],53:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -3847,7 +3860,7 @@ module.exports = Class.extend({
 
 });
 
-},{"class":"DSkb5a","jquery":"H0VjM3"}],54:[function(require,module,exports){
+},{"class":"MFFfPr","jquery":"6obL00"}],54:[function(require,module,exports){
 var Class = require('class');
 var PaginationIndicator = require('./paging-indicator.js');
 
@@ -4119,7 +4132,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./paging-indicator.js":53,"class":"DSkb5a"}],55:[function(require,module,exports){
+},{"./paging-indicator.js":53,"class":"MFFfPr"}],55:[function(require,module,exports){
 var Class = require('class'),
 MediaQueryWatcher = require('mediaquerywatcher'),
 $ = require('jquery');
@@ -4324,7 +4337,7 @@ module.exports = Class.extend({
 	}
 	
 });
-},{"class":"DSkb5a","jquery":"H0VjM3","mediaquerywatcher":33}],56:[function(require,module,exports){
+},{"class":"MFFfPr","jquery":"6obL00","mediaquerywatcher":33}],56:[function(require,module,exports){
 exports.getDependency = function(dependencies, name, defaultDep) {
 	dependencies = dependencies || {};
 	return dependencies[name] || defaultDep;
@@ -4418,6 +4431,6 @@ exports.isIE = function() {
   return (myNav.indexOf('msie') !== -1) ? parseInt(myNav.split('msie')[1], 10) : false;
 };
 
-},{}]},{},["52u7fV"])
+},{}]},{},["8VJE8H"])
 ;
 })(this, jQuery);
