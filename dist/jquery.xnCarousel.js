@@ -1,1125 +1,6 @@
-(function(root, factory) {
-    if(typeof exports === 'object') {
-        module.exports = factory(require('jquery'));
-    }
-    else if(typeof define === 'function' && define.amd) {
-        define('xnCarousel', ['jquery'], factory);
-    }
-    else {
-        root.xnCarousel = factory(root.jQuery);
-    }
-}(this, function(jQuery) {
-var require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var Modernizr = require('./lib/Modernizr'),
-    ModernizrProto = require('./lib/ModernizrProto'),
-    classes = require('./lib/classes'),
-    testRunner = require('./lib/testRunner'),
-    setClasses = require('./lib/setClasses');
-
-// Run each test
-testRunner();
-
-// Remove the "no-js" class if it exists
-setClasses(classes);
-
-delete ModernizrProto.addTest;
-delete ModernizrProto.addAsyncTest;
-
-// Run the things that are supposed to run after the tests
-for (var i = 0; i < Modernizr._q.length; i++) {
-  Modernizr._q[i]();
-}
-
-module.exports = Modernizr;
-
-},{"./lib/Modernizr":2,"./lib/ModernizrProto":3,"./lib/classes":4,"./lib/setClasses":20,"./lib/testRunner":26}],2:[function(require,module,exports){
-var ModernizrProto = require('./ModernizrProto');
-
-
-  // Fake some of Object.create
-  // so we can force non test results
-  // to be non "own" properties.
-  var Modernizr = function(){};
-  Modernizr.prototype = ModernizrProto;
-
-  // Leak modernizr globally when you `require` it
-  // rather than force it here.
-  // Overwrite name so constructor name is nicer :D
-  Modernizr = new Modernizr();
-
-  
-
-module.exports = Modernizr;
-},{"./ModernizrProto":3}],3:[function(require,module,exports){
-var tests = require('./tests');
-
-
-  var ModernizrProto = {
-    // The current version, dummy
-    _version: 'v3.0.0pre',
-
-    // Any settings that don't work as separate modules
-    // can go in here as configuration.
-    _config: {
-      classPrefix : '',
-      enableClasses : true
-    },
-
-    // Queue of tests
-    _q: [],
-
-    // Stub these for people who are listening
-    on: function( test, cb ) {
-      // I don't really think people should do this, but we can
-      // safe guard it a bit.
-      // -- NOTE:: this gets WAY overridden in src/addTest for
-      // actual async tests. This is in case people listen to
-      // synchronous tests. I would leave it out, but the code
-      // to *disallow* sync tests in the real version of this
-      // function is actually larger than this.
-      setTimeout(function() {
-        cb(this[test]);
-      }, 0);
-    },
-
-    addTest: function( name, fn, options ) {
-      tests.push({name : name, fn : fn, options : options });
-    },
-
-    addAsyncTest: function (fn) {
-      tests.push({name : null, fn : fn});
-    }
-  };
-
-  
-
-module.exports = ModernizrProto;
-},{"./tests":27}],4:[function(require,module,exports){
-
-  var classes = [];
-  
-module.exports = classes;
-},{}],5:[function(require,module,exports){
-
-  /**
-   * contains returns a boolean for if substr is found within str.
-   */
-  function contains( str, substr ) {
-    return !!~('' + str).indexOf(substr);
-  }
-
-  
-module.exports = contains;
-},{}],6:[function(require,module,exports){
-
-  var createElement = function() {
-    return document.createElement.apply(document, arguments);
-  };
-  
-module.exports = createElement;
-},{}],7:[function(require,module,exports){
-var ModernizrProto = require('./ModernizrProto');
-var omPrefixes = require('./omPrefixes');
-
-
-  var cssomPrefixes = omPrefixes.split(' ');
-  ModernizrProto._cssomPrefixes = cssomPrefixes;
-  
-
-module.exports = cssomPrefixes;
-},{"./ModernizrProto":3,"./omPrefixes":18}],8:[function(require,module,exports){
-
-  var docElement = document.documentElement;
-  
-module.exports = docElement;
-},{}],9:[function(require,module,exports){
-var ModernizrProto = require('./ModernizrProto');
-var omPrefixes = require('./omPrefixes');
-
-
-  var domPrefixes = omPrefixes.toLowerCase().split(' ');
-  ModernizrProto._domPrefixes = domPrefixes;
-  
-
-module.exports = domPrefixes;
-},{"./ModernizrProto":3,"./omPrefixes":18}],10:[function(require,module,exports){
-
-    // Helper function for e.g. boxSizing -> box-sizing
-    function domToHyphenated( name ) {
-        return name.replace(/([A-Z])/g, function(str, m1) {
-            return '-' + m1.toLowerCase();
-        }).replace(/^ms-/, '-ms-');
-    }
-    
-module.exports = domToHyphenated;
-},{}],11:[function(require,module,exports){
-var slice = require('./slice');
-
-
-  // Adapted from ES5-shim https://github.com/kriskowal/es5-shim/blob/master/es5-shim.js
-  // es5.github.com/#x15.3.4.5
-
-  if (!Function.prototype.bind) {
-    Function.prototype.bind = function bind(that) {
-
-      var target = this;
-
-      if (typeof target != "function") {
-        throw new TypeError();
-      }
-
-      var args = slice.call(arguments, 1);
-      var bound = function() {
-
-        if (this instanceof bound) {
-
-          var F = function(){};
-          F.prototype = target.prototype;
-          var self = new F();
-
-          var result = target.apply(
-            self,
-            args.concat(slice.call(arguments))
-          );
-          if (Object(result) === result) {
-            return result;
-          }
-          return self;
-
-        } else {
-
-          return target.apply(
-            that,
-            args.concat(slice.call(arguments))
-          );
-
-        }
-
-      };
-
-      return bound;
-    };
-  }
-
-  
-
-module.exports = Function.prototype.bind;
-},{"./slice":21}],12:[function(require,module,exports){
-var createElement = require('./createElement');
-
-
-  function getBody() {
-    // After page load injecting a fake body doesn't work so check if body exists
-    var body = document.body;
-
-    if(!body) {
-      // Can't use the real body create a fake one.
-      body = createElement('body');
-      body.fake = true;
-    }
-
-    return body;
-  }
-
-  
-
-module.exports = getBody;
-},{"./createElement":6}],13:[function(require,module,exports){
-var ModernizrProto = require('./ModernizrProto');
-var docElement = require('./docElement');
-var createElement = require('./createElement');
-var getBody = require('./getBody');
-
-
-  // Inject element with style element and some CSS rules
-  function injectElementWithStyles( rule, callback, nodes, testnames ) {
-    var mod = 'modernizr';
-    var style;
-    var ret;
-    var node;
-    var docOverflow;
-    var div = createElement('div');
-    var body = getBody();
-
-    if ( parseInt(nodes, 10) ) {
-      // In order not to give false positives we create a node for each test
-      // This also allows the method to scale for unspecified uses
-      while ( nodes-- ) {
-        node = createElement('div');
-        node.id = testnames ? testnames[nodes] : mod + (nodes + 1);
-        div.appendChild(node);
-      }
-    }
-
-    // <style> elements in IE6-9 are considered 'NoScope' elements and therefore will be removed
-    // when injected with innerHTML. To get around this you need to prepend the 'NoScope' element
-    // with a 'scoped' element, in our case the soft-hyphen entity as it won't mess with our measurements.
-    // msdn.microsoft.com/en-us/library/ms533897%28VS.85%29.aspx
-    // Documents served as xml will throw if using &shy; so use xml friendly encoded version. See issue #277
-    style = ['&#173;','<style id="s', mod, '">', rule, '</style>'].join('');
-    div.id = mod;
-    // IE6 will false positive on some tests due to the style element inside the test div somehow interfering offsetHeight, so insert it into body or fakebody.
-    // Opera will act all quirky when injecting elements in documentElement when page is served as xml, needs fakebody too. #270
-    (!body.fake ? div : body).innerHTML += style;
-    body.appendChild(div);
-    if ( body.fake ) {
-      //avoid crashing IE8, if background image is used
-      body.style.background = '';
-      //Safari 5.13/5.1.4 OSX stops loading if ::-webkit-scrollbar is used and scrollbars are visible
-      body.style.overflow = 'hidden';
-      docOverflow = docElement.style.overflow;
-      docElement.style.overflow = 'hidden';
-      docElement.appendChild(body);
-    }
-
-    ret = callback(div, rule);
-    // If this is done after page load we don't want to remove the body so check if body exists
-    if ( body.fake ) {
-      body.parentNode.removeChild(body);
-      docElement.style.overflow = docOverflow;
-      // Trigger layout so kinetic scrolling isn't disabled in iOS6+
-      docElement.offsetHeight;
-    } else {
-      div.parentNode.removeChild(div);
-    }
-
-    return !!ret;
-
-  }
-
-  
-
-module.exports = injectElementWithStyles;
-},{"./ModernizrProto":3,"./createElement":6,"./docElement":8,"./getBody":12}],14:[function(require,module,exports){
-
-  /**
-   * is returns a boolean for if typeof obj is exactly type.
-   */
-  function is( obj, type ) {
-    return typeof obj === type;
-  }
-  
-module.exports = is;
-},{}],15:[function(require,module,exports){
-var Modernizr = require('./Modernizr');
-var modElem = require('./modElem');
-
-
-  var mStyle = {
-    style : modElem.elem.style
-  };
-
-  // kill ref for gc, must happen before
-  // mod.elem is removed, so we unshift on to
-  // the front of the queue.
-  Modernizr._q.unshift(function() {
-    delete mStyle.style;
-  });
-
-  
-
-module.exports = mStyle;
-},{"./Modernizr":2,"./modElem":16}],16:[function(require,module,exports){
-var Modernizr = require('./Modernizr');
-var createElement = require('./createElement');
-
-
-  /**
-   * Create our "modernizr" element that we do most feature tests on.
-   */
-  var modElem = {
-    elem : createElement('modernizr')
-  };
-
-  // Clean up this element
-  Modernizr._q.push(function() {
-    delete modElem.elem;
-  });
-
-  
-
-module.exports = modElem;
-},{"./Modernizr":2,"./createElement":6}],17:[function(require,module,exports){
-var injectElementWithStyles = require('./injectElementWithStyles');
-var domToHyphenated = require('./domToHyphenated');
-
-
-    // Function to allow us to use native feature detection functionality if available.
-    // Accepts a list of property names and a single value
-    // Returns `undefined` if native detection not available
-    function nativeTestProps ( props, value ) {
-        var i = props.length;
-        // Start with the JS API: http://www.w3.org/TR/css3-conditional/#the-css-interface
-        if ('CSS' in window && 'supports' in window.CSS) {
-            // Try every prefixed variant of the property
-            while (i--) {
-                if (window.CSS.supports(domToHyphenated(props[i]), value)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-        // Otherwise fall back to at-rule (for FF 17 and Opera 12.x)
-        else if ('CSSSupportsRule' in window) {
-            // Build a condition string for every prefixed variant
-            var conditionText = [];
-            while (i--) {
-                conditionText.push('(' + domToHyphenated(props[i]) + ':' + value + ')');
-            }
-            conditionText = conditionText.join(' or ');
-            return injectElementWithStyles('@supports (' + conditionText + ') { #modernizr { position: absolute; } }', function( node ) {
-                return (window.getComputedStyle ?
-                        getComputedStyle(node, null) :
-                        node.currentStyle)['position'] == 'absolute';
-            });
-        }
-        return undefined;
-    }
-    
-
-module.exports = nativeTestProps;
-},{"./domToHyphenated":10,"./injectElementWithStyles":13}],18:[function(require,module,exports){
-
-  // Following spec is to expose vendor-specific style properties as:
-  //   elem.style.WebkitBorderRadius
-  // and the following would be incorrect:
-  //   elem.style.webkitBorderRadius
-
-  // Webkit ghosts their properties in lowercase but Opera & Moz do not.
-  // Microsoft uses a lowercase `ms` instead of the correct `Ms` in IE8+
-  //   erik.eae.net/archives/2008/03/10/21.48.10/
-
-  // More here: github.com/Modernizr/Modernizr/issues/issue/21
-  var omPrefixes = 'Webkit Moz O ms';
-  
-module.exports = omPrefixes;
-},{}],19:[function(require,module,exports){
-var ModernizrProto = require('./ModernizrProto');
-
-
-  // List of property values to set for css tests. See ticket #21
-  var prefixes = ' -webkit- -moz- -o- -ms- '.split(' ');
-
-  // expose these for the plugin API. Look in the source for how to join() them against your input
-  ModernizrProto._prefixes = prefixes;
-
-  
-
-module.exports = prefixes;
-},{"./ModernizrProto":3}],20:[function(require,module,exports){
-var Modernizr = require('./Modernizr');
-var docElement = require('./docElement');
-
-
-  // Pass in an and array of class names, e.g.:
-  //  ['no-webp', 'borderradius', ...]
-  function setClasses( classes ) {
-    var className = docElement.className;
-    var regex;
-    var classPrefix = Modernizr._config.classPrefix || '';
-
-    // Change `no-js` to `js` (we do this regardles of the `enableClasses`
-    // option)
-    // Handle classPrefix on this too
-    var reJS = new RegExp('(^|\\s)'+classPrefix+'no-js(\\s|$)');
-    className = className.replace(reJS, '$1'+classPrefix+'js$2');
-
-    if(Modernizr._config.enableClasses) {
-      // Add the new classes
-      className += ' ' + classPrefix + classes.join(' ' + classPrefix);
-      docElement.className = className;
-    }
-
-  }
-
-  
-
-module.exports = setClasses;
-},{"./Modernizr":2,"./docElement":8}],21:[function(require,module,exports){
-var classes = require('./classes');
-
-
-  var slice = classes.slice;
-  
-
-module.exports = slice;
-},{"./classes":4}],22:[function(require,module,exports){
-var ModernizrProto = require('./ModernizrProto');
-var testPropsAll = require('./testPropsAll');
-
-
-  /**
-   * testAllProps determines whether a given CSS property, in some prefixed
-   * form, is supported by the browser. It can optionally be given a value; in
-   * which case testAllProps will only return true if the browser supports that
-   * value for the named property; this latter case will use native detection
-   * (via window.CSS.supports) if available. A boolean can be passed as a 3rd
-   * parameter to skip the value check when native detection isn't available,
-   * to improve performance when simply testing for support of a property.
-   *
-   * @param prop - String naming the property to test
-   * @param value - [optional] String of the value to test
-   * @param skipValueTest - [optional] Whether to skip testing that the value
-   *                        is supported when using non-native detection
-   *                        (default: false)
-   */
-    function testAllProps (prop, value, skipValueTest) {
-        return testPropsAll(prop, undefined, undefined, value, skipValueTest);
-    }
-    ModernizrProto.testAllProps = testAllProps;
-    
-
-module.exports = testAllProps;
-},{"./ModernizrProto":3,"./testPropsAll":25}],23:[function(require,module,exports){
-var is = require('./is');
-require('./fnBind');
-
-
-  /**
-   * testDOMProps is a generic DOM property test; if a browser supports
-   *   a certain property, it won't return undefined for it.
-   */
-  function testDOMProps( props, obj, elem ) {
-    var item;
-
-    for ( var i in props ) {
-      if ( props[i] in obj ) {
-
-        // return the property name as a string
-        if (elem === false) return props[i];
-
-        item = obj[props[i]];
-
-        // let's bind a function (and it has a bind method -- certain native objects that report that they are a
-        // function don't [such as webkitAudioContext])
-        if (is(item, 'function') && 'bind' in item){
-          // default to autobind unless override
-          return item.bind(elem || obj);
-        }
-
-        // return the unbound function or obj or value
-        return item;
-      }
-    }
-    return false;
-  }
-
-  
-
-module.exports = testDOMProps;
-},{"./fnBind":11,"./is":14}],24:[function(require,module,exports){
-var contains = require('./contains');
-var mStyle = require('./mStyle');
-var createElement = require('./createElement');
-var nativeTestProps = require('./nativeTestProps');
-var is = require('./is');
-
-
-  // testProps is a generic CSS / DOM property test.
-
-  // In testing support for a given CSS property, it's legit to test:
-  //    `elem.style[styleName] !== undefined`
-  // If the property is supported it will return an empty string,
-  // if unsupported it will return undefined.
-
-  // We'll take advantage of this quick test and skip setting a style
-  // on our modernizr element, but instead just testing undefined vs
-  // empty string.
-
-  // Because the testing of the CSS property names (with "-", as
-  // opposed to the camelCase DOM properties) is non-portable and
-  // non-standard but works in WebKit and IE (but not Gecko or Opera),
-  // we explicitly reject properties with dashes so that authors
-  // developing in WebKit or IE first don't end up with
-  // browser-specific content by accident.
-
-  function testProps( props, prefixed, value, skipValueTest ) {
-    skipValueTest = is(skipValueTest, 'undefined') ? false : skipValueTest;
-
-    // Try native detect first
-    if (!is(value, 'undefined')) {
-      var result = nativeTestProps(props, value);
-      if(!is(result, 'undefined')) {
-        return result;
-      }
-    }
-
-    // Otherwise do it properly
-    var afterInit, i, j, prop, before;
-
-    // If we don't have a style element, that means
-    // we're running async or after the core tests,
-    // so we'll need to create our own elements to use
-    if ( !mStyle.style ) {
-      afterInit = true;
-      mStyle.modElem = createElement('modernizr');
-      mStyle.style = mStyle.modElem.style;
-    }
-
-    // Delete the objects if we
-    // we created them.
-    function cleanElems() {
-      if (afterInit) {
-        delete mStyle.style;
-        delete mStyle.modElem;
-      }
-    }
-
-    for ( i in props ) {
-      prop = props[i];
-      before = mStyle.style[prop];
-
-      if ( !contains(prop, "-") && mStyle.style[prop] !== undefined ) {
-
-        // If value to test has been passed in, do a set-and-check test.
-        // 0 (integer) is a valid property value, so check that `value` isn't
-        // undefined, rather than just checking it's truthy.
-        if (!skipValueTest && !is(value, 'undefined')) {
-
-          // Needs a try catch block because of old IE. This is slow, but will
-          // be avoided in most cases because `skipValueTest` will be used.
-          try {
-            mStyle.style[prop] = value;
-          } catch (e) {}
-
-          // If the property value has changed, we assume the value used is
-          // supported. If `value` is empty string, it'll fail here (because
-          // it hasn't changed), which matches how browsers have implemented
-          // CSS.supports()
-          if (mStyle.style[prop] != before) {
-            cleanElems();
-            return prefixed == 'pfx' ? prop : true;
-          }
-        }
-        // Otherwise just return true, or the property name if this is a
-        // `prefixed()` call
-        else {
-          cleanElems();
-          return prefixed == 'pfx' ? prop : true;
-        }
-      }
-    }
-    cleanElems();
-    return false;
-  }
-
-  
-
-module.exports = testProps;
-},{"./contains":5,"./createElement":6,"./is":14,"./mStyle":15,"./nativeTestProps":17}],25:[function(require,module,exports){
-var ModernizrProto = require('./ModernizrProto');
-var cssomPrefixes = require('./cssomPrefixes');
-var is = require('./is');
-var testProps = require('./testProps');
-var domPrefixes = require('./domPrefixes');
-var testDOMProps = require('./testDOMProps');
-var prefixes = require('./prefixes');
-
-
-    /**
-     * testPropsAll tests a list of DOM properties we want to check against.
-     *     We specify literally ALL possible (known and/or likely) properties on
-     *     the element including the non-vendor prefixed one, for forward-
-     *     compatibility.
-     */
-    function testPropsAll( prop, prefixed, elem, value, skipValueTest ) {
-
-        var ucProp = prop.charAt(0).toUpperCase() + prop.slice(1),
-            props = (prop + ' ' + cssomPrefixes.join(ucProp + ' ') + ucProp).split(' ');
-
-        // did they call .prefixed('boxSizing') or are we just testing a prop?
-        if(is(prefixed, "string") || is(prefixed, "undefined")) {
-            return testProps(props, prefixed, value, skipValueTest);
-
-            // otherwise, they called .prefixed('requestAnimationFrame', window[, elem])
-        } else {
-            props = (prop + ' ' + (domPrefixes).join(ucProp + ' ') + ucProp).split(' ');
-            return testDOMProps(props, prefixed, elem);
-        }
-    }
-
-    // Modernizr.testAllProps() investigates whether a given style property,
-    //     or any of its vendor-prefixed variants, is recognized
-    // Note that the property names must be provided in the camelCase variant.
-    // Modernizr.testAllProps('boxSizing')
-    ModernizrProto.testAllProps = testPropsAll;
-
-    
-
-module.exports = testPropsAll;
-},{"./ModernizrProto":3,"./cssomPrefixes":7,"./domPrefixes":9,"./is":14,"./prefixes":19,"./testDOMProps":23,"./testProps":24}],26:[function(require,module,exports){
-var tests = require('./tests');
-var Modernizr = require('./Modernizr');
-var classes = require('./classes');
-var is = require('./is');
-
-
-  // Run through all tests and detect their support in the current UA.
-  function testRunner() {
-    var featureNames;
-    var feature;
-    var aliasIdx;
-    var result;
-    var nameIdx;
-    var featureName;
-    var featureNameSplit;
-    var modernizrProp;
-    var mPropCount;
-
-    for ( var featureIdx in tests ) {
-      featureNames = [];
-      feature = tests[featureIdx];
-      // run the test, throw the return value into the Modernizr,
-      //   then based on that boolean, define an appropriate className
-      //   and push it into an array of classes we'll join later.
-      //
-      //   If there is no name, it's an 'async' test that is run,
-      //   but not directly added to the object. That should
-      //   be done with a post-run addTest call.
-      if ( feature.name ) {
-        featureNames.push(feature.name.toLowerCase());
-
-        if (feature.options && feature.options.aliases && feature.options.aliases.length) {
-          // Add all the aliases into the names list
-          for (aliasIdx = 0; aliasIdx < feature.options.aliases.length; aliasIdx++) {
-            featureNames.push(feature.options.aliases[aliasIdx].toLowerCase());
-          }
-        }
-      }
-
-      // Run the test, or use the raw value if it's not a function
-      result = is(feature.fn, 'function') ? feature.fn() : feature.fn;
-
-
-      // Set each of the names on the Modernizr object
-      for (nameIdx = 0; nameIdx < featureNames.length; nameIdx++) {
-        featureName = featureNames[nameIdx];
-        // Support dot properties as sub tests. We don't do checking to make sure
-        // that the implied parent tests have been added. You must call them in
-        // order (either in the test, or make the parent test a dependency).
-        //
-        // Cap it to TWO to make the logic simple and because who needs that kind of subtesting
-        // hashtag famous last words
-        featureNameSplit = featureName.split('.');
-
-        if (featureNameSplit.length === 1) {
-          Modernizr[featureNameSplit[0]] = result;
-        }
-        else if (featureNameSplit.length === 2) {
-          Modernizr[featureNameSplit[0]][featureNameSplit[1]] = result;
-        }
-
-        classes.push((result ? '' : 'no-') + featureNameSplit.join('-'));
-      }
-    }
-  }
-
-  
-
-module.exports = testRunner;
-},{"./Modernizr":2,"./classes":4,"./is":14,"./tests":27}],27:[function(require,module,exports){
-
-  var tests = [];
-  
-module.exports = tests;
-},{}],28:[function(require,module,exports){
-var Modernizr = require('./../../lib/Modernizr');
-var testAllProps = require('./../../lib/testAllProps');
-
-/*!
-{
-  "name": "CSS Transitions",
-  "property": "csstransitions",
-  "caniuse": "css-transitions",
-  "tags": ["css"]
-}
-!*/
-
-  Modernizr.addTest('csstransitions', testAllProps('transition', 'all', true));
-
-
-},{"./../../lib/Modernizr":2,"./../../lib/testAllProps":22}],29:[function(require,module,exports){
-/**
- * jQuery plugin declaration.
- * A wrapper is created in order to ensure one instance per DOM element
- */
-
-module.exports = {
-    wrap: function(name, clazz, $) {
-		if(!$) {
-            throw Error("jQuery not found");
-        }
-        var dataKey = "plugin_" + name;
-
-        $.fn[ name ] = function ( method ) {
-            var plugin = this.data( dataKey );
-            if (plugin && plugin[method]) {
-                var value = plugin[method].apply(plugin, [].slice.call(arguments, 1));
-				if(typeof value === 'undefined') { value = this }
-				return value;
-
-            } else if (typeof method === 'object' || !method) {
-
-                $elems = this.each(function() {
-                    if ( !$.data( this, dataKey ) ) {
-                        $.data( this, dataKey, new clazz( this, method ) );
-                    }
-                });
-
-				if(method && method.api && this.length > 0) {
-					return this.eq(0).data(dataKey);
-				}
-
-				return $elems;
-
-            } else {
-                $.error('Method ' + method + ' does not exist on ' + name);
-            }
-        };
-    }
-}
-
-
-
-
-},{}],30:[function(require,module,exports){
-/*! matchMedia() polyfill addListener/removeListener extension. Author & copyright (c) 2012: Scott Jehl. Dual MIT/BSD license */
-(function(){
-    // Bail out for browsers that have addListener support
-    if (window.matchMedia && window.matchMedia('all').addListener) {
-        return false;
-    }
-
-    var localMatchMedia = window.matchMedia,
-        hasMediaQueries = localMatchMedia('only all').matches,
-        isListening     = false,
-        timeoutID       = 0,    // setTimeout for debouncing 'handleChange'
-        queries         = [],   // Contains each 'mql' and associated 'listeners' if 'addListener' is used
-        handleChange    = function() {
-            // Debounce
-            clearTimeout(timeoutID);
-
-            timeoutID = setTimeout(function() {
-                for (var i = 0, il = queries.length; i < il; i++) {
-                    var mql         = queries[i].mql,
-                        listeners   = queries[i].listeners || [],
-                        matches     = localMatchMedia(mql.media).matches;
-
-                    // Update mql.matches value and call listeners
-                    // Fire listeners only if transitioning to or from matched state
-                    if (matches !== mql.matches) {
-                        mql.matches = matches;
-
-                        for (var j = 0, jl = listeners.length; j < jl; j++) {
-                            listeners[j].call(window, mql);
-                        }
-                    }
-                }
-            }, 30);
-        };
-
-    window.matchMedia = function(media) {
-        var mql         = localMatchMedia(media),
-            listeners   = [],
-            index       = 0;
-
-        mql.addListener = function(listener) {
-            // Changes would not occur to css media type so return now (Affects IE <= 8)
-            if (!hasMediaQueries) {
-                return;
-            }
-
-            // Set up 'resize' listener for browsers that support CSS3 media queries (Not for IE <= 8)
-            // There should only ever be 1 resize listener running for performance
-            if (!isListening) {
-                isListening = true;
-                window.addEventListener('resize', handleChange, true);
-            }
-
-            // Push object only if it has not been pushed already
-            if (index === 0) {
-                index = queries.push({
-                    mql         : mql,
-                    listeners   : listeners
-                });
-            }
-
-            listeners.push(listener);
-        };
-
-        mql.removeListener = function(listener) {
-            for (var i = 0, il = listeners.length; i < il; i++){
-                if (listeners[i] === listener){
-                    listeners.splice(i, 1);
-                }
-            }
-        };
-
-        return mql;
-    };
-}());
-
-},{}],31:[function(require,module,exports){
-/*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
-
-window.matchMedia || (window.matchMedia = function() {
-    "use strict";
-
-    // For browsers that support matchMedium api such as IE 9 and webkit
-    var styleMedia = (window.styleMedia || window.media);
-
-    // For those that don't support matchMedium
-    if (!styleMedia) {
-        var style       = document.createElement('style'),
-            script      = document.getElementsByTagName('script')[0],
-            info        = null;
-
-        style.type  = 'text/css';
-        style.id    = 'matchmediajs-test';
-
-        script.parentNode.insertBefore(style, script);
-
-        // 'style.currentStyle' is used by IE <= 8 and 'window.getComputedStyle' for all other browsers
-        info = ('getComputedStyle' in window) && window.getComputedStyle(style, null) || style.currentStyle;
-
-        styleMedia = {
-            matchMedium: function(media) {
-                var text = '@media ' + media + '{ #matchmediajs-test { width: 1px; } }';
-
-                // 'style.styleSheet' is used by IE <= 8 and 'style.textContent' for all other browsers
-                if (style.styleSheet) {
-                    style.styleSheet.cssText = text;
-                } else {
-                    style.textContent = text;
-                }
-
-                // Test if media query is true or false
-                return info.width === '1px';
-            }
-        };
-    }
-
-    return function(media) {
-        return {
-            matches: styleMedia.matchMedium(media || 'all'),
-            media: media || 'all'
-        };
-    };
-}());
-
-},{}],32:[function(require,module,exports){
-var $ = require('jquery'), CSSRuleRegex = /^([^:]+):(.+)/;
-
-//IE polyfill
-require('./lib/matchMedia');
-require('./lib/matchMedia.addListener');
-
-/**
- * Uses the settings.errorLogger to find the errorLogger if it was defined.
- * The logger will be used to report errors on invalid items.
- * If no logger is found, errors wont be reported.
- */
-function setErrorLogger() {
-  if(!this.settings.errorLogger) { return; }
-
-  var logger;
-
-  if(Util.isString(this.settings.errorLogger)) {
-    logger = Util.getDeepValue(this.settings.errorLogger);
-  } else {
-    logger = this.settings.errorLogger;
-  }
-
-  this._errorLogger = logger;
-
-  console.info((this._errorLogger)?
-      "Error logger is defined. It will be used to log invalid items.":
-      "No error logger found. Errors wont be logged");
-}
-
-function obtainCSSValues(selector, CSS) {
-  var pattern = new RegExp(selector.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + "\\s*{(\\s*[^}]+)}");
-  return CSS.match(pattern)[1];
-}
-
-//gets css rule object
-//@param: String
-//ie: {"width" : "100px"}
-function getCSSRule(rule) {
-  var CSSrule = {},
-  data = CSSRuleRegex.exec(rule);
-  CSSrule.property = data [1];
-  CSSrule.value = data [2];
-  return CSSrule;
-}
-
-//return all selector css values for a media query rule in a key/value format.
-function obtainCSSValuesFromRule(cssRules) {
-  var rules = {};
-  $.each(cssRules, function(i, rule) {
-    var values = obtainCSSValues(rule.selectorText, rule.cssText).split(';');
-    
-    $.each(rule.selectorText.replace(/,\s+/g,',').split(','), function(i, selector) {
-      rules[selector] = [];
-      $.each(values, function(i, value) {
-        if (CSSRuleRegex.test(value) === true) {
-          rules[selector].push(getCSSRule(value));
-        }
-      });
-    });
-          
-  });
-  return rules;
-}
-
-/**
- * Class constructor
- */
-function MediaQueryWatcher () {
-  this.mediaQueriesRules = {};
-}
-
-//return all selector css values for a media query rule in a key/value format.
-function obtainCSS(rule) {
-  var rules = {};
-    var values = obtainCSSValues(rule.selectorText, rule.cssText).split(';');
-    rules[rule.selectorText] = [];
-    $.each(values, function(i, value) {
-      if (CSSRuleRegex.test(value) === true) {
-        rules[rule.selectorText].push(getCSSRule(value));
-      }
-    });
-  return rules;
-}
-
-/**
- * Media Query Watcher Class contents
- */
-MediaQueryWatcher.prototype = {
-
- addMediaQueriesListener : function (styleSheet, mediaChangeHandler) {
-    var rules, actualAppliedRules = ["noMediaRule"], mql;
-    if (styleSheet) {
-      rules = styleSheet.cssRules;
-      for (var j = 0; j < rules.length; j += 1) {
-        if (rules[j].constructor === window.CSSMediaRule) {
-            this.mediaQueriesRules[rules[j].media.mediaText] = this.mediaQueriesRules[rules[j].media.mediaText] || {};
-            $.extend(this.mediaQueriesRules[rules[j].media.mediaText], obtainCSSValuesFromRule(rules[j].cssRules));
-            mql = window.matchMedia(rules[j].media.mediaText);
-            if (mql.matches === true) {
-              actualAppliedRules.push(rules[j].media.mediaText); 
-            }
-            mql.addListener(mediaChangeHandler);
-        } else if (rules[j].constructor === window.CSSStyleRule) {
-            this.mediaQueriesRules["noMediaRule"] = this.mediaQueriesRules["noMediaRule"] || {};
-            $.extend(this.mediaQueriesRules["noMediaRule"], obtainCSSValuesFromRule([rules[j]]));
-        }
-      }
-    }
-    
-    return actualAppliedRules;
-  },
-
-  //gets the target CSS properties from a @mediaData for the indicated selectors in descending priority order.
-  getMediaQueryProperties : function (mediaData, selectors, targetProperties) {
-    var propertiesObject = {}, itemsRemoved = 0;
-
-    if (typeof(mediaData) !== 'undefined') {
-      $.each(selectors, function (index, selector) {
-        var property, propertyPosition;
-        if (typeof(mediaData[selector]) !== 'undefined') {
-          $.each(mediaData[selector], function(i, val) {
-            property = val.property.split(" ").join("");
-            propertyPosition = targetProperties.indexOf(property);
-            if (propertyPosition !== -1) {
-              propertiesObject[property] = val.value.split(" ").join("");
-              targetProperties.splice(propertyPosition - itemsRemoved, 1);
-              itemsRemoved += 1;
-            }
-          });
-        }
-        if (targetProperties.length === 0) {
-          return false;
-        }
-      });
-    }
-
-    return propertiesObject;
-  }
-
-};
-
-// Exports the class
-module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":31,"./lib/matchMedia.addListener":30,"jquery":"H0VjM3"}],"class":[function(require,module,exports){
-module.exports=require('DSkb5a');
-},{}],"DSkb5a":[function(require,module,exports){
-/* Simple JavaScript Inheritance
- * By John Resig http://ejohn.org/
- * MIT Licensed.
- */
-// Inspired by base2 and Prototype
-(function() {
-  var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
-  // The base Class implementation (does nothing)
-  this.Class = function(){};
-  
-  // Create a new Class that inherits from this class
-  Class.extend = function(prop) {
-    var _super = this.prototype;
-    
-    // Instantiate a base class (but only create the instance,
-    // don't run the init constructor)
-    initializing = true;
-    var prototype = new this();
-    initializing = false;
-    
-    // Copy the properties over onto the new prototype
-    for (var name in prop) {
-      // Check if we're overwriting an existing function
-      prototype[name] = typeof prop[name] == "function" && 
-        typeof _super[name] == "function" && fnTest.test(prop[name]) ?
-        (function(name, fn){
-          return function() {
-            var tmp = this._super;
-            
-            // Add a new ._super() method that is the same method
-            // but on the super-class
-            this._super = _super[name];
-            
-            // The method only need to be bound temporarily, so we
-            // remove it when we're done executing
-            var ret = fn.apply(this, arguments);        
-            this._super = tmp;
-            
-            return ret;
-          };
-        })(name, prop[name]) :
-        prop[name];
-    }
-    
-    // The dummy class constructor
-    function Class() {
-      // All construction is actually done in the init method
-      if ( !initializing && this.init )
-        this.init.apply(this, arguments);
-    }
-    
-    // Populate our constructed prototype object
-    Class.prototype = prototype;
-    
-    // Enforce the constructor to be what we expect
-    Class.constructor = Class;
-
-    // And make this class extendable
-    Class.extend = arguments.callee;
-    
-    return Class;
-  };
-})();
-
-module.exports = Class;
-},{}],35:[function(require,module,exports){
+(function(window, jQuery) {
+var require;
+require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 //fgnass.github.com/spin.js#v1.3.2
 
 /**
@@ -1130,9 +11,6 @@ module.exports = Class;
 
   /* CommonJS */
   if (typeof exports == 'object')  module.exports = factory()
-
-  /* AMD module */
-  else if (typeof define == 'function' && define.amd) define(factory)
 
   /* Browser global */
   else root.Spinner = factory()
@@ -1476,6 +354,1116 @@ module.exports = Class;
 
 }));
 
+},{}],2:[function(require,module,exports){
+var Modernizr = require('./lib/Modernizr'),
+    ModernizrProto = require('./lib/ModernizrProto'),
+    classes = require('./lib/classes'),
+    testRunner = require('./lib/testRunner'),
+    setClasses = require('./lib/setClasses');
+
+// Run each test
+testRunner();
+
+// Remove the "no-js" class if it exists
+setClasses(classes);
+
+delete ModernizrProto.addTest;
+delete ModernizrProto.addAsyncTest;
+
+// Run the things that are supposed to run after the tests
+for (var i = 0; i < Modernizr._q.length; i++) {
+  Modernizr._q[i]();
+}
+
+module.exports = Modernizr;
+
+},{"./lib/Modernizr":3,"./lib/ModernizrProto":4,"./lib/classes":5,"./lib/setClasses":21,"./lib/testRunner":27}],3:[function(require,module,exports){
+var ModernizrProto = require('./ModernizrProto');
+
+
+  // Fake some of Object.create
+  // so we can force non test results
+  // to be non "own" properties.
+  var Modernizr = function(){};
+  Modernizr.prototype = ModernizrProto;
+
+  // Leak modernizr globally when you `require` it
+  // rather than force it here.
+  // Overwrite name so constructor name is nicer :D
+  Modernizr = new Modernizr();
+
+  
+
+module.exports = Modernizr;
+},{"./ModernizrProto":4}],4:[function(require,module,exports){
+var tests = require('./tests');
+
+
+  var ModernizrProto = {
+    // The current version, dummy
+    _version: 'v3.0.0pre',
+
+    // Any settings that don't work as separate modules
+    // can go in here as configuration.
+    _config: {
+      classPrefix : '',
+      enableClasses : true
+    },
+
+    // Queue of tests
+    _q: [],
+
+    // Stub these for people who are listening
+    on: function( test, cb ) {
+      // I don't really think people should do this, but we can
+      // safe guard it a bit.
+      // -- NOTE:: this gets WAY overridden in src/addTest for
+      // actual async tests. This is in case people listen to
+      // synchronous tests. I would leave it out, but the code
+      // to *disallow* sync tests in the real version of this
+      // function is actually larger than this.
+      setTimeout(function() {
+        cb(this[test]);
+      }, 0);
+    },
+
+    addTest: function( name, fn, options ) {
+      tests.push({name : name, fn : fn, options : options });
+    },
+
+    addAsyncTest: function (fn) {
+      tests.push({name : null, fn : fn});
+    }
+  };
+
+  
+
+module.exports = ModernizrProto;
+},{"./tests":28}],5:[function(require,module,exports){
+
+  var classes = [];
+  
+module.exports = classes;
+},{}],6:[function(require,module,exports){
+
+  /**
+   * contains returns a boolean for if substr is found within str.
+   */
+  function contains( str, substr ) {
+    return !!~('' + str).indexOf(substr);
+  }
+
+  
+module.exports = contains;
+},{}],7:[function(require,module,exports){
+
+  var createElement = function() {
+    return document.createElement.apply(document, arguments);
+  };
+  
+module.exports = createElement;
+},{}],8:[function(require,module,exports){
+var ModernizrProto = require('./ModernizrProto');
+var omPrefixes = require('./omPrefixes');
+
+
+  var cssomPrefixes = omPrefixes.split(' ');
+  ModernizrProto._cssomPrefixes = cssomPrefixes;
+  
+
+module.exports = cssomPrefixes;
+},{"./ModernizrProto":4,"./omPrefixes":19}],9:[function(require,module,exports){
+
+  var docElement = document.documentElement;
+  
+module.exports = docElement;
+},{}],10:[function(require,module,exports){
+var ModernizrProto = require('./ModernizrProto');
+var omPrefixes = require('./omPrefixes');
+
+
+  var domPrefixes = omPrefixes.toLowerCase().split(' ');
+  ModernizrProto._domPrefixes = domPrefixes;
+  
+
+module.exports = domPrefixes;
+},{"./ModernizrProto":4,"./omPrefixes":19}],11:[function(require,module,exports){
+
+    // Helper function for e.g. boxSizing -> box-sizing
+    function domToHyphenated( name ) {
+        return name.replace(/([A-Z])/g, function(str, m1) {
+            return '-' + m1.toLowerCase();
+        }).replace(/^ms-/, '-ms-');
+    }
+    
+module.exports = domToHyphenated;
+},{}],12:[function(require,module,exports){
+var slice = require('./slice');
+
+
+  // Adapted from ES5-shim https://github.com/kriskowal/es5-shim/blob/master/es5-shim.js
+  // es5.github.com/#x15.3.4.5
+
+  if (!Function.prototype.bind) {
+    Function.prototype.bind = function bind(that) {
+
+      var target = this;
+
+      if (typeof target != "function") {
+        throw new TypeError();
+      }
+
+      var args = slice.call(arguments, 1);
+      var bound = function() {
+
+        if (this instanceof bound) {
+
+          var F = function(){};
+          F.prototype = target.prototype;
+          var self = new F();
+
+          var result = target.apply(
+            self,
+            args.concat(slice.call(arguments))
+          );
+          if (Object(result) === result) {
+            return result;
+          }
+          return self;
+
+        } else {
+
+          return target.apply(
+            that,
+            args.concat(slice.call(arguments))
+          );
+
+        }
+
+      };
+
+      return bound;
+    };
+  }
+
+  
+
+module.exports = Function.prototype.bind;
+},{"./slice":22}],13:[function(require,module,exports){
+var createElement = require('./createElement');
+
+
+  function getBody() {
+    // After page load injecting a fake body doesn't work so check if body exists
+    var body = document.body;
+
+    if(!body) {
+      // Can't use the real body create a fake one.
+      body = createElement('body');
+      body.fake = true;
+    }
+
+    return body;
+  }
+
+  
+
+module.exports = getBody;
+},{"./createElement":7}],14:[function(require,module,exports){
+var ModernizrProto = require('./ModernizrProto');
+var docElement = require('./docElement');
+var createElement = require('./createElement');
+var getBody = require('./getBody');
+
+
+  // Inject element with style element and some CSS rules
+  function injectElementWithStyles( rule, callback, nodes, testnames ) {
+    var mod = 'modernizr';
+    var style;
+    var ret;
+    var node;
+    var docOverflow;
+    var div = createElement('div');
+    var body = getBody();
+
+    if ( parseInt(nodes, 10) ) {
+      // In order not to give false positives we create a node for each test
+      // This also allows the method to scale for unspecified uses
+      while ( nodes-- ) {
+        node = createElement('div');
+        node.id = testnames ? testnames[nodes] : mod + (nodes + 1);
+        div.appendChild(node);
+      }
+    }
+
+    // <style> elements in IE6-9 are considered 'NoScope' elements and therefore will be removed
+    // when injected with innerHTML. To get around this you need to prepend the 'NoScope' element
+    // with a 'scoped' element, in our case the soft-hyphen entity as it won't mess with our measurements.
+    // msdn.microsoft.com/en-us/library/ms533897%28VS.85%29.aspx
+    // Documents served as xml will throw if using &shy; so use xml friendly encoded version. See issue #277
+    style = ['&#173;','<style id="s', mod, '">', rule, '</style>'].join('');
+    div.id = mod;
+    // IE6 will false positive on some tests due to the style element inside the test div somehow interfering offsetHeight, so insert it into body or fakebody.
+    // Opera will act all quirky when injecting elements in documentElement when page is served as xml, needs fakebody too. #270
+    (!body.fake ? div : body).innerHTML += style;
+    body.appendChild(div);
+    if ( body.fake ) {
+      //avoid crashing IE8, if background image is used
+      body.style.background = '';
+      //Safari 5.13/5.1.4 OSX stops loading if ::-webkit-scrollbar is used and scrollbars are visible
+      body.style.overflow = 'hidden';
+      docOverflow = docElement.style.overflow;
+      docElement.style.overflow = 'hidden';
+      docElement.appendChild(body);
+    }
+
+    ret = callback(div, rule);
+    // If this is done after page load we don't want to remove the body so check if body exists
+    if ( body.fake ) {
+      body.parentNode.removeChild(body);
+      docElement.style.overflow = docOverflow;
+      // Trigger layout so kinetic scrolling isn't disabled in iOS6+
+      docElement.offsetHeight;
+    } else {
+      div.parentNode.removeChild(div);
+    }
+
+    return !!ret;
+
+  }
+
+  
+
+module.exports = injectElementWithStyles;
+},{"./ModernizrProto":4,"./createElement":7,"./docElement":9,"./getBody":13}],15:[function(require,module,exports){
+
+  /**
+   * is returns a boolean for if typeof obj is exactly type.
+   */
+  function is( obj, type ) {
+    return typeof obj === type;
+  }
+  
+module.exports = is;
+},{}],16:[function(require,module,exports){
+var Modernizr = require('./Modernizr');
+var modElem = require('./modElem');
+
+
+  var mStyle = {
+    style : modElem.elem.style
+  };
+
+  // kill ref for gc, must happen before
+  // mod.elem is removed, so we unshift on to
+  // the front of the queue.
+  Modernizr._q.unshift(function() {
+    delete mStyle.style;
+  });
+
+  
+
+module.exports = mStyle;
+},{"./Modernizr":3,"./modElem":17}],17:[function(require,module,exports){
+var Modernizr = require('./Modernizr');
+var createElement = require('./createElement');
+
+
+  /**
+   * Create our "modernizr" element that we do most feature tests on.
+   */
+  var modElem = {
+    elem : createElement('modernizr')
+  };
+
+  // Clean up this element
+  Modernizr._q.push(function() {
+    delete modElem.elem;
+  });
+
+  
+
+module.exports = modElem;
+},{"./Modernizr":3,"./createElement":7}],18:[function(require,module,exports){
+var injectElementWithStyles = require('./injectElementWithStyles');
+var domToHyphenated = require('./domToHyphenated');
+
+
+    // Function to allow us to use native feature detection functionality if available.
+    // Accepts a list of property names and a single value
+    // Returns `undefined` if native detection not available
+    function nativeTestProps ( props, value ) {
+        var i = props.length;
+        // Start with the JS API: http://www.w3.org/TR/css3-conditional/#the-css-interface
+        if ('CSS' in window && 'supports' in window.CSS) {
+            // Try every prefixed variant of the property
+            while (i--) {
+                if (window.CSS.supports(domToHyphenated(props[i]), value)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        // Otherwise fall back to at-rule (for FF 17 and Opera 12.x)
+        else if ('CSSSupportsRule' in window) {
+            // Build a condition string for every prefixed variant
+            var conditionText = [];
+            while (i--) {
+                conditionText.push('(' + domToHyphenated(props[i]) + ':' + value + ')');
+            }
+            conditionText = conditionText.join(' or ');
+            return injectElementWithStyles('@supports (' + conditionText + ') { #modernizr { position: absolute; } }', function( node ) {
+                return (window.getComputedStyle ?
+                        getComputedStyle(node, null) :
+                        node.currentStyle)['position'] == 'absolute';
+            });
+        }
+        return undefined;
+    }
+    
+
+module.exports = nativeTestProps;
+},{"./domToHyphenated":11,"./injectElementWithStyles":14}],19:[function(require,module,exports){
+
+  // Following spec is to expose vendor-specific style properties as:
+  //   elem.style.WebkitBorderRadius
+  // and the following would be incorrect:
+  //   elem.style.webkitBorderRadius
+
+  // Webkit ghosts their properties in lowercase but Opera & Moz do not.
+  // Microsoft uses a lowercase `ms` instead of the correct `Ms` in IE8+
+  //   erik.eae.net/archives/2008/03/10/21.48.10/
+
+  // More here: github.com/Modernizr/Modernizr/issues/issue/21
+  var omPrefixes = 'Webkit Moz O ms';
+  
+module.exports = omPrefixes;
+},{}],20:[function(require,module,exports){
+var ModernizrProto = require('./ModernizrProto');
+
+
+  // List of property values to set for css tests. See ticket #21
+  var prefixes = ' -webkit- -moz- -o- -ms- '.split(' ');
+
+  // expose these for the plugin API. Look in the source for how to join() them against your input
+  ModernizrProto._prefixes = prefixes;
+
+  
+
+module.exports = prefixes;
+},{"./ModernizrProto":4}],21:[function(require,module,exports){
+var Modernizr = require('./Modernizr');
+var docElement = require('./docElement');
+
+
+  // Pass in an and array of class names, e.g.:
+  //  ['no-webp', 'borderradius', ...]
+  function setClasses( classes ) {
+    var className = docElement.className;
+    var regex;
+    var classPrefix = Modernizr._config.classPrefix || '';
+
+    // Change `no-js` to `js` (we do this regardles of the `enableClasses`
+    // option)
+    // Handle classPrefix on this too
+    var reJS = new RegExp('(^|\\s)'+classPrefix+'no-js(\\s|$)');
+    className = className.replace(reJS, '$1'+classPrefix+'js$2');
+
+    if(Modernizr._config.enableClasses) {
+      // Add the new classes
+      className += ' ' + classPrefix + classes.join(' ' + classPrefix);
+      docElement.className = className;
+    }
+
+  }
+
+  
+
+module.exports = setClasses;
+},{"./Modernizr":3,"./docElement":9}],22:[function(require,module,exports){
+var classes = require('./classes');
+
+
+  var slice = classes.slice;
+  
+
+module.exports = slice;
+},{"./classes":5}],23:[function(require,module,exports){
+var ModernizrProto = require('./ModernizrProto');
+var testPropsAll = require('./testPropsAll');
+
+
+  /**
+   * testAllProps determines whether a given CSS property, in some prefixed
+   * form, is supported by the browser. It can optionally be given a value; in
+   * which case testAllProps will only return true if the browser supports that
+   * value for the named property; this latter case will use native detection
+   * (via window.CSS.supports) if available. A boolean can be passed as a 3rd
+   * parameter to skip the value check when native detection isn't available,
+   * to improve performance when simply testing for support of a property.
+   *
+   * @param prop - String naming the property to test
+   * @param value - [optional] String of the value to test
+   * @param skipValueTest - [optional] Whether to skip testing that the value
+   *                        is supported when using non-native detection
+   *                        (default: false)
+   */
+    function testAllProps (prop, value, skipValueTest) {
+        return testPropsAll(prop, undefined, undefined, value, skipValueTest);
+    }
+    ModernizrProto.testAllProps = testAllProps;
+    
+
+module.exports = testAllProps;
+},{"./ModernizrProto":4,"./testPropsAll":26}],24:[function(require,module,exports){
+var is = require('./is');
+require('./fnBind');
+
+
+  /**
+   * testDOMProps is a generic DOM property test; if a browser supports
+   *   a certain property, it won't return undefined for it.
+   */
+  function testDOMProps( props, obj, elem ) {
+    var item;
+
+    for ( var i in props ) {
+      if ( props[i] in obj ) {
+
+        // return the property name as a string
+        if (elem === false) return props[i];
+
+        item = obj[props[i]];
+
+        // let's bind a function (and it has a bind method -- certain native objects that report that they are a
+        // function don't [such as webkitAudioContext])
+        if (is(item, 'function') && 'bind' in item){
+          // default to autobind unless override
+          return item.bind(elem || obj);
+        }
+
+        // return the unbound function or obj or value
+        return item;
+      }
+    }
+    return false;
+  }
+
+  
+
+module.exports = testDOMProps;
+},{"./fnBind":12,"./is":15}],25:[function(require,module,exports){
+var contains = require('./contains');
+var mStyle = require('./mStyle');
+var createElement = require('./createElement');
+var nativeTestProps = require('./nativeTestProps');
+var is = require('./is');
+
+
+  // testProps is a generic CSS / DOM property test.
+
+  // In testing support for a given CSS property, it's legit to test:
+  //    `elem.style[styleName] !== undefined`
+  // If the property is supported it will return an empty string,
+  // if unsupported it will return undefined.
+
+  // We'll take advantage of this quick test and skip setting a style
+  // on our modernizr element, but instead just testing undefined vs
+  // empty string.
+
+  // Because the testing of the CSS property names (with "-", as
+  // opposed to the camelCase DOM properties) is non-portable and
+  // non-standard but works in WebKit and IE (but not Gecko or Opera),
+  // we explicitly reject properties with dashes so that authors
+  // developing in WebKit or IE first don't end up with
+  // browser-specific content by accident.
+
+  function testProps( props, prefixed, value, skipValueTest ) {
+    skipValueTest = is(skipValueTest, 'undefined') ? false : skipValueTest;
+
+    // Try native detect first
+    if (!is(value, 'undefined')) {
+      var result = nativeTestProps(props, value);
+      if(!is(result, 'undefined')) {
+        return result;
+      }
+    }
+
+    // Otherwise do it properly
+    var afterInit, i, j, prop, before;
+
+    // If we don't have a style element, that means
+    // we're running async or after the core tests,
+    // so we'll need to create our own elements to use
+    if ( !mStyle.style ) {
+      afterInit = true;
+      mStyle.modElem = createElement('modernizr');
+      mStyle.style = mStyle.modElem.style;
+    }
+
+    // Delete the objects if we
+    // we created them.
+    function cleanElems() {
+      if (afterInit) {
+        delete mStyle.style;
+        delete mStyle.modElem;
+      }
+    }
+
+    for ( i in props ) {
+      prop = props[i];
+      before = mStyle.style[prop];
+
+      if ( !contains(prop, "-") && mStyle.style[prop] !== undefined ) {
+
+        // If value to test has been passed in, do a set-and-check test.
+        // 0 (integer) is a valid property value, so check that `value` isn't
+        // undefined, rather than just checking it's truthy.
+        if (!skipValueTest && !is(value, 'undefined')) {
+
+          // Needs a try catch block because of old IE. This is slow, but will
+          // be avoided in most cases because `skipValueTest` will be used.
+          try {
+            mStyle.style[prop] = value;
+          } catch (e) {}
+
+          // If the property value has changed, we assume the value used is
+          // supported. If `value` is empty string, it'll fail here (because
+          // it hasn't changed), which matches how browsers have implemented
+          // CSS.supports()
+          if (mStyle.style[prop] != before) {
+            cleanElems();
+            return prefixed == 'pfx' ? prop : true;
+          }
+        }
+        // Otherwise just return true, or the property name if this is a
+        // `prefixed()` call
+        else {
+          cleanElems();
+          return prefixed == 'pfx' ? prop : true;
+        }
+      }
+    }
+    cleanElems();
+    return false;
+  }
+
+  
+
+module.exports = testProps;
+},{"./contains":6,"./createElement":7,"./is":15,"./mStyle":16,"./nativeTestProps":18}],26:[function(require,module,exports){
+var ModernizrProto = require('./ModernizrProto');
+var cssomPrefixes = require('./cssomPrefixes');
+var is = require('./is');
+var testProps = require('./testProps');
+var domPrefixes = require('./domPrefixes');
+var testDOMProps = require('./testDOMProps');
+var prefixes = require('./prefixes');
+
+
+    /**
+     * testPropsAll tests a list of DOM properties we want to check against.
+     *     We specify literally ALL possible (known and/or likely) properties on
+     *     the element including the non-vendor prefixed one, for forward-
+     *     compatibility.
+     */
+    function testPropsAll( prop, prefixed, elem, value, skipValueTest ) {
+
+        var ucProp = prop.charAt(0).toUpperCase() + prop.slice(1),
+            props = (prop + ' ' + cssomPrefixes.join(ucProp + ' ') + ucProp).split(' ');
+
+        // did they call .prefixed('boxSizing') or are we just testing a prop?
+        if(is(prefixed, "string") || is(prefixed, "undefined")) {
+            return testProps(props, prefixed, value, skipValueTest);
+
+            // otherwise, they called .prefixed('requestAnimationFrame', window[, elem])
+        } else {
+            props = (prop + ' ' + (domPrefixes).join(ucProp + ' ') + ucProp).split(' ');
+            return testDOMProps(props, prefixed, elem);
+        }
+    }
+
+    // Modernizr.testAllProps() investigates whether a given style property,
+    //     or any of its vendor-prefixed variants, is recognized
+    // Note that the property names must be provided in the camelCase variant.
+    // Modernizr.testAllProps('boxSizing')
+    ModernizrProto.testAllProps = testPropsAll;
+
+    
+
+module.exports = testPropsAll;
+},{"./ModernizrProto":4,"./cssomPrefixes":8,"./domPrefixes":10,"./is":15,"./prefixes":20,"./testDOMProps":24,"./testProps":25}],27:[function(require,module,exports){
+var tests = require('./tests');
+var Modernizr = require('./Modernizr');
+var classes = require('./classes');
+var is = require('./is');
+
+
+  // Run through all tests and detect their support in the current UA.
+  function testRunner() {
+    var featureNames;
+    var feature;
+    var aliasIdx;
+    var result;
+    var nameIdx;
+    var featureName;
+    var featureNameSplit;
+    var modernizrProp;
+    var mPropCount;
+
+    for ( var featureIdx in tests ) {
+      featureNames = [];
+      feature = tests[featureIdx];
+      // run the test, throw the return value into the Modernizr,
+      //   then based on that boolean, define an appropriate className
+      //   and push it into an array of classes we'll join later.
+      //
+      //   If there is no name, it's an 'async' test that is run,
+      //   but not directly added to the object. That should
+      //   be done with a post-run addTest call.
+      if ( feature.name ) {
+        featureNames.push(feature.name.toLowerCase());
+
+        if (feature.options && feature.options.aliases && feature.options.aliases.length) {
+          // Add all the aliases into the names list
+          for (aliasIdx = 0; aliasIdx < feature.options.aliases.length; aliasIdx++) {
+            featureNames.push(feature.options.aliases[aliasIdx].toLowerCase());
+          }
+        }
+      }
+
+      // Run the test, or use the raw value if it's not a function
+      result = is(feature.fn, 'function') ? feature.fn() : feature.fn;
+
+
+      // Set each of the names on the Modernizr object
+      for (nameIdx = 0; nameIdx < featureNames.length; nameIdx++) {
+        featureName = featureNames[nameIdx];
+        // Support dot properties as sub tests. We don't do checking to make sure
+        // that the implied parent tests have been added. You must call them in
+        // order (either in the test, or make the parent test a dependency).
+        //
+        // Cap it to TWO to make the logic simple and because who needs that kind of subtesting
+        // hashtag famous last words
+        featureNameSplit = featureName.split('.');
+
+        if (featureNameSplit.length === 1) {
+          Modernizr[featureNameSplit[0]] = result;
+        }
+        else if (featureNameSplit.length === 2) {
+          Modernizr[featureNameSplit[0]][featureNameSplit[1]] = result;
+        }
+
+        classes.push((result ? '' : 'no-') + featureNameSplit.join('-'));
+      }
+    }
+  }
+
+  
+
+module.exports = testRunner;
+},{"./Modernizr":3,"./classes":5,"./is":15,"./tests":28}],28:[function(require,module,exports){
+
+  var tests = [];
+  
+module.exports = tests;
+},{}],29:[function(require,module,exports){
+var Modernizr = require('./../../lib/Modernizr');
+var testAllProps = require('./../../lib/testAllProps');
+
+/*!
+{
+  "name": "CSS Transitions",
+  "property": "csstransitions",
+  "caniuse": "css-transitions",
+  "tags": ["css"]
+}
+!*/
+
+  Modernizr.addTest('csstransitions', testAllProps('transition', 'all', true));
+
+
+},{"./../../lib/Modernizr":3,"./../../lib/testAllProps":23}],30:[function(require,module,exports){
+/**
+ * jQuery plugin declaration.
+ * A wrapper is created in order to ensure one instance per DOM element
+ */
+
+module.exports = {
+    wrap: function(name, clazz, $) {
+		if(!$) {
+            throw Error("jQuery not found");
+        }
+        var dataKey = "plugin_" + name;
+
+        $.fn[ name ] = function ( method ) {
+            var plugin = this.data( dataKey );
+            if (plugin && plugin[method]) {
+                var value = plugin[method].apply(plugin, [].slice.call(arguments, 1));
+				if(typeof value === 'undefined') { value = this }
+				return value;
+
+            } else if (typeof method === 'object' || !method) {
+
+                $elems = this.each(function() {
+                    if ( !$.data( this, dataKey ) ) {
+                        $.data( this, dataKey, new clazz( this, method ) );
+                    }
+                });
+
+				if(method && method.api && this.length > 0) {
+					return this.eq(0).data(dataKey);
+				}
+
+				return $elems;
+
+            } else {
+                $.error('Method ' + method + ' does not exist on ' + name);
+            }
+        };
+    }
+}
+
+
+
+
+},{}],31:[function(require,module,exports){
+/*! matchMedia() polyfill addListener/removeListener extension. Author & copyright (c) 2012: Scott Jehl. Dual MIT/BSD license */
+(function(){
+    // Bail out for browsers that have addListener support
+    if (window.matchMedia && window.matchMedia('all').addListener) {
+        return false;
+    }
+
+    var localMatchMedia = window.matchMedia,
+        hasMediaQueries = localMatchMedia('only all').matches,
+        isListening     = false,
+        timeoutID       = 0,    // setTimeout for debouncing 'handleChange'
+        queries         = [],   // Contains each 'mql' and associated 'listeners' if 'addListener' is used
+        handleChange    = function() {
+            // Debounce
+            clearTimeout(timeoutID);
+
+            timeoutID = setTimeout(function() {
+                for (var i = 0, il = queries.length; i < il; i++) {
+                    var mql         = queries[i].mql,
+                        listeners   = queries[i].listeners || [],
+                        matches     = localMatchMedia(mql.media).matches;
+
+                    // Update mql.matches value and call listeners
+                    // Fire listeners only if transitioning to or from matched state
+                    if (matches !== mql.matches) {
+                        mql.matches = matches;
+
+                        for (var j = 0, jl = listeners.length; j < jl; j++) {
+                            listeners[j].call(window, mql);
+                        }
+                    }
+                }
+            }, 30);
+        };
+
+    window.matchMedia = function(media) {
+        var mql         = localMatchMedia(media),
+            listeners   = [],
+            index       = 0;
+
+        mql.addListener = function(listener) {
+            // Changes would not occur to css media type so return now (Affects IE <= 8)
+            if (!hasMediaQueries) {
+                return;
+            }
+
+            // Set up 'resize' listener for browsers that support CSS3 media queries (Not for IE <= 8)
+            // There should only ever be 1 resize listener running for performance
+            if (!isListening) {
+                isListening = true;
+                window.addEventListener('resize', handleChange, true);
+            }
+
+            // Push object only if it has not been pushed already
+            if (index === 0) {
+                index = queries.push({
+                    mql         : mql,
+                    listeners   : listeners
+                });
+            }
+
+            listeners.push(listener);
+        };
+
+        mql.removeListener = function(listener) {
+            for (var i = 0, il = listeners.length; i < il; i++){
+                if (listeners[i] === listener){
+                    listeners.splice(i, 1);
+                }
+            }
+        };
+
+        return mql;
+    };
+}());
+
+},{}],32:[function(require,module,exports){
+/*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
+
+window.matchMedia || (window.matchMedia = function() {
+    "use strict";
+
+    // For browsers that support matchMedium api such as IE 9 and webkit
+    var styleMedia = (window.styleMedia || window.media);
+
+    // For those that don't support matchMedium
+    if (!styleMedia) {
+        var style       = document.createElement('style'),
+            script      = document.getElementsByTagName('script')[0],
+            info        = null;
+
+        style.type  = 'text/css';
+        style.id    = 'matchmediajs-test';
+
+        script.parentNode.insertBefore(style, script);
+
+        // 'style.currentStyle' is used by IE <= 8 and 'window.getComputedStyle' for all other browsers
+        info = ('getComputedStyle' in window) && window.getComputedStyle(style, null) || style.currentStyle;
+
+        styleMedia = {
+            matchMedium: function(media) {
+                var text = '@media ' + media + '{ #matchmediajs-test { width: 1px; } }';
+
+                // 'style.styleSheet' is used by IE <= 8 and 'style.textContent' for all other browsers
+                if (style.styleSheet) {
+                    style.styleSheet.cssText = text;
+                } else {
+                    style.textContent = text;
+                }
+
+                // Test if media query is true or false
+                return info.width === '1px';
+            }
+        };
+    }
+
+    return function(media) {
+        return {
+            matches: styleMedia.matchMedium(media || 'all'),
+            media: media || 'all'
+        };
+    };
+}());
+
+},{}],33:[function(require,module,exports){
+var $ = require('jquery'), CSSRuleRegex = /^([^:]+):(.+)/;
+
+//IE polyfill
+require('./lib/matchMedia');
+require('./lib/matchMedia.addListener');
+
+/**
+ * Uses the settings.errorLogger to find the errorLogger if it was defined.
+ * The logger will be used to report errors on invalid items.
+ * If no logger is found, errors wont be reported.
+ */
+function setErrorLogger() {
+  if(!this.settings.errorLogger) { return; }
+
+  var logger;
+
+  if(Util.isString(this.settings.errorLogger)) {
+    logger = Util.getDeepValue(this.settings.errorLogger);
+  } else {
+    logger = this.settings.errorLogger;
+  }
+
+  this._errorLogger = logger;
+
+  console.info((this._errorLogger)?
+      "Error logger is defined. It will be used to log invalid items.":
+      "No error logger found. Errors wont be logged");
+}
+
+function obtainCSSValues(selector, CSS) {
+  var pattern = new RegExp(selector.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + "\\s*{(\\s*[^}]+)}");
+  return CSS.match(pattern)[1];
+}
+
+//gets css rule object
+//@param: String
+//ie: {"width" : "100px"}
+function getCSSRule(rule) {
+  var CSSrule = {},
+  data = CSSRuleRegex.exec(rule);
+  CSSrule.property = data [1];
+  CSSrule.value = data [2];
+  return CSSrule;
+}
+
+//return all selector css values for a media query rule in a key/value format.
+function obtainCSSValuesFromRule(cssRules) {
+  var rules = {};
+  $.each(cssRules, function(i, rule) {
+    var values = obtainCSSValues(rule.selectorText, rule.cssText).split(';');
+    
+    $.each(rule.selectorText.replace(/,\s+/g,',').split(','), function(i, selector) {
+      rules[selector] = [];
+      $.each(values, function(i, value) {
+        if (CSSRuleRegex.test(value) === true) {
+          rules[selector].push(getCSSRule(value));
+        }
+      });
+    });
+          
+  });
+  return rules;
+}
+
+/**
+ * Class constructor
+ */
+function MediaQueryWatcher () {
+  this.mediaQueriesRules = {};
+}
+
+//return all selector css values for a media query rule in a key/value format.
+function obtainCSS(rule) {
+  var rules = {};
+    var values = obtainCSSValues(rule.selectorText, rule.cssText).split(';');
+    rules[rule.selectorText] = [];
+    $.each(values, function(i, value) {
+      if (CSSRuleRegex.test(value) === true) {
+        rules[rule.selectorText].push(getCSSRule(value));
+      }
+    });
+  return rules;
+}
+
+/**
+ * Media Query Watcher Class contents
+ */
+MediaQueryWatcher.prototype = {
+
+ addMediaQueriesListener : function (styleSheet, mediaChangeHandler) {
+    var rules, actualAppliedRules = ["noMediaRule"], mql;
+    if (styleSheet) {
+      rules = styleSheet.cssRules;
+      for (var j = 0; j < rules.length; j += 1) {
+        if (rules[j].constructor === window.CSSMediaRule) {
+            this.mediaQueriesRules[rules[j].media.mediaText] = this.mediaQueriesRules[rules[j].media.mediaText] || {};
+            $.extend(this.mediaQueriesRules[rules[j].media.mediaText], obtainCSSValuesFromRule(rules[j].cssRules));
+            mql = window.matchMedia(rules[j].media.mediaText);
+            if (mql.matches === true) {
+              actualAppliedRules.push(rules[j].media.mediaText); 
+            }
+            mql.addListener(mediaChangeHandler);
+        } else if (rules[j].constructor === window.CSSStyleRule) {
+            this.mediaQueriesRules["noMediaRule"] = this.mediaQueriesRules["noMediaRule"] || {};
+            $.extend(this.mediaQueriesRules["noMediaRule"], obtainCSSValuesFromRule([rules[j]]));
+        }
+      }
+    }
+    
+    return actualAppliedRules;
+  },
+
+  //gets the target CSS properties from a @mediaData for the indicated selectors in descending priority order.
+  getMediaQueryProperties : function (mediaData, selectors, targetProperties) {
+    var propertiesObject = {}, itemsRemoved = 0;
+
+    if (typeof(mediaData) !== 'undefined') {
+      $.each(selectors, function (index, selector) {
+        var property, propertyPosition;
+        if (typeof(mediaData[selector]) !== 'undefined') {
+          $.each(mediaData[selector], function(i, val) {
+            property = val.property.split(" ").join("");
+            propertyPosition = targetProperties.indexOf(property);
+            if (propertyPosition !== -1) {
+              propertiesObject[property] = val.value.split(" ").join("");
+              targetProperties.splice(propertyPosition - itemsRemoved, 1);
+              itemsRemoved += 1;
+            }
+          });
+        }
+        if (targetProperties.length === 0) {
+          return false;
+        }
+      });
+    }
+
+    return propertiesObject;
+  }
+
+};
+
+// Exports the class
+module.exports = MediaQueryWatcher;
+},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"H0VjM3"}],"class":[function(require,module,exports){
+module.exports=require('DSkb5a');
+},{}],"DSkb5a":[function(require,module,exports){
+/* Simple JavaScript Inheritance
+ * By John Resig http://ejohn.org/
+ * MIT Licensed.
+ */
+// Inspired by base2 and Prototype
+(function() {
+  var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
+  // The base Class implementation (does nothing)
+  this.Class = function(){};
+  
+  // Create a new Class that inherits from this class
+  Class.extend = function(prop) {
+    var _super = this.prototype;
+    
+    // Instantiate a base class (but only create the instance,
+    // don't run the init constructor)
+    initializing = true;
+    var prototype = new this();
+    initializing = false;
+    
+    // Copy the properties over onto the new prototype
+    for (var name in prop) {
+      // Check if we're overwriting an existing function
+      prototype[name] = typeof prop[name] == "function" && 
+        typeof _super[name] == "function" && fnTest.test(prop[name]) ?
+        (function(name, fn){
+          return function() {
+            var tmp = this._super;
+            
+            // Add a new ._super() method that is the same method
+            // but on the super-class
+            this._super = _super[name];
+            
+            // The method only need to be bound temporarily, so we
+            // remove it when we're done executing
+            var ret = fn.apply(this, arguments);        
+            this._super = tmp;
+            
+            return ret;
+          };
+        })(name, prop[name]) :
+        prop[name];
+    }
+    
+    // The dummy class constructor
+    function Class() {
+      // All construction is actually done in the init method
+      if ( !initializing && this.init )
+        this.init.apply(this, arguments);
+    }
+    
+    // Populate our constructed prototype object
+    Class.prototype = prototype;
+    
+    // Enforce the constructor to be what we expect
+    Class.constructor = Class;
+
+    // And make this class extendable
+    Class.extend = arguments.callee;
+    
+    return Class;
+  };
+})();
+
+module.exports = Class;
 },{}],36:[function(require,module,exports){
 var Class = require('class');
 require('browsernizr/test/css/transitions');
@@ -1512,7 +1500,7 @@ module.exports = Class.extend({
 
 });
 
-},{"browsernizr":1,"browsernizr/test/css/transitions":28,"class":"DSkb5a"}],37:[function(require,module,exports){
+},{"browsernizr":2,"browsernizr/test/css/transitions":29,"class":"DSkb5a"}],37:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -3434,7 +3422,9 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"DSkb5a","jquery":"H0VjM3"}],"52u7fV":[function(require,module,exports){
+},{"class":"DSkb5a","jquery":"H0VjM3"}],"wrapper":[function(require,module,exports){
+module.exports=require('52u7fV');
+},{}],"52u7fV":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3442,9 +3432,7 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"H0VjM3","jquery-plugin-wrapper":29}],"wrapper":[function(require,module,exports){
-module.exports=require('52u7fV');
-},{}],"H0VjM3":[function(require,module,exports){
+},{"./carousel":41,"jquery":"H0VjM3","jquery-plugin-wrapper":30}],"H0VjM3":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
@@ -3650,7 +3638,7 @@ module.exports = Class.extend({
 
 },{"./eager-strategy":49,"./lazy-strategy":50,"class":"DSkb5a"}],52:[function(require,module,exports){
 var Class = require('class'),
-SpinJs = require('spin.js'),
+SpinJs = require('../../../libs/spin.js'),
 $ = require('jquery');
 
 
@@ -3755,7 +3743,7 @@ module.exports = Class.extend({
     }
 });
 
-},{"class":"DSkb5a","jquery":"H0VjM3","spin.js":35}],53:[function(require,module,exports){
+},{"../../../libs/spin.js":1,"class":"DSkb5a","jquery":"H0VjM3"}],53:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -4336,7 +4324,7 @@ module.exports = Class.extend({
 	}
 	
 });
-},{"class":"DSkb5a","jquery":"H0VjM3","mediaquerywatcher":32}],56:[function(require,module,exports){
+},{"class":"DSkb5a","jquery":"H0VjM3","mediaquerywatcher":33}],56:[function(require,module,exports){
 exports.getDependency = function(dependencies, name, defaultDep) {
 	dependencies = dependencies || {};
 	return dependencies[name] || defaultDep;
@@ -4432,5 +4420,4 @@ exports.isIE = function() {
 
 },{}]},{},["52u7fV"])
 ;
-return require('wrapper');
-}));
+})(this, jQuery);

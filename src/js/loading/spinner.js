@@ -1,5 +1,5 @@
 var Class = require('class'),
-SpinJs = require('spin.js'),
+SpinJs = require('../../../libs/spin.js'),
 $ = require('jquery');
 
 
