@@ -1,4 +1,5 @@
 var AbstractStrategy = require('./abstract-strategy');
+var $ = require('jquery');
 
 module.exports = AbstractStrategy.extend({
 
@@ -6,7 +7,19 @@ module.exports = AbstractStrategy.extend({
 		var overviewPosition = this.getPixels($overview, 'left');
 		var currentPosition = ($currentItem.length > 0)? this.getPixels($currentItem, 'left'): -1*overviewPosition;
 
-		var offset = this.getPixels($pageToShow, 'left');
+		var offset;
+		//Checks if item has fixed width and it is the last page.
+		if ($overview.children()[0].style.width.indexOf('px') !== -1 && ($overview.children()[$overview.children().length - 1] === $pageToShow[$pageToShow.length - 1])) {
+			var itemWidth = $($overview.children()[0]).width();
+			var itemsCount = $overview.children().length;
+			var pageSize = $pageToShow.length;
+			var pageWidth = pageSize * itemWidth;
+			var diffToFill = pageWidth - $overview.width();
+			offset = itemsCount * itemWidth - pageWidth + diffToFill;
+		} else {
+			offset = this.getPixels($pageToShow, 'left');
+		}
+
 		var difference = currentPosition - offset;
 		var position = overviewPosition;
 		if (difference !== 0) {

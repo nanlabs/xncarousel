@@ -1766,6 +1766,7 @@ module.exports = NoAnimationStrategy;
 
 },{"./slider-strategy":40}],40:[function(require,module,exports){
 var AbstractStrategy = require('./abstract-strategy');
+var $ = require('jquery');
 
 module.exports = AbstractStrategy.extend({
 
@@ -1773,7 +1774,19 @@ module.exports = AbstractStrategy.extend({
 		var overviewPosition = this.getPixels($overview, 'left');
 		var currentPosition = ($currentItem.length > 0)? this.getPixels($currentItem, 'left'): -1*overviewPosition;
 
-		var offset = this.getPixels($pageToShow, 'left');
+		var offset;
+		//Checks if item has fixed width and it is the last page.
+		if ($overview.children()[0].style.width.indexOf('px') !== -1 && ($overview.children()[$overview.children().length - 1] === $pageToShow[$pageToShow.length - 1])) {
+			var itemWidth = $($overview.children()[0]).width();
+			var itemsCount = $overview.children().length;
+			var pageSize = $pageToShow.length;
+			var pageWidth = pageSize * itemWidth;
+			var diffToFill = pageWidth - $overview.width();
+			offset = itemsCount * itemWidth - pageWidth + diffToFill;
+		} else {
+			offset = this.getPixels($pageToShow, 'left');
+		}
+
 		var difference = currentPosition - offset;
 		var position = overviewPosition;
 		if (difference !== 0) {
@@ -1834,7 +1847,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":36}],41:[function(require,module,exports){
+},{"./abstract-strategy":36,"jquery":"H0VjM3"}],41:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 var util = require('./util');
@@ -2367,7 +2380,8 @@ module.exports = Class.extend({
 			this.pagingModule.renderIndicator();
 			this.pagingModule.pagingIndicator.select(actualPage);
 			setTimeout(function () {
-				self.goToPage(actualPage);
+				var pageCount = self.$viewport.find('.pagination .item-container').children().length;
+				self.goToPage(actualPage < pageCount ? actualPage : pageCount - 1);
 			}, 0);
 		}
 	},
@@ -3420,9 +3434,7 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"DSkb5a","jquery":"H0VjM3"}],"wrapper":[function(require,module,exports){
-module.exports=require('52u7fV');
-},{}],"52u7fV":[function(require,module,exports){
+},{"class":"DSkb5a","jquery":"H0VjM3"}],"52u7fV":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3430,8 +3442,8 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"H0VjM3","jquery-plugin-wrapper":29}],"jquery":[function(require,module,exports){
-module.exports=require('H0VjM3');
+},{"./carousel":41,"jquery":"H0VjM3","jquery-plugin-wrapper":29}],"wrapper":[function(require,module,exports){
+module.exports=require('52u7fV');
 },{}],"H0VjM3":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
@@ -3439,6 +3451,8 @@ module.exports=require('H0VjM3');
  */
 module.exports = jQuery;
 
+},{}],"jquery":[function(require,module,exports){
+module.exports=require('H0VjM3');
 },{}],48:[function(require,module,exports){
 var Class = require('class');
 
@@ -4033,6 +4047,12 @@ module.exports = Class.extend({
 		var first = this.pageSize * pageNumber;
 		var last = Math.min(first + this.pageSize, this.carouselApi.getItemCount()) - 1;
 
+		if(first > last) { return []; }
+		
+		//It only displays pages full of content
+		if (last - first < this.pageSize - 1) {
+			first -= this.pageSize - 1 - (last - first);
+		}
 		var result = [];
 		for(var i = first; i <= last; i ++) {
 			result.push(i);

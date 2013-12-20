@@ -185,6 +185,8 @@ module.exports = Class.extend({
 		var first = this.pageSize * pageNumber;
 		var last = Math.min(first + this.pageSize, this.carouselApi.getItemCount()) - 1;
 
+		if(first > last) { return []; }
+		
 		//It only displays pages full of content
 		if (last - first < this.pageSize - 1) {
 			first -= this.pageSize - 1 - (last - first);

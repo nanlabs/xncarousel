@@ -97,7 +97,7 @@ describe 'Pagination module', (done)->
 			expect(module.getIndicesForPage(0)).to.have.members [0, 1, 2, 3, 4]
 			expect(module.getIndicesForPage(1)).to.have.members [5, 6, 7, 8, 9]
 			expect(module.getIndicesForPage(2)).to.have.members [10, 11, 12, 13, 14]
-			expect(module.getIndicesForPage(3)).to.have.members [15, 16]
+			expect(module.getIndicesForPage(3)).to.have.members [12, 13, 14, 15, 16] #The normal case would be 15 and 16, but the paginator tries to fill a complete page.
 			expect(module.getIndicesForPage(4)).to.be.empty
 
 	describe 'calculation (circular = false)', ->
