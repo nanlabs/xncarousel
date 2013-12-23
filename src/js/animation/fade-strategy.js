@@ -4,6 +4,7 @@ module.exports = AbstractStrategy.extend({
 
 	animateToPage: function ($overview, $currentItem, $nextItem) {
 		this._animateItem($currentItem, $nextItem);
+		this._disabled = false; 
 	},
 
 	setItemVisible: function ($item) {
@@ -62,7 +63,12 @@ module.exports = AbstractStrategy.extend({
 	},
 
 	animatePartial: function($overview, pcn, $currentItem) {
-		$currentItem.css('opacity', (1 - Math.abs(pcn)));
+		if (!this._disabled){
+			this._disabled = true;
+			var pctAdapted = Math.abs(pcn) < 0.8 ? Math.abs(pcn) : 0.8;
+			$currentItem.css('opacity', (1 - Math.abs(pctAdapted)));
+		}
+
 	}
 
 });
