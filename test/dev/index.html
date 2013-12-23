@@ -26,7 +26,7 @@
     <body>
     	<div id="apiDemo">
     		<div>API</div>
-        	<div class="viewport api">
+        	<div class="xn-viewport api">
         	</div>
         	<div class="buttonbar">
         		<div class="modifiers">
@@ -37,7 +37,7 @@
 	        		<input type="button" id="btnSelect" value="Select 2nd item"></input>
 	        		<input type="button" id="btnClearSelect" value="Clear Selection"></input>
         		</div>
-        		<div class="pagination">
+        		<div class="xn-pagination">
         			<input type="button" id="btnBack" value="Go Back"></input>
         			<input type="button" id="btnNext" value="Go Next"></input>
         			<input type="button" id="btnFirst" value="Go to First"></input>
@@ -61,13 +61,13 @@
 
         </div>
         <div>No Animation</div>
-        <div class="viewport standalone hero">
+        <div class="xn-viewport standalone hero">
         </div>
         <div>Fade Animation</div>
-        <div class="viewport plugin hero">
+        <div class="xn-viewport plugin hero">
         </div>
         <div>Page Slide Mode (w/ touch support)</div>
-        <div class="viewport plugin slide">
+        <div class="xn-viewport plugin slide">
         </div>
 
         <script type="text/javascript">
@@ -101,7 +101,7 @@
 
             $(function () {
                 $.getJSON('data.json', function (data) {
-                    $(".viewport.standalone.hero").xnCarousel({
+                    $(".xn-viewport.standalone.hero").xnCarousel({
                         touchEnabled: true,
                         pageSize: 1,
                         pagingIndicators: true,
@@ -115,9 +115,9 @@
                         }
                     });
 
-					$(".viewport.standalone.hero").xnCarousel("render", data.results);
+					$(".xn-viewport.standalone.hero").xnCarousel("render", data.results);
 
-                    $(".viewport.plugin.hero").xnCarousel({
+                    $(".xn-viewport.plugin.hero").xnCarousel({
                         touchEnabled: true,
                         pageSize: 1,
                         pagingIndicators: true,
@@ -129,9 +129,9 @@
                         itemTemplate: heroItemTemplate
                     });
 
-					$(".viewport.plugin.hero").xnCarousel("render", data.results);
+					$(".xn-viewport.plugin.hero").xnCarousel("render", data.results);
 
-                    $(".viewport.plugin.slide").xnCarousel({
+                    $(".xn-viewport.plugin.slide").xnCarousel({
                         touchEnabled: true,
                         pageSize: 4,
                         pagingIndicators: true,
@@ -145,9 +145,9 @@
                         itemTemplate: sliderItemTemplate
                     });
 
-					$(".viewport.plugin.slide").xnCarousel("render", data.results);
+					$(".xn-viewport.plugin.slide").xnCarousel("render", data.results);
 
-					var carousel = $(".viewport.api").xnCarousel({
+					var carousel = $(".xn-viewport.api").xnCarousel({
                         touchEnabled: true,
                         pageSize: 3,
                         pagingIndicators: true,

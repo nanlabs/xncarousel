@@ -38,8 +38,8 @@ describe 'Pagination indicator', ->
   describe 'component rendering', ->
 
     it 'should create the container', ->
-      expect($elem.find('.pagination')).to.have.lengthOf 1
-      expect($elem.find('.pagination .item-container')).to.have.lengthOf 1
+      expect($elem.find('.xn-pagination')).to.have.lengthOf 1
+      expect($elem.find('.xn-pagination .item-container')).to.have.lengthOf 1
 
     it 'should create the UI with the amount of page items specified', ->
       createIndicator 4

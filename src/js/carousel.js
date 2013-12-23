@@ -12,10 +12,10 @@ var Animation = require('./animation/animation-module');
 var Loading = require('./loading/loading-module');
 
 
-var leftIndicatorDefaultTemplate = '<div class="left-indicator"><div class="triangle-left"></div></div>';
-var rightIndicatorDefaultTemplate = '<div class="right-indicator"><div class="triangle-right"></div></div>';
+var leftIndicatorDefaultTemplate = '<div class="xn-left-indicator"><div class="xn-triangle-left"></div></div>';
+var rightIndicatorDefaultTemplate = '<div class="xn-right-indicator"><div class="xn-triangle-right"></div></div>';
 
-var containerTemplate = '<div class="overview"></div>';
+var containerTemplate = '<div class="xn-overview"></div>';
 
 var SELECTED_CLASS = "selected";
 
@@ -203,7 +203,7 @@ module.exports = Class.extend({
 	 * @return {array} Array containing the carousel items
 	 */
 	getItems: function () {
-		return this.$overview.children('.carousel-item');
+		return this.$overview.children('.xn-carousel-item');
 	},
 
 	/**
@@ -404,7 +404,7 @@ module.exports = Class.extend({
 
 		var pageCount = this.getPageCount();
 
-		var $carouselItem = $('<div class="carousel-item"></div>');
+		var $carouselItem = $('<div class="xn-carousel-item"></div>');
 
 		this.loadingModule.preLoadItem($carouselItem, item);
 
@@ -523,14 +523,14 @@ module.exports = Class.extend({
 			var actualPage = this.pagingModule.getCurrentPage(),
 			self = this;
 			this.settings.pageSize = pageSize;
-			this.$viewport.find('.pagination').remove();
+			this.$viewport.find('.xn-pagination').remove();
 			this.pagingModule.updatePageSize(pageSize);
 			this.animationModule.updatePageSize(pageSize);
-			this.animationModule.updateAfterRemoval(this.$viewport.find('.carousel-item'));
+			this.animationModule.updateAfterRemoval(this.$viewport.find('.xn-carousel-item'));
 			this.pagingModule.renderIndicator();
 			this.pagingModule.pagingIndicator.select(actualPage);
 			setTimeout(function () {
-				var pageCount = self.$viewport.find('.pagination .item-container').children().length;
+				var pageCount = self.$viewport.find('.xn-pagination .item-container').children().length;
 				self.goToPage(actualPage < pageCount ? actualPage : pageCount - 1);
 			}, 0);
 		}
@@ -626,26 +626,26 @@ module.exports = Class.extend({
 
 	_createContainer: function () {
 
-		this.$leftIndicator = this.$viewport.children('.left-indicator');
-		this.$rightIndicator = this.$viewport.children('.right-indicator');
+		this.$leftIndicator = this.$viewport.children('.xn-left-indicator');
+		this.$rightIndicator = this.$viewport.children('.xn-right-indicator');
 
 		if (this.$leftIndicator.length === 0) {
 			// No left indicator template was set, using the default template
 			this.$viewport.append(leftIndicatorDefaultTemplate);
-			this.$leftIndicator = this.$viewport.children('.left-indicator');
+			this.$leftIndicator = this.$viewport.children('.xn-left-indicator');
 		}
 
 		if (this.$rightIndicator.length === 0) {
 			// No right indicator template was set, using the default template
 			this.$viewport.append(rightIndicatorDefaultTemplate);
-			this.$rightIndicator = this.$viewport.children('.right-indicator');
+			this.$rightIndicator = this.$viewport.children('.xn-right-indicator');
 		}
 
-		this.$overview = this.$viewport.children('.overview');
+		this.$overview = this.$viewport.children('.xn-overview');
 
 		if (this.$overview.length === 0) {
 			this.$viewport.prepend(containerTemplate);
-			this.$overview = this.$viewport.children('.overview');
+			this.$overview = this.$viewport.children('.xn-overview');
 		}
 
 		this.$overview.css('left', '0%');

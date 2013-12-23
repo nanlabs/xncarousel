@@ -38,7 +38,7 @@ module.exports = AbstractStrategy.extend({
 	postLoad: function (event) {
 		console.debug('After loaded');
 		var self = event.data;
-		$(this).parents('.carousel-item').removeClass('loading');
+		$(this).parents('.xn-carousel-item').removeClass('loading');
 		self.spinner.hideSpinner($(this));
 		self.loadingObject.afterLoaded();
 	}

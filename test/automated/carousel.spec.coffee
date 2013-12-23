@@ -25,7 +25,7 @@ describe 'carousel', ->
 			return "<div class='template' data-id='#{item.id}'></div>"
 
 		c = new Carousel($elem, {animationType: 'none', pageSize: 1, itemTemplate: renderer})
-		$elem.find '.overview'
+		$elem.find '.xn-overview'
 		return c
 
 	createCarouselWithTwoItemsPerPage = (showNavigationArrows) ->
@@ -74,16 +74,16 @@ describe 'carousel', ->
 
 		it 'should create the UI with the specified items', ->
 			carousel.render validItems
-			expect($elem.find '.carousel-item').to.have.lengthOf validItems.length
+			expect($elem.find '.xn-carousel-item').to.have.lengthOf validItems.length
 
 		it 'should create the UI with no items if desired', ->
 			carousel.render []
-			assert.lengthOf $elem.find('.carousel-item'), 0
+			assert.lengthOf $elem.find('.xn-carousel-item'), 0
 
 		it 'should render a new set of items if some were existing', ->
 			carousel.render validItems
 			carousel.render [validItem]
-			$items = $elem.find '.carousel-item'
+			$items = $elem.find '.xn-carousel-item'
 			expect($items).to.have.lengthOf 1
 
 	describe 'pagination arrows rendering', ->
@@ -93,11 +93,11 @@ describe 'carousel', ->
 			carousel = createCarouselWithPagingIndicators(false)
 			carousel.render validItems
 
-			$rightIndicator = $elem.find '.right-indicator'
+			$rightIndicator = $elem.find '.xn-right-indicator'
 			expect($rightIndicator).not.to.be.null
 			expect($rightIndicator.css('display')).to.be.equal 'none'
 
-			$leftIndicator = $elem.find '.left-indicator'
+			$leftIndicator = $elem.find '.xn-left-indicator'
 			expect($leftIndicator).not.to.be.null
 			expect($leftIndicator.css('display')).to.be.equal 'none'
 
@@ -106,12 +106,12 @@ describe 'carousel', ->
 			carousel = createCarouselWithPagingIndicators(true)
 			carousel.render [validItem]
 
-			$rightIndicator = $elem.find '.right-indicator'
+			$rightIndicator = $elem.find '.xn-right-indicator'
 			expect($rightIndicator).not.to.be.null
 			expect($rightIndicator.css('display')).to.be.equal 'block'
 			expect($rightIndicator.css('opacity')).not.to.be.equal 0
 
-			$leftIndicator = $elem.find '.left-indicator'
+			$leftIndicator = $elem.find '.xn-left-indicator'
 			expect($leftIndicator).not.to.be.null
 			expect($leftIndicator.css('display')).to.be.equal 'block'
 			expect($leftIndicator.css('opacity')).not.to.be.equal 0
@@ -122,11 +122,11 @@ describe 'carousel', ->
 			carousel.render [validItem]
 			expect(carousel.settings.showNavigationArrows).to.be.equal('auto')
 
-			$rightIndicator = $elem.find '.right-indicator'
+			$rightIndicator = $elem.find '.xn-right-indicator'
 			expect($rightIndicator).not.to.be.null
 			expect($rightIndicator.css('display')).to.be.equal 'none'
 
-			$leftIndicator = $elem.find '.left-indicator'
+			$leftIndicator = $elem.find '.xn-left-indicator'
 			expect($leftIndicator).not.to.be.null
 			expect($leftIndicator.css('display')).to.be.equal 'none'
 
@@ -136,7 +136,7 @@ describe 'carousel', ->
 			carousel.render validItems
 			carousel.selectItem 1
 			expect(carousel.getSelectedIndex()).to.equal 1
-			$selected = $elem.find '.carousel-item.selected .template'
+			$selected = $elem.find '.xn-carousel-item.selected .template'
 			expect($selected).to.have.lengthOf 1
 			itemId = $($selected[0]).attr 'data-id'
 			expect(itemId).to.be.equal String(validItems[1].id)
@@ -147,7 +147,7 @@ describe 'carousel', ->
 			expect(carousel.getSelectedIndex()).to.equal 1
 			carousel.selectItem 0
 			expect(carousel.getSelectedIndex()).to.equal 0
-			$selected = $elem.find '.carousel-item.selected .template'
+			$selected = $elem.find '.xn-carousel-item.selected .template'
 			expect($selected).to.have.lengthOf 1
 			itemId = $($selected[0]).attr 'data-id'
 			expect(itemId).to.be.equal String(validItems[0].id)
@@ -155,10 +155,10 @@ describe 'carousel', ->
 		it 'should mark as selected when clicking on an item', ->
 			carousel.render validItems
 
-			$item = $($elem.find('.carousel-item')[1])
+			$item = $($elem.find('.xn-carousel-item')[1])
 			$item.simulate 'click'
 
-			$selected = $elem.find '.carousel-item.selected'
+			$selected = $elem.find '.xn-carousel-item.selected'
 			expect($selected).to.have.lengthOf 1
 			expect($item[0]).to.be.equal $selected[0]
 
@@ -166,7 +166,7 @@ describe 'carousel', ->
 			carousel.render validItems
 			carousel.selectItem 1
 			carousel.clearSelection()
-			$selected = $elem.find '.carousel-item.selected'
+			$selected = $elem.find '.xn-carousel-item.selected'
 			expect($selected).to.have.lengthOf 0
 			expect(carousel.getSelectedIndex()).to.be.equal -1
 
@@ -175,7 +175,7 @@ describe 'carousel', ->
 		it 'should append a new item', ->
 			carousel.render validItems
 			carousel.addItem validItem
-			$items = $elem.find '.carousel-item .template'
+			$items = $elem.find '.xn-carousel-item .template'
 			expect($items).to.have.lengthOf validItems.length + 1
 			newItemId = $($items[2]).attr 'data-id'
 			expect(newItemId).to.be.equal String(validItem.id)
@@ -185,7 +185,7 @@ describe 'carousel', ->
 		it 'should remove an existing item', ->
 			carousel.render validItems
 			carousel.removeItem 0
-			$items = $elem.find '.carousel-item .template'
+			$items = $elem.find '.xn-carousel-item .template'
 			expect($items).to.have.lengthOf validItems.length - 1
 			remainingId = $($items[0]).attr 'data-id'
 			expect(remainingId).to.be.equal String(validItems[1].id)
@@ -195,7 +195,7 @@ describe 'carousel', ->
 		it 'should remove an existing item', ->
 			carousel.render validItems
 			carousel.clear()
-			$items = $elem.find '.carousel-item'
+			$items = $elem.find '.xn-carousel-item'
 			expect($items).to.have.lengthOf 0
 			expect(carousel.getItems()).to.have.lengthOf 0
 
@@ -204,56 +204,56 @@ describe 'carousel', ->
 		it 'should hide left indicator in the first page', ->
 			carousel.render validItems
 
-			$leftIndicator = $elem.find '.left-indicator'
+			$leftIndicator = $elem.find '.xn-left-indicator'
 			expect($leftIndicator).not.to.be.null
 			expect($leftIndicator.css('display')).to.be.equal 'none'
 
 		it 'should go to the next page when clicking right indicator', ->
 			carousel.render validItems
 
-			$overview = $elem.find '.overview'
+			$overview = $elem.find '.xn-overview'
 
-			$rightIndicator = $elem.find '.right-indicator'
+			$rightIndicator = $elem.find '.xn-right-indicator'
 
 			expect($rightIndicator).not.to.be.null
 
 			console.log "Overview position: #{$overview.css('position')}"
-			$activeItem = $overview.children('.carousel-item.active')
+			$activeItem = $overview.children('.xn-carousel-item.active')
 			expect($activeItem.data('id'), validItems[0].id)
 
 			$rightIndicator.simulate 'click'
-			$activeItem = $overview.children('.carousel-item.active')
+			$activeItem = $overview.children('.xn-carousel-item.active')
 			expect($activeItem.data('id'), validItems[1].id)
 
 		it 'should go to the previous page when clicking left indicator', ->
 			carousel.render validItems
 
-			$overview = $elem.find '.overview'
+			$overview = $elem.find '.xn-overview'
 
-			$leftIndicator = $elem.find '.left-indicator'
+			$leftIndicator = $elem.find '.xn-left-indicator'
 			expect($leftIndicator).not.to.be.null
 
-			$rightIndicator = $elem.find '.right-indicator'
+			$rightIndicator = $elem.find '.xn-right-indicator'
 			expect($rightIndicator).not.to.be.null
 
 			console.log "Overview position: #{$overview.css('position')}"
-			$activeItem = $overview.children('.carousel-item.active')
+			$activeItem = $overview.children('.xn-carousel-item.active')
 			expect($activeItem.data('id'), validItems[0].id)
 
 			$rightIndicator.simulate 'click'
-			$activeItem = $overview.children('.carousel-item.active')
+			$activeItem = $overview.children('.xn-carousel-item.active')
 			expect($activeItem.data('id'), validItems[1].id)
 
 			$leftIndicator.simulate 'click'
-			$activeItem = $overview.children('.carousel-item.active')
+			$activeItem = $overview.children('.xn-carousel-item.active')
 			expect($activeItem.data('id'), validItems[0].id)
 
 		it 'should hide the right indicator in the last page', ->
 			carousel.render [validItem]
 
-			assert.lengthOf $elem.find('.carousel-item'), 1
+			assert.lengthOf $elem.find('.xn-carousel-item'), 1
 
-			$rightIndicator = $elem.find '.right-indicator'
+			$rightIndicator = $elem.find '.xn-right-indicator'
 
 			expect($rightIndicator).not.to.be.null
 			expect($rightIndicator.css('display')).to.be.equal 'none'
@@ -261,8 +261,8 @@ describe 'carousel', ->
 		it "should disable navigators before the animation has finished", (done) ->
 			carousel = createCarouselWithSlideAnimation()
 			carousel.render validItems
-			$item = $elem.find(".right-indicator")
-			$overviewChildren = $elem.find(".overview").children()
+			$item = $elem.find(".xn-right-indicator")
+			$overviewChildren = $elem.find(".xn-overview").children()
 			setTimeout (->
 				expect($($overviewChildren.get(0)).hasClass("active")).to.be.equal false
 				expect($($overviewChildren.get(1)).hasClass("active")).to.be.equal true
@@ -274,7 +274,7 @@ describe 'carousel', ->
 		it "should disable pagination navigators before the animation has finished", (done) ->
 			carousel = createCarouselWithSlideAnimation()
 			carousel.render validItems
-			$pagIndicators = $elem.find(".pagination .item-container").children()
+			$pagIndicators = $elem.find(".xn-pagination .item-container").children()
 			setTimeout (->
 				expect($($pagIndicators.get("1")).hasClass("selected")).to.be.equal true
 				expect($($pagIndicators.get("0")).hasClass("selected")).to.be.equal false
@@ -286,9 +286,9 @@ describe 'carousel', ->
 		it "should allow pagination and arrow navigators to be mutually excluded before the animation has finished", (done) ->
 			carousel = createCarouselWithSlideAnimation()
 			carousel.render validItems
-			$pagIndicators = $elem.find(".pagination .item-container").children()
-			$item = $elem.find(".left-indicator")
-			$overviewChildren = $elem.find(".overview").children()
+			$pagIndicators = $elem.find(".xn-pagination .item-container").children()
+			$item = $elem.find(".xn-left-indicator")
+			$overviewChildren = $elem.find(".xn-overview").children()
 			setTimeout (->
 				expect($($overviewChildren.get(0)).hasClass("active")).to.be.equal false
 				expect($($overviewChildren.get(1)).hasClass("active")).to.be.equal true
@@ -303,7 +303,7 @@ describe 'carousel', ->
 			carousel = createCarousel()
 			carousel.render(validItems)
 
-			$overview = $elem.find '.overview'
+			$overview = $elem.find '.xn-overview'
 
 			afterAnimationHandler = ->
 				currentIndex = carousel.getItemIndicesForCurrentPage()[0]
@@ -321,9 +321,9 @@ describe 'carousel', ->
 			carousel = createCarouselWithCircularNavigation()
 			carousel.render validItems
 
-			$overview = $elem.find '.overview'
+			$overview = $elem.find '.xn-overview'
 
-			$leftIndicator = $elem.find '.left-indicator'
+			$leftIndicator = $elem.find '.xn-left-indicator'
 			expect($leftIndicator).not.to.be.null
 			expect($leftIndicator.css('display')).to.be.equal 'block'
 
@@ -341,9 +341,9 @@ describe 'carousel', ->
 			carousel = createCarouselWithCircularNavigation()
 			carousel.render validItems
 
-			$overview = $elem.find '.overview'
+			$overview = $elem.find '.xn-overview'
 
-			$rightIndicator = $elem.find '.right-indicator'
+			$rightIndicator = $elem.find '.xn-right-indicator'
 			expect($rightIndicator).not.to.be.null
 			expect($rightIndicator.css('display')).to.be.equal 'block'
 
@@ -374,7 +374,7 @@ describe 'carousel', ->
 			carousel = createCarouselWithInterval(500)
 			carousel.render validItems
 
-			$overview = $elem.find '.overview'
+			$overview = $elem.find '.xn-overview'
 
 			currentPage = carousel.getCurrentPage()
 
@@ -407,51 +407,51 @@ describe 'carousel', ->
 		it 'should go to previous page', ->
 			carousel.goToPage 2
 			expect(carousel.getCurrentPage()).to.equal 2
-			##expect($overview.children('.carousel-item.active').index()).to.equal 2
+			##expect($overview.children('.xn-carousel-item.active').index()).to.equal 2
 
 			carousel.goBack()
 			expect(carousel.getCurrentPage()).to.equal 1
-			## expect($overview.children('.carousel-item.active').index()).to.equal 1
+			## expect($overview.children('.xn-carousel-item.active').index()).to.equal 1
 
 		it 'should go to next page', ->
 			carousel.goToPage 1
 			expect(carousel.getCurrentPage()).to.equal 1
-			##expect($overview.children('.carousel-item.active').index()).to.equal 1
+			##expect($overview.children('.xn-carousel-item.active').index()).to.equal 1
 
 			carousel.goNext()
 			expect(carousel.getCurrentPage()).to.equal 2
-			## expect($overview.children('.carousel-item.active').index()).to.equal 2
+			## expect($overview.children('.xn-carousel-item.active').index()).to.equal 2
 
 		it 'should go to first page', ->
 			carousel.goToPage 2
 			expect(carousel.getCurrentPage()).to.equal 2
-			##expect($overview.children('.carousel-item.active').index()).to.equal 2
+			##expect($overview.children('.xn-carousel-item.active').index()).to.equal 2
 
 			carousel.goToFirstPage()
 			expect(carousel.getCurrentPage()).to.equal 0
-			## expect($overview.children('.carousel-item.active').index()).to.equal 0
+			## expect($overview.children('.xn-carousel-item.active').index()).to.equal 0
 
 		it 'should go to last page', ->
 			carousel.goToPage 0
 			expect(carousel.getCurrentPage()).to.equal 0
-			##expect($overview.children('.carousel-item.active').index()).to.equal 0
+			##expect($overview.children('.xn-carousel-item.active').index()).to.equal 0
 
 			carousel.goToLastPage()
 			expect(carousel.getCurrentPage()).to.equal 2
-			## expect($overview.children('.carousel-item.active').index()).to.equal 2
+			## expect($overview.children('.xn-carousel-item.active').index()).to.equal 2
 
 		it 'should go to a specified page', ->
 			carousel.goToPage 0
 			expect(carousel.getCurrentPage()).to.equal 0
-			##expect($overview.children('.carousel-item.active').index()).to.equal 0
+			##expect($overview.children('.xn-carousel-item.active').index()).to.equal 0
 
 			carousel.goToPage 2
 			expect(carousel.getCurrentPage()).to.equal 2
-			## expect($overview.children('.carousel-item.active').index()).to.equal 2
+			## expect($overview.children('.xn-carousel-item.active').index()).to.equal 2
 
 			carousel.goToPage 1
 			expect(carousel.getCurrentPage()).to.equal 1
-			## expect($overview.children('.carousel-item.active').index()).to.equal 1
+			## expect($overview.children('.xn-carousel-item.active').index()).to.equal 1
 
 		it 'should return the number of items', ->
 			expect(carousel.getItemCount()).to.equal validItems.length
@@ -551,7 +551,7 @@ describe 'carousel', ->
 			carousel.render validItems
 
 			itemRemovedHandler = ->
-				$items = $elem.find '.carousel-item .template'
+				$items = $elem.find '.xn-carousel-item .template'
 				expect($items).to.have.lengthOf validItems.length - 1
 				remainingId = $($items[0]).attr 'data-id'
 				expect(remainingId).to.be.equal String(validItems[1].id)
@@ -566,7 +566,7 @@ describe 'carousel', ->
 			carousel = createCarousel()
 			carousel.render validItems
 
-			$overview = $elem.find '.overview'
+			$overview = $elem.find '.xn-overview'
 
 			itemsClearedHandler = ->
 				expect($overview.children().length).to.be.equal(0)
@@ -617,10 +617,10 @@ describe 'carousel', ->
 			carousel.render validItems
 
 			itemSelectedHandler = (event, selectedIndex)->
-				$selected = $elem.find '.carousel-item.selected'
+				$selected = $elem.find '.xn-carousel-item.selected'
 				expect($selected.index()).to.be.equal(selectedIndex)
 
-				$selected = $elem.find '.carousel-item.selected .template'
+				$selected = $elem.find '.xn-carousel-item.selected .template'
 				expect($selected).to.have.lengthOf 1
 				itemId = $($selected[0]).attr 'data-id'
 				expect(itemId).to.be.equal String(validItems[selectedIndex].id)
@@ -628,14 +628,14 @@ describe 'carousel', ->
 
 			$elem.on('carousel:itemSelected', itemSelectedHandler)
 
-			$item = $($elem.find('.carousel-item')[1])
+			$item = $($elem.find('.xn-carousel-item')[1])
 			$item.simulate 'click'
 ###
     it 'should change to the first page after the last one', (done)->
       carousel = createCarouselWithInterval(500)
       carousel.render validItems
 
-      $overview = $elem.find '.overview'
+      $overview = $elem.find '.xn-overview'
 
       currentPage = carousel.getCurrentPage()
 

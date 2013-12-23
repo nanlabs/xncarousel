@@ -76,13 +76,13 @@ describe 'Animation module', ->
 			carousel = createCarouselWithSliderAnimation()
 			carousel.render(validItems)
 
-			$overview = $elem.find '.overview'
+			$overview = $elem.find '.xn-overview'
 			## The style is neccessary to calculate the offset of the overview
 			$overview.css({padding: 0, margin: 0, position: 'relative', height: '100%'})
 
 			currentOffset = 0
 
-			$items = $overview.children('.carousel-item')
+			$items = $overview.children('.xn-carousel-item')
 			$items.each(->
 				$this = $(this)
 				expect($this[0].style.left).to.be.equal(currentOffset + '%')
@@ -93,7 +93,7 @@ describe 'Animation module', ->
 			carousel = createCarouselWithSliderAnimation()
 			carousel.render(validItems)
 
-			$overview = $elem.find '.overview'
+			$overview = $elem.find '.xn-overview'
 			## The style is neccessary to calculate the offset of the overview
 			$overview.css({padding: 0, margin: 0, position: 'relative', width: '100%'})
 
@@ -106,10 +106,10 @@ describe 'Animation module', ->
 			expect(carousel.getCurrentPage()).to.be.equal(0)
 			expect(carousel.getPageCount()).to.be.equal(2)
 
-			$currentItem = $overview.children('.carousel-item.active')
+			$currentItem = $overview.children('.xn-carousel-item.active')
 			expect($currentItem.outerWidth()).to.be.equal(1042)
 
-			$rightIndicator = $elem.find '.right-indicator'
+			$rightIndicator = $elem.find '.xn-right-indicator'
 
 			expect($rightIndicator).not.to.be.a('null')
 			expect($rightIndicator.length).to.be.equal 1
@@ -130,9 +130,9 @@ describe 'Animation module', ->
 			carousel = createCarouselWithFadeAnimation()
 			carousel.render(validItems)
 
-			$overview = $elem.find '.overview'
+			$overview = $elem.find '.xn-overview'
 
-			$items = $overview.children('.carousel-item')
+			$items = $overview.children('.xn-carousel-item')
 			$items.each(->
 				$this = $(this)
 				if ($this.hasClass('active'))
@@ -145,16 +145,16 @@ describe 'Animation module', ->
 			carousel = createCarouselWithFadeAnimation()
 			carousel.render(validItems)
 
-			$overview = $elem.find '.overview'
+			$overview = $elem.find '.xn-overview'
 
 			afterAnimationHandler = ->
-				$currentItem = $overview.children('.carousel-item.active')
+				$currentItem = $overview.children('.xn-carousel-item.active')
 				expect($currentItem.css('opacity')).to.be.equal('1')
 				done()
 
 			$overview.on('animation:finished', afterAnimationHandler)
 
-			$rightIndicator = $elem.find '.right-indicator'
+			$rightIndicator = $elem.find '.xn-right-indicator'
 
 			expect($rightIndicator).not.to.be.a('null')
 
@@ -164,22 +164,22 @@ describe 'Animation module', ->
 			carousel = createCarouselWithFadeAnimation()
 			carousel.render(validItems)
 
-			$overview = $elem.find '.overview'
+			$overview = $elem.find '.xn-overview'
 
-			$rightIndicator = $elem.find '.right-indicator'
+			$rightIndicator = $elem.find '.xn-right-indicator'
 
 			expect($rightIndicator).not.to.be.a('null')
 
 			$rightIndicator.simulate('click')
 
 			afterAnimationHandler = ->
-				$currentItem = $overview.children('.carousel-item.active')
+				$currentItem = $overview.children('.xn-carousel-item.active')
 				expect($currentItem.css('opacity')).to.be.equal('1')
 				done()
 
 			$overview.on('animation:finished', afterAnimationHandler)
 
-			$leftIndicator = $elem.find '.left-indicator'
+			$leftIndicator = $elem.find '.xn-left-indicator'
 
 			expect($leftIndicator).not.to.be.a('null')
 
