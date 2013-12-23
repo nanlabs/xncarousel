@@ -2536,6 +2536,10 @@ module.exports = Class.extend({
 
 		var displayBlock = this.settings.circularNavigation || alwaysShowNavigationArrows;
 		var displayNone = !this.settings.showNavigationArrows;
+		var lastPageItems = this.pagingModule.getIndicesForPage(this.pagingModule.getLastPage());
+		//isDifferentItem tells if the carousel has next page. When adding a new item in runtime, an inconsistent state
+		// may become between actual rendered page (the last one) and total static pages.
+		var isDifferentItem = this.$overview.find('.active').last().index() !== lastPageItems[lastPageItems.length-1];
 
 		if (displayBlock) {
 			this.$rightIndicator.css('display', 'block');
@@ -2546,7 +2550,7 @@ module.exports = Class.extend({
 		} else {
 			// The visibility depends on the page
 			this.$leftIndicator.css('display', (this._hasPrevPage() ? 'block' : 'none'));
-			this.$rightIndicator.css('display', (this._hasNextPage() ? 'block' : 'none'));
+			this.$rightIndicator.css('display', (isDifferentItem ? 'block' : 'none'));
 		}
 
 		if (alwaysShowNavigationArrows) {
@@ -2565,7 +2569,7 @@ module.exports = Class.extend({
 				this.$leftIndicator.on('click', this.leftIndicatorClickHandler);
 			}
 
-			if (this._hasNextPage()) {
+			if (isDifferentItem === true) {
 				this.$rightIndicator.on('click', this.rightIndicatorClickHandler);
 			}
 		}
@@ -3359,7 +3363,6 @@ var DragSupport = Class.extend({
 
     var diffPosition = this.initialPageX - eventData.pageX;
 
-    this.isDragging = false;
 
     $( "body" ).removeClass( "noSelect" );
 
@@ -3367,7 +3370,7 @@ var DragSupport = Class.extend({
     this.$element[0].ontouchend = null;
     document.ontouchmove = null;
     document.ontouchend = null;
-
+    
     // If user is not dragging and the delay between touch down and up is smaill enough, consider it a 'click'
     if ( ((diffPosition === 0) || !this.isDragging) && (now.getTime() - this.touchStartTime.getTime() < this.touchClickDelayMS) ) {
       // The user wants to select and item
@@ -3375,6 +3378,7 @@ var DragSupport = Class.extend({
     } else {
       this.onDragFinish(this.initialPageX, eventData);
     }
+    this.isDragging = false;
   },
 
   mouseUpHandler: function(event) {
@@ -3435,7 +3439,9 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"DSkb5a","jquery":"H0VjM3"}],"52u7fV":[function(require,module,exports){
+},{"class":"DSkb5a","jquery":"H0VjM3"}],"wrapper":[function(require,module,exports){
+module.exports=require('52u7fV');
+},{}],"52u7fV":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3443,9 +3449,7 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"H0VjM3","jquery-plugin-wrapper":30}],"wrapper":[function(require,module,exports){
-module.exports=require('52u7fV');
-},{}],"H0VjM3":[function(require,module,exports){
+},{"./carousel":41,"jquery":"H0VjM3","jquery-plugin-wrapper":30}],"H0VjM3":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
