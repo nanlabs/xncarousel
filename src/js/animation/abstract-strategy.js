@@ -25,9 +25,9 @@ module.exports = Class.extend({
 	getPixels: function ($element, cssAttr) {
 		var stringValue = $element[0].style[cssAttr];
 		if (stringValue[stringValue.length - 1] === '%') {
-			return parseInt(stringValue.slice(0, -1), 10);
+			return parseFloat(stringValue.slice(0, -1), 10);
 		} else {
-			return parseInt(stringValue.slice(0, -2), 10);
+			return parseFloat(stringValue.slice(0, -2), 10);
 		}
 	},
 

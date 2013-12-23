@@ -66,7 +66,7 @@ module.exports = AbstractStrategy.extend({
 		if (!this._disabled){
 			this._disabled = true;
 			var pctAdapted = Math.abs(pcn) < 0.8 ? Math.abs(pcn) : 0.8;
-			$currentItem.css('opacity', (1 - Math.abs(pctAdapted)));
+			$currentItem.css('opacity', (1 - pctAdapted));
 		}
 
 	}
