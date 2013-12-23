@@ -128,7 +128,6 @@ var DragSupport = Class.extend({
 
     var diffPosition = this.initialPageX - eventData.pageX;
 
-    this.isDragging = false;
 
     $( "body" ).removeClass( "noSelect" );
 
@@ -136,7 +135,7 @@ var DragSupport = Class.extend({
     this.$element[0].ontouchend = null;
     document.ontouchmove = null;
     document.ontouchend = null;
-
+    
     // If user is not dragging and the delay between touch down and up is smaill enough, consider it a 'click'
     if ( ((diffPosition === 0) || !this.isDragging) && (now.getTime() - this.touchStartTime.getTime() < this.touchClickDelayMS) ) {
       // The user wants to select and item
@@ -144,6 +143,7 @@ var DragSupport = Class.extend({
     } else {
       this.onDragFinish(this.initialPageX, eventData);
     }
+    this.isDragging = false;
   },
 
   mouseUpHandler: function(event) {
