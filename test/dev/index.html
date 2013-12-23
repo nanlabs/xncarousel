@@ -87,7 +87,7 @@
 
             var sliderItemTemplate = function (item) {
 				var itemTemplate = '<span class="thumbnail-wrapper"><img class="thumbnail" src="' + buildImageUrl(item, "145x100") + '"/></span>';
-                itemTemplate += '<div class="name">' + item.name + '</div>';
+                itemTemplate += '<div class="name">' + item.id + ' - ' +item.name + '</div>';
                 itemTemplate += '<div class="date">' + item.date + '</div>';
 
                 return itemTemplate;
