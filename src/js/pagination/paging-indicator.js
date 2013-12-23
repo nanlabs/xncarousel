@@ -1,9 +1,9 @@
 var $ = require('jquery');
 var Class = require('class');
 
-var ITEM_CONTAINER_SELECTOR = '.pagination .item-container';
+var ITEM_CONTAINER_SELECTOR = '.xn-pagination .item-container';
 var PAGE_ITEM_SELECTOR = '.item';
-var CONTAINER_TEMPLATE = '<div class="pagination"><div class="item-container"></div></div>';
+var CONTAINER_TEMPLATE = '<div class="xn-pagination"><div class="item-container"></div></div>';
 var ITEM_TEMPLATE = '<div class="item"></div>';
 var SELECTED_CLASS = 'selected';
 

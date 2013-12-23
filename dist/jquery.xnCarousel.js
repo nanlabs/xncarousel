@@ -1396,9 +1396,9 @@ MediaQueryWatcher.prototype = {
 
 // Exports the class
 module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"6obL00"}],"class":[function(require,module,exports){
-module.exports=require('MFFfPr');
-},{}],"MFFfPr":[function(require,module,exports){
+},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"H0VjM3"}],"class":[function(require,module,exports){
+module.exports=require('DSkb5a');
+},{}],"DSkb5a":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1502,7 +1502,7 @@ module.exports = Class.extend({
 
 });
 
-},{"browsernizr":2,"browsernizr/test/css/transitions":29,"class":"MFFfPr"}],37:[function(require,module,exports){
+},{"browsernizr":2,"browsernizr/test/css/transitions":29,"class":"DSkb5a"}],37:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -1672,7 +1672,7 @@ module.exports = Class.extend({
 	}
 });
 
-},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"MFFfPr","jquery":"6obL00"}],38:[function(require,module,exports){
+},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"DSkb5a","jquery":"H0VjM3"}],38:[function(require,module,exports){
 var AbstractStrategy = require('./abstract-strategy');
 
 module.exports = AbstractStrategy.extend({
@@ -1849,7 +1849,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":36,"jquery":"6obL00"}],41:[function(require,module,exports){
+},{"./abstract-strategy":36,"jquery":"H0VjM3"}],41:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 var util = require('./util');
@@ -1864,10 +1864,10 @@ var Animation = require('./animation/animation-module');
 var Loading = require('./loading/loading-module');
 
 
-var leftIndicatorDefaultTemplate = '<div class="left-indicator"><div class="triangle-left"></div></div>';
-var rightIndicatorDefaultTemplate = '<div class="right-indicator"><div class="triangle-right"></div></div>';
+var leftIndicatorDefaultTemplate = '<div class="xn-left-indicator"><div class="xn-triangle-left"></div></div>';
+var rightIndicatorDefaultTemplate = '<div class="xn-right-indicator"><div class="xn-triangle-right"></div></div>';
 
-var containerTemplate = '<div class="overview"></div>';
+var containerTemplate = '<div class="xn-overview"></div>';
 
 var SELECTED_CLASS = "selected";
 
@@ -2055,7 +2055,7 @@ module.exports = Class.extend({
 	 * @return {array} Array containing the carousel items
 	 */
 	getItems: function () {
-		return this.$overview.children('.carousel-item');
+		return this.$overview.children('.xn-carousel-item');
 	},
 
 	/**
@@ -2256,7 +2256,7 @@ module.exports = Class.extend({
 
 		var pageCount = this.getPageCount();
 
-		var $carouselItem = $('<div class="carousel-item"></div>');
+		var $carouselItem = $('<div class="xn-carousel-item"></div>');
 
 		this.loadingModule.preLoadItem($carouselItem, item);
 
@@ -2375,14 +2375,14 @@ module.exports = Class.extend({
 			var actualPage = this.pagingModule.getCurrentPage(),
 			self = this;
 			this.settings.pageSize = pageSize;
-			this.$viewport.find('.pagination').remove();
+			this.$viewport.find('.xn-pagination').remove();
 			this.pagingModule.updatePageSize(pageSize);
 			this.animationModule.updatePageSize(pageSize);
-			this.animationModule.updateAfterRemoval(this.$viewport.find('.carousel-item'));
+			this.animationModule.updateAfterRemoval(this.$viewport.find('.xn-carousel-item'));
 			this.pagingModule.renderIndicator();
 			this.pagingModule.pagingIndicator.select(actualPage);
 			setTimeout(function () {
-				var pageCount = self.$viewport.find('.pagination .item-container').children().length;
+				var pageCount = self.$viewport.find('.xn-pagination .item-container').children().length;
 				self.goToPage(actualPage < pageCount ? actualPage : pageCount - 1);
 			}, 0);
 		}
@@ -2478,26 +2478,26 @@ module.exports = Class.extend({
 
 	_createContainer: function () {
 
-		this.$leftIndicator = this.$viewport.children('.left-indicator');
-		this.$rightIndicator = this.$viewport.children('.right-indicator');
+		this.$leftIndicator = this.$viewport.children('.xn-left-indicator');
+		this.$rightIndicator = this.$viewport.children('.xn-right-indicator');
 
 		if (this.$leftIndicator.length === 0) {
 			// No left indicator template was set, using the default template
 			this.$viewport.append(leftIndicatorDefaultTemplate);
-			this.$leftIndicator = this.$viewport.children('.left-indicator');
+			this.$leftIndicator = this.$viewport.children('.xn-left-indicator');
 		}
 
 		if (this.$rightIndicator.length === 0) {
 			// No right indicator template was set, using the default template
 			this.$viewport.append(rightIndicatorDefaultTemplate);
-			this.$rightIndicator = this.$viewport.children('.right-indicator');
+			this.$rightIndicator = this.$viewport.children('.xn-right-indicator');
 		}
 
-		this.$overview = this.$viewport.children('.overview');
+		this.$overview = this.$viewport.children('.xn-overview');
 
 		if (this.$overview.length === 0) {
 			this.$viewport.prepend(containerTemplate);
-			this.$overview = this.$viewport.children('.overview');
+			this.$overview = this.$viewport.children('.xn-overview');
 		}
 
 		this.$overview.css('left', '0%');
@@ -2981,7 +2981,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":51,"./pagination/paging-module":54,"./responsive-module":55,"./util":56,"class":"MFFfPr","jquery":"6obL00"}],42:[function(require,module,exports){
+},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":51,"./pagination/paging-module":54,"./responsive-module":55,"./util":56,"class":"DSkb5a","jquery":"H0VjM3"}],42:[function(require,module,exports){
 /**
 * Returns a function which calls the specified function in the specified
 * scope.
@@ -3435,9 +3435,7 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"MFFfPr","jquery":"6obL00"}],"wrapper":[function(require,module,exports){
-module.exports=require('8VJE8H');
-},{}],"8VJE8H":[function(require,module,exports){
+},{"class":"DSkb5a","jquery":"H0VjM3"}],"52u7fV":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3445,7 +3443,9 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"6obL00","jquery-plugin-wrapper":30}],"6obL00":[function(require,module,exports){
+},{"./carousel":41,"jquery":"H0VjM3","jquery-plugin-wrapper":30}],"wrapper":[function(require,module,exports){
+module.exports=require('52u7fV');
+},{}],"H0VjM3":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
@@ -3453,7 +3453,7 @@ module.exports = Carousel;
 module.exports = jQuery;
 
 },{}],"jquery":[function(require,module,exports){
-module.exports=require('6obL00');
+module.exports=require('H0VjM3');
 },{}],48:[function(require,module,exports){
 var Class = require('class');
 
@@ -3471,7 +3471,7 @@ module.exports = Class.extend({
 	
 });
 
-},{"class":"MFFfPr"}],49:[function(require,module,exports){
+},{"class":"DSkb5a"}],49:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3511,7 +3511,7 @@ module.exports = AbstractStrategy.extend({
 
 	postLoad: function (event) {
 		console.log('After loaded');
-		$(this).parents('.carousel-item').removeClass('loading');
+		$(this).parents('.xn-carousel-item').removeClass('loading');
 		var self = event.data;
 		self.spinner.hideSpinner($(this));
 		self.loadingObject.afterLoaded();
@@ -3519,7 +3519,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":48,"./spinner":52,"jquery":"6obL00"}],50:[function(require,module,exports){
+},{"./abstract-strategy":48,"./spinner":52,"jquery":"H0VjM3"}],50:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3560,14 +3560,14 @@ module.exports = AbstractStrategy.extend({
 	postLoad: function (event) {
 		console.debug('After loaded');
 		var self = event.data;
-		$(this).parents('.carousel-item').removeClass('loading');
+		$(this).parents('.xn-carousel-item').removeClass('loading');
 		self.spinner.hideSpinner($(this));
 		self.loadingObject.afterLoaded();
 	}
 
 });
 
-},{"./abstract-strategy":48,"./spinner":52,"jquery":"6obL00"}],51:[function(require,module,exports){
+},{"./abstract-strategy":48,"./spinner":52,"jquery":"H0VjM3"}],51:[function(require,module,exports){
 var Class = require('class');
 
 var LazyStrategy = require('./lazy-strategy');
@@ -3649,7 +3649,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./eager-strategy":49,"./lazy-strategy":50,"class":"MFFfPr"}],52:[function(require,module,exports){
+},{"./eager-strategy":49,"./lazy-strategy":50,"class":"DSkb5a"}],52:[function(require,module,exports){
 var Class = require('class'),
 SpinJs = require('../../../libs/spin.js'),
 $ = require('jquery');
@@ -3756,13 +3756,13 @@ module.exports = Class.extend({
     }
 });
 
-},{"../../../libs/spin.js":1,"class":"MFFfPr","jquery":"6obL00"}],53:[function(require,module,exports){
+},{"../../../libs/spin.js":1,"class":"DSkb5a","jquery":"H0VjM3"}],53:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
-var ITEM_CONTAINER_SELECTOR = '.pagination .item-container';
+var ITEM_CONTAINER_SELECTOR = '.xn-pagination .item-container';
 var PAGE_ITEM_SELECTOR = '.item';
-var CONTAINER_TEMPLATE = '<div class="pagination"><div class="item-container"></div></div>';
+var CONTAINER_TEMPLATE = '<div class="xn-pagination"><div class="item-container"></div></div>';
 var ITEM_TEMPLATE = '<div class="item"></div>';
 var SELECTED_CLASS = 'selected';
 
@@ -3860,7 +3860,7 @@ module.exports = Class.extend({
 
 });
 
-},{"class":"MFFfPr","jquery":"6obL00"}],54:[function(require,module,exports){
+},{"class":"DSkb5a","jquery":"H0VjM3"}],54:[function(require,module,exports){
 var Class = require('class');
 var PaginationIndicator = require('./paging-indicator.js');
 
@@ -4132,7 +4132,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./paging-indicator.js":53,"class":"MFFfPr"}],55:[function(require,module,exports){
+},{"./paging-indicator.js":53,"class":"DSkb5a"}],55:[function(require,module,exports){
 var Class = require('class'),
 MediaQueryWatcher = require('mediaquerywatcher'),
 $ = require('jquery');
@@ -4337,7 +4337,7 @@ module.exports = Class.extend({
 	}
 	
 });
-},{"class":"MFFfPr","jquery":"6obL00","mediaquerywatcher":33}],56:[function(require,module,exports){
+},{"class":"DSkb5a","jquery":"H0VjM3","mediaquerywatcher":33}],56:[function(require,module,exports){
 exports.getDependency = function(dependencies, name, defaultDep) {
 	dependencies = dependencies || {};
 	return dependencies[name] || defaultDep;
@@ -4431,6 +4431,6 @@ exports.isIE = function() {
   return (myNav.indexOf('msie') !== -1) ? parseInt(myNav.split('msie')[1], 10) : false;
 };
 
-},{}]},{},["8VJE8H"])
+},{}]},{},["52u7fV"])
 ;
 })(this, jQuery);
