@@ -80,13 +80,13 @@ exports.isInt = function(n) {
 exports.getPixels = function ($element, cssAttr) {
 	var stringValue = $element[0].style[cssAttr];
 	if (stringValue[stringValue.length - 1] === '%') {
-		return parseInt(stringValue.slice(0, -1), 10);
+		return parseFloat(stringValue.slice(0, -1), 10);
 	} else {
-		return parseInt(stringValue.slice(0, -2), 10);
+		return parseFloat(stringValue.slice(0, -2), 10);
 	}
 };
 
 exports.isIE = function() {
   var myNav = navigator.userAgent.toLowerCase();
-  return (myNav.indexOf('msie') !== -1) ? parseInt(myNav.split('msie')[1], 10) : false;
+  return (myNav.indexOf('msie') !== -1) ? parseFloat(myNav.split('msie')[1], 10) : false;
 };
