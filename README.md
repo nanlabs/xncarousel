@@ -13,52 +13,19 @@ jQuery plugin to create a fully featured Carousel component
  - Item Data can be provided via DOM elements or using JSON
  - Complete API to interact with the carousel using Javascript
 
-## Development Requirements
-
- - node.js
- - Grunt and Bower:
-   `npm install -g grunt-cli bower`
 
 ## Dependencies
 
 The component only requires jQuery 1.9
 
-## Getting started 
-
- - `git clone https://github.com/nanlabs/xncarousel.git`
- - `cd xncarousel`
- - `npm install`
- - `bower install`
- 
-
-## Build commands
-
-### Full build
-
-`grunt`
-Compiles, tests and packages the development and production (minified) version of the component.
-
-`grunt build-no-tests`
-Same as above but doesn't run tests.
-
-### Development
-
-`grunt dev`
-Compiles the code and then creates a server, opens the dev page in the default browser and watches for file changes as you develop. Everytime a file changes it will compile, test them and reload the dev page. 
-
-### Test
-
-`grunt test`
-Compiles and runs the tests in the console (terminal).
- 
-`grunt test-browsers`
-Compiles and runs the tests in real browsers.
-
-`grunt coverage`
-Compiles, runs the tests and crates a coverage report.
-
 
 ## Usage
+
+### Download
+
+ - If you are building the component, read the "Development" section at the end of the document.
+ - or Add this component as a bower dependency, poiting to this repo (develop branch).
+ - or Download the files in the dist directory in this repo.
 
 ### Initialization
 
@@ -142,7 +109,6 @@ $(".carousel-container").xnCarousel("render", itemsArray);
 
 
 * **pageSize**: {number - default: 1}  ___ *Number of items per page*
-* **itemWidth**: {number - default: none}  ___ *Item width in pixels. When defined, pageSize is ignored as there are as many items as can fit in the carousel viewport*
 * **pagingIndicators**: {boolean - default: false}  ___ *True to display the page indicators (bullets). False to hide them*
 * **pageInterval**: {number - default: 0}  ___ *If > 0, carousel will automatically move to the next page using the value as interval in milliseconds, ie 1000 means the carousel will change the page once a second. If set to 0, automatic navigation is disabled.*
 * **showNavigationArrows**: {true | false | "auto" - default: auto}  ___ *Shows page navigation arrows (prev/next). If true, the arrows are always displayed, when set to false, arrows are not shown. If set to auto, it will display arrows on mouse over*
@@ -168,28 +134,67 @@ $(".carousel-container").xnCarousel("render", itemsArray);
  - min-width 769px: carousel responsive enabled.
 
 
-## Documentation
+## API Documentation
+
+### Methods
+
+The following methods can be used by the JS client code to interact with the carousel:
+
+* **goToPage(pageNumber)** *Navigates to the provided page*
+* **goNext()** *Navigates to the next page if available (might be the first when loop navigation is enabled)*
+* **goBack()** *Navigates to the prev page if available (might be the last when loop navigation is enabled)*
+* **goToLastPage()** *Navigates to the last page*
+* **goToFirstPage()** *Navigates to the first page*
+* **getCurrentPage() -> Number** *Returns the current page index*
+* **getItemCount() -> Number** *Returns the number of items*
+* **getPageCount() -> Number** *Returns the number of pages*
+* **getPageIndex(itemIndex) -> Number** *Returns the page index for the provided item*
+* **getItems() -> $items** *Returns the jQuery DOM elements for the items*
+* **getLastItemIndex() -> Number** *Returns the index of the last item*
+* **getItemIndicesForPage(pageIndex) -> [Number]** *Returns an array with the item indices that belong to the provided page*
+* **getItemIndicesForCurrentPage() -> [Number]** *Returns an array with the item indices that belong to the current page*
+* **clear(options)** *Removes all the items. The event is not fired if options.silent = true*
+* **isValidItemIndex(index) -> Boolean** *Returns true if the provided index is valid (within range). False otherwise*
+* **removeItem(index)** *Removes an item by index*
+* **selectItem(index, options)** *Changes the current selection to an item by index. The event is not fired if options.silent = true*
+* **clearSelection(options)** *Clears the selected item. The event is not fired if options.silent = true*
+* **getSelectedIndex() -> Number** *Returns the index of the selected item*
+* **addItem(item)** *Adds an item to the carousel. The item parameter might be a JS object (the template function is used) or an html code as a string*
+* **render(items)** *Renders the items passed as parameters or the ones under the DOM elements with class "xn-items". Must be called once on initialization*
+
 
 ### Events
 
-* **carousel:initialized** *Thrown after the carousel is initialized, but before items are rendered.*
+The Carousel triggers many events to notify the client code of situations. The component uses jQuery's event infrastructure.
+Listeners for this events might be added to the same DOM element to which the plugin was applied (in the example, ``` $(".carousel-container")```)
 
-* **carousel:pageSelected [index]** *Thrown when the pages are selected*
-* **carousel:selectionClear** *Thrown when the selection has been removed*
-* **carousel:itemRemoved** *Thrown after a carousel item has been removed*
-* **carousel:itemAdded** *Thrown after a carousel item has been added*
+To avoid conflicts, all event names contain a namespace prefix: "carousel:".
 
-* **carousel:pageChanged [pageNumber]** *Thrown when the pages are changed, by clicking or automatically*
-* **carousel:pageChangeEnded** *Thrown when the pages changing animations are done*
-* **carousel:pageRemoved** *Thrown after a carousel page has been removed, because the items quotient has been decreased*
-* **carousel:pageAdded** *Thrown after a carousel page has been added, because the items quotient has been increased*
+For example, to add a listener for the pageSelected event, use the following code:
+```javascript
+$(".carousel-container").on("carousel:pageSelected", function(event, pageIndex) {
+	...Listener logic...
+});
+``` 
 
-* **carousel:itemsCleared** *Thrown after the carousel items are cleared*
+#### List
+* **initialized** *Triggered after the carousel is initialized, but before items are rendered.*
+* **rendered** *Triggered after the carousel items and pagination components have been rendered.*
 
+* **pageSelected [index]** *Triggered when the pages are selected*
+* **itemSelected  [index]** *Triggered after an item has been selected*
+* **selectionClear** *Triggered when the selection has been removed*
 
+* **itemRemoved** *Triggered after a carousel item has been removed*
+* **itemAdded [itemJSON, $item]** *Triggered after a carousel item has been added*
+* **itemsCleared** *Triggered after all the carousel items are removed*
 
+* **pageChangeStart [currentPageIndex, newPageIndex]** *Triggered when a page changed was requested (by code or UI), before actually changing the page*
+* **pageChanged [pageIndex]** *Triggered after the state of the carousel has changed (new current page) and the animation has started but before the animation ends*
+* **pageChangeEnded [oldPageIndex, currentPageIndex]** *Triggered when the page change has finished (incl. animations)*
 
-
+* **pageRemoved** *Triggered after a carousel page has been removed, because an item has been removed*
+* **pageAdded [pageIndex]** *Triggered after a carousel page has been added, because an item has been added*
 
 
 ###Responsive behaviour
@@ -205,6 +210,48 @@ Let's put an example to get this better. Suppose that the carousel viewport has 
 
 If carousel responsive option is set to false, the media query works as defaults, otherwise it updates the height to keep the aspect. So for this case the height (296px) applies to the upper limit (900px) and then it keeps the same proportions at different resolutions. Also remember that the carousel responsive option accepts an object with different ranges (like CSS3 media queries do) where this behaviour is enabled/disabled.
 
+
+## Development 
+
+### Requirements
+
+ - node.js
+ - Grunt and Bower:
+   `npm install -g grunt-cli bower`
+
+###  Getting started 
+
+ - `git clone https://github.com/nanlabs/xncarousel.git`
+ - `cd xncarousel`
+ - `npm install`
+ - `bower install`
+ 
+
+###  Build commands
+
+#### Full build
+
+`grunt`
+Compiles, tests and packages the development and production (minified) version of the component.
+
+`grunt build-no-tests`
+Same as above but doesn't run tests.
+
+#### Development
+
+`grunt dev`
+Compiles the code and then creates a server, opens the dev page in the default browser and watches for file changes as you develop. Everytime a file changes it will compile, test them and reload the dev page. 
+
+#### Test
+
+`grunt test`
+Compiles and runs the tests in the console (terminal).
+ 
+`grunt test-browsers`
+Compiles and runs the tests in real browsers.
+
+`grunt coverage`
+Compiles, runs the tests and crates a coverage report.
 
 ## License
 
