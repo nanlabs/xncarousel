@@ -66,7 +66,7 @@ module.exports = Class.extend({
 
 		//When the items width is fixed we need to update the paginator as the viewport size changes.
 		if (this.settings.itemWidth){
-			this.settings.pageSize = Math.ceil(this.$viewport.width() / this.settings.itemWidth);
+			this.settings.pageSize = ~~(this.$viewport.width() / this.settings.itemWidth);
 			$(window).resize($.proxy(this._updatePaginator, this));
 		}
 		this._initPaginationModule();
@@ -224,7 +224,11 @@ module.exports = Class.extend({
 	 * @return {array} Array containing the indices
 	 */
 	getItemIndicesForPage: function (pageNumber) {
-		return this.pagingModule.getIndicesForPage(pageNumber);
+		var indexes = this.pagingModule.getIndicesForPage(pageNumber);
+		if (this.settings.itemWidth && this.settings.animationType === "slide" && indexes.length > 0) {
+			indexes.push(indexes[indexes.length -1 ] + 1);
+		}
+		return indexes;
 	},
 
 	/**
@@ -234,7 +238,7 @@ module.exports = Class.extend({
 	 * @return {array}  Array containing the indices
 	 */
 	getItemIndicesForCurrentPage: function () {
-		return this.pagingModule.getIndicesForPage(this.getCurrentPage());
+		return this.getItemIndicesForPage(this.getCurrentPage());
 	},
 
 	/**
@@ -518,7 +522,7 @@ module.exports = Class.extend({
 	},
 
 	_updatePaginator: function () {
-		var pageSize = Math.ceil(this.$viewport.width() / this.settings.itemWidth);
+		var pageSize = ~~(this.$viewport.width() / this.settings.itemWidth);
 		if (pageSize !== this.settings.pageSize)  {
 			var actualPage = this.pagingModule.getCurrentPage(),
 			self = this;
@@ -545,6 +549,7 @@ module.exports = Class.extend({
 		var api = {
 			container: this.$overview,
 			getCurrentPage: $.proxy(this.getCurrentPage, this),
+			getPageCount: $.proxy(this.getPageCount, this),
 			getItemsForPage: $.proxy(this._getDOMItemsForPage, this),
 			getItemsForCurrentPage: $.proxy(this._getDOMItemsForCurrentPage, this)
 		};
@@ -684,7 +689,7 @@ module.exports = Class.extend({
 
 		var displayBlock = this.settings.circularNavigation || alwaysShowNavigationArrows;
 		var displayNone = !this.settings.showNavigationArrows;
-		var lastPageItems = this.pagingModule.getIndicesForPage(this.pagingModule.getLastPage());
+		var lastPageItems = this.getItemIndicesForPage(this.pagingModule.getLastPage());
 		//isDifferentItem tells if the carousel has next page. When adding a new item in runtime, an inconsistent state
 		// may become between actual rendered page (the last one) and total static pages.
 		var isDifferentItem = this.$overview.find('.active').last().index() !== lastPageItems[lastPageItems.length-1];
@@ -970,7 +975,7 @@ module.exports = Class.extend({
 	_getDOMItemsForPage: function (pageNumber) {
 		var $items = this.getItems();
 
-		return $($.map(this.pagingModule.getIndicesForPage(pageNumber), function (val) {
+		return $($.map(this.getItemIndicesForPage(pageNumber), function (val) {
 			return $items[val];
 		}));
 	},

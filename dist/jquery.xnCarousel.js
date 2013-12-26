@@ -1492,9 +1492,9 @@ module.exports = Class.extend({
 	getPixels: function ($element, cssAttr) {
 		var stringValue = $element[0].style[cssAttr];
 		if (stringValue[stringValue.length - 1] === '%') {
-			return parseInt(stringValue.slice(0, -1), 10);
+			return parseFloat(stringValue.slice(0, -1), 10);
 		} else {
-			return parseInt(stringValue.slice(0, -2), 10);
+			return parseFloat(stringValue.slice(0, -2), 10);
 		}
 	},
 
@@ -1679,6 +1679,7 @@ module.exports = AbstractStrategy.extend({
 
 	animateToPage: function ($overview, $currentItem, $nextItem) {
 		this._animateItem($currentItem, $nextItem);
+		this._disabled = false; 
 	},
 
 	setItemVisible: function ($item) {
@@ -1737,7 +1738,12 @@ module.exports = AbstractStrategy.extend({
 	},
 
 	animatePartial: function($overview, pcn, $currentItem) {
-		$currentItem.css('opacity', (1 - Math.abs(pcn)));
+		if (!this._disabled){
+			this._disabled = true;
+			var pctAdapted = Math.abs(pcn) < 0.8 ? Math.abs(pcn) : 0.8;
+			$currentItem.css('opacity', (1 - pctAdapted));
+		}
+
 	}
 
 });
@@ -1773,8 +1779,8 @@ module.exports = AbstractStrategy.extend({
 		var currentPosition = ($currentItem.length > 0)? this.getPixels($currentItem, 'left'): -1*overviewPosition;
 
 		var offset;
-		//Checks if item has fixed width and it is the last page.
-		if ($overview.children()[0].style.width.indexOf('px') !== -1 && ($overview.children()[$overview.children().length - 1] === $pageToShow[$pageToShow.length - 1])) {
+		// Checks if item has fixed width and it is the last page.
+		if ($overview.children()[0].style.width.indexOf('px') !== -1 && this.animationObject.carouselApi.getCurrentPage() ===  this.animationObject.carouselApi.getPageCount() - 1) {
 			var itemWidth = $($overview.children()[0]).width();
 			var itemsCount = $overview.children().length;
 			var pageSize = $pageToShow.length;
@@ -1918,7 +1924,7 @@ module.exports = Class.extend({
 
 		//When the items width is fixed we need to update the paginator as the viewport size changes.
 		if (this.settings.itemWidth){
-			this.settings.pageSize = Math.ceil(this.$viewport.width() / this.settings.itemWidth);
+			this.settings.pageSize = ~~(this.$viewport.width() / this.settings.itemWidth);
 			$(window).resize($.proxy(this._updatePaginator, this));
 		}
 		this._initPaginationModule();
@@ -2076,7 +2082,11 @@ module.exports = Class.extend({
 	 * @return {array} Array containing the indices
 	 */
 	getItemIndicesForPage: function (pageNumber) {
-		return this.pagingModule.getIndicesForPage(pageNumber);
+		var indexes = this.pagingModule.getIndicesForPage(pageNumber);
+		if (this.settings.itemWidth && this.settings.animationType === "slide" && indexes.length > 0) {
+			indexes.push(indexes[indexes.length -1 ] + 1);
+		}
+		return indexes;
 	},
 
 	/**
@@ -2086,7 +2096,7 @@ module.exports = Class.extend({
 	 * @return {array}  Array containing the indices
 	 */
 	getItemIndicesForCurrentPage: function () {
-		return this.pagingModule.getIndicesForPage(this.getCurrentPage());
+		return this.getItemIndicesForPage(this.getCurrentPage());
 	},
 
 	/**
@@ -2344,10 +2354,36 @@ module.exports = Class.extend({
 
 		this._startAutomaticPaging();
 
+		this._buildLastPage();
+
 		this._trigger('carousel:rendered');
 	},
 
 	//***************************Private Methods**********************************************
+
+	_buildLastPage: function () {
+		//incomplete page?
+		if (this.$overview.children().length / this.pagingModule.getPageCount() % 2 !== 1 && this.settings.animationType === 'fade') {
+			var newPage, lastItems = this._getDOMItemsForPage(this.pagingModule.getLastPage()).not(this._getDOMItemsForPage(this.pagingModule.getLastPage()-1)).get(),
+			prevPageNotSharedItems = this._getDOMItemsForPage(this.pagingModule.getLastPage()-1).not(this._getDOMItemsForPage(this.pagingModule.getLastPage())).get(),
+			sharedItems = this._getDOMItemsForPage(this.pagingModule.getLastPage()-1).not(prevPageNotSharedItems).get();
+			
+			sharedItems = $(sharedItems).clone();
+			$(lastItems[0]).before(sharedItems);
+
+			newPage = sharedItems.add(lastItems);
+			
+				//Checks if item has fixed width and it is the last page.
+				var step = parseFloat(lastItems[0].style.width,10);
+				// var count = this.settings.itemWidth ? -(this.pagingModule.pageSize * this.size.itemWidth - this.$overview.outerWidth(true)) : 0;
+				var count = 0;
+				var self = this;
+				$.each(newPage, function (i, el) {
+					$(el).css('left', count + self.size.unitType);
+					count += step;
+				});
+		}
+	},
 
 	_initPaginationModule: function () {
 
@@ -2370,7 +2406,7 @@ module.exports = Class.extend({
 	},
 
 	_updatePaginator: function () {
-		var pageSize = Math.ceil(this.$viewport.width() / this.settings.itemWidth);
+		var pageSize = ~~(this.$viewport.width() / this.settings.itemWidth);
 		if (pageSize !== this.settings.pageSize)  {
 			var actualPage = this.pagingModule.getCurrentPage(),
 			self = this;
@@ -2397,6 +2433,7 @@ module.exports = Class.extend({
 		var api = {
 			container: this.$overview,
 			getCurrentPage: $.proxy(this.getCurrentPage, this),
+			getPageCount: $.proxy(this.getPageCount, this),
 			getItemsForPage: $.proxy(this._getDOMItemsForPage, this),
 			getItemsForCurrentPage: $.proxy(this._getDOMItemsForCurrentPage, this)
 		};
@@ -2536,7 +2573,7 @@ module.exports = Class.extend({
 
 		var displayBlock = this.settings.circularNavigation || alwaysShowNavigationArrows;
 		var displayNone = !this.settings.showNavigationArrows;
-		var lastPageItems = this.pagingModule.getIndicesForPage(this.pagingModule.getLastPage());
+		var lastPageItems = this.getItemIndicesForPage(this.pagingModule.getLastPage());
 		//isDifferentItem tells if the carousel has next page. When adding a new item in runtime, an inconsistent state
 		// may become between actual rendered page (the last one) and total static pages.
 		var isDifferentItem = this.$overview.find('.active').last().index() !== lastPageItems[lastPageItems.length-1];
@@ -2822,7 +2859,7 @@ module.exports = Class.extend({
 	_getDOMItemsForPage: function (pageNumber) {
 		var $items = this.getItems();
 
-		return $($.map(this.pagingModule.getIndicesForPage(pageNumber), function (val) {
+		return $($.map(this.getItemIndicesForPage(pageNumber), function (val) {
 			return $items[val];
 		}));
 	},
@@ -4054,7 +4091,7 @@ module.exports = Class.extend({
 
 		if(first > last) { return []; }
 		
-		//It only displays pages full of content
+		// //It only displays pages full of content
 		if (last - first < this.pageSize - 1) {
 			first -= this.pageSize - 1 - (last - first);
 		}
@@ -4424,15 +4461,15 @@ exports.isInt = function(n) {
 exports.getPixels = function ($element, cssAttr) {
 	var stringValue = $element[0].style[cssAttr];
 	if (stringValue[stringValue.length - 1] === '%') {
-		return parseInt(stringValue.slice(0, -1), 10);
+		return parseFloat(stringValue.slice(0, -1), 10);
 	} else {
-		return parseInt(stringValue.slice(0, -2), 10);
+		return parseFloat(stringValue.slice(0, -2), 10);
 	}
 };
 
 exports.isIE = function() {
   var myNav = navigator.userAgent.toLowerCase();
-  return (myNav.indexOf('msie') !== -1) ? parseInt(myNav.split('msie')[1], 10) : false;
+  return (myNav.indexOf('msie') !== -1) ? parseFloat(myNav.split('msie')[1], 10) : false;
 };
 
 },{}]},{},["52u7fV"])

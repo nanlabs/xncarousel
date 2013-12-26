@@ -8,8 +8,8 @@ module.exports = AbstractStrategy.extend({
 		var currentPosition = ($currentItem.length > 0)? this.getPixels($currentItem, 'left'): -1*overviewPosition;
 
 		var offset;
-		//Checks if item has fixed width and it is the last page.
-		if ($overview.children()[0].style.width.indexOf('px') !== -1 && ($overview.children()[$overview.children().length - 1] === $pageToShow[$pageToShow.length - 1])) {
+		// Checks if item has fixed width and it is the last page.
+		if ($overview.children()[0].style.width.indexOf('px') !== -1 && this.animationObject.carouselApi.getCurrentPage() ===  this.animationObject.carouselApi.getPageCount() - 1) {
 			var itemWidth = $($overview.children()[0]).width();
 			var itemsCount = $overview.children().length;
 			var pageSize = $pageToShow.length;
