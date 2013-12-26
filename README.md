@@ -125,7 +125,8 @@ $(".carousel-container").xnCarousel("render", itemsArray);
 * **itemTemplate**: {function - default: empty template}  ___ *Function that receives an item and returns the HTML to be used when rendering that item. Used as a template when loading items via JSON*
 
 
-* **pageSize**: {number - default: 1}  ___ *Number of items per page*
+* **pageSize**: {number - default: 1}  ___ *Number of items per page. Items width will adjust to always fit this amount of items on a single page. Ignored when _itemWidth_ is defined*
+* **itemWidth**: {number - default: null}  ___ *Item width in pixels. When defined, _pageSize_ is ignored, as items will always have this width, so if the carousel container size change, the amount of items on a single page will also change accordingly. *
 * **pagingIndicators**: {boolean - default: false}  ___ *True to display the page indicators (bullets). False to hide them*
 * **pageInterval**: {number - default: 0}  ___ *If > 0, carousel will automatically move to the next page using the value as interval in milliseconds, ie 1000 means the carousel will change the page once a second. If set to 0, automatic navigation is disabled.*
 * **showNavigationArrows**: {true | false | "auto" - default: auto}  ___ *Shows page navigation arrows (prev/next). If true, the arrows are always displayed, when set to false, arrows are not shown. If set to auto, it will display arrows on mouse over*
