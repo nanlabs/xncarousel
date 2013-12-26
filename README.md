@@ -13,89 +13,82 @@ jQuery plugin to create a fully featured Carousel component
  - Item Data can be provided via DOM elements or using JSON
  - Complete API to interact with the carousel using Javascript
 
-## Getting Started
+## Development Requirements
 
- - Download the project
- - Install node.js
- - Install Grunt and Bower:
+ - node.js
+ - Grunt and Bower:
    `npm install -g grunt-cli bower`
+
+## Dependencies
+
+The component only requires jQuery 1.9
+
+## Getting started 
+
+ - `git clone https://github.com/nanlabs/xncarousel.git`
+ - `cd xncarousel`
  - `npm install`
  - `bower install`
  
-After doing that, all the dependencies will be downloaded.
-Then, use grunt to build and test the component and also run the demo.
 
-### Build and test
+## Build commands
 
-Run `grunt`
+### Full build
 
-It will test and build the development and production (minified) version of the component.
+`grunt`
+Compiles, tests and packages the development and production (minified) version of the component.
 
-### Develop
+`grunt build-no-tests`
+Same as above but doesn't run tests.
 
-Run `grunt dev`
+### Development
 
-It will create a server, open the dev page and watch for file changes as you develop (it will compile and test them and reload the dev page). 
+`grunt dev`
+Compiles the code and then creates a server, opens the dev page in the default browser and watches for file changes as you develop. Everytime a file changes it will compile, test them and reload the dev page. 
 
 ### Test
 
-Run `grunt test`
-
-It will only run the tests.
+`grunt test`
+Compiles and runs the tests in the console (terminal).
  
-## Examples
+`grunt test-browsers`
+Compiles and runs the tests in real browsers.
 
-Run `grunt demo`
+`grunt coverage`
+Compiles, runs the tests and crates a coverage report.
 
 
 ## Usage
-This plugin has two ways of using it:
 
-###JS component:
-To properly use the library just follow this steps:
+### Initialization
+
+To use the component, follow these steps:
 
 1. Include the minified js library in the html page as follows:
-```<script src="../../dist/carousel.min.js"></script>``` 
+```<script src="<carousel dir>/jquery.xnCarousel.min.js"></script>``` 
 
 2. Include the html dom element to hold the component
 ```<div class="carousel-container"></div>``` 
 
-3. Declare the item definition template: 
+3. Initialize it from your javascript code 
 
 ```javascript
-var itemTemplate = function (item) {
-    var itemTemplate = '<span class="thumbnail-wrapper"><img class="thumbnail" src="' + item.thumb + '"/></span>';
-	itemTemplate += '<div class="name">' + item.name + '</div>';
-	itemTemplate += '<div class="date">' + item.date + '</div>';
-
-    return itemTemplate;
-};
-```
-
-4.. Finally just invoke the carousel constructor: 
-
-```javascript
-var Carousel = require('xnCarousel');
 
 $(function () {
-	var carousel = new Carousel(".carousel-container", {
-		touchEnabled: true,
-		pageSize: 1,
-		pagingIndicators: true,
-		animationType: 'none',
-		moveSpeed: 500,
-		showIndicators: true,
-		itemTemplate: itemTemplate                       
+	$(".carousel-container").xnCarousel({
+		...options (see below)...
 	});
-	
-	carousel.render(items);
-});
 ```
 
-Thats it, but there's also another way to have the carousel rendered. Just put the items markup into the carousel carousel container inside a wrapper with "xn-items" class defined. 
+### Item Definition
 
-ie:
+There are 2 ways to define the items, via DOM elements or using a template and JSON. 
 
+1. DOM Definition
+
+Put the items markup inside a wrapper with "xn-items" class defined. The wrapper must be a child of the main carousel container. 
+
+eg:
 	```
 	<div class="carousel-container">
 		<div class="xn-items">
@@ -105,46 +98,73 @@ ie:
 		</div>
 	</div>
 	``` 
-
-	Then call the constructor as usual
-
-```javascript
-	var carousel = new Carousel(".carousel-container", {
-		...
-		...
-	});
-```
-
-	And finally make a call to the render method
 	
+No special option must be used since the component will look for items insde a "xn-items" wrapper. 
+Then render the items by calling
 ```javascript
-carousel.render();
+$(".carousel-container").xnCarousel("render");
+``` 
+
+2. JSON items (with a template)
+
+If you need to load items using JSON, don't define the items in the DOM. Instead, create a JS function that receieves a single item and returns the HTML as a string.
+Example:
+```javascript
+var templateFunction = function (item) {
+    var itemTemplate = '<span class="thumbnail-wrapper"><img class="thumbnail" src="' + item.thumb + '"/></span>';
+	itemTemplate += '<div class="name">' + item.name + '</div>';
+	itemTemplate += '<div class="date">' + item.date + '</div>';
+
+    return itemTemplate;
+};
 ```
 
-
-###JQuery plugin:
-Just perform the previous steps 1,2,3 and then:
+Provide the function to the carousel on initalization:
 ```javascript
-
-$(function () {
-	$(".carousel-container").xnCarousel({
-		touchEnabled: true,
-		pageSize: 1,
-		pagingIndicators: true,
-		animationType: 'none',
-		moveSpeed: 500,
-		showIndicators: true,
-		itemTemplate: itemTemplate                       
-	});
-
-	$(".carousel-container").xnCarousel("render", items);
+$(".carousel-container").xnCarousel({
+	...
+	itemTemplate: templateFunction,
+	...
 });
 ```
 
+Then call the render method, but passing the items array:
+```javascript
+$(".carousel-container").xnCarousel("render", itemsArray);
+``` 
 
-## Dependencies
 
-The component requires jQuery 1.9.
+### Component options:
+
+* **touchEnabled**: {boolean - default: false}  ___ *Enables or disables the touch feature*
+* **circularNavigation**: {boolean - default: false}  ___ *True enables the circular (loop) navigation*
+* **itemTemplate**: {function - default: empty template}  ___ *Function that receives an item and returns the HTML to be used when rendering that item. Used as a template when loading items via JSON*
+
+
+* **pageSize**: {number - default: 1}  ___ *Number of items per page*
+* **pagingIndicators**: {boolean - default: false}  ___ *True to display the page indicators (bullets). False to hide them*
+* **pageInterval**: {number - default: 0}  ___ *If > 0, carousel will automatically move to the next page using the value as interval in milliseconds, ie 1000 means the carousel will change the page once a second. If set to 0, automatic navigation is disabled.*
+* **showNavigationArrows**: {true | false | "auto" - default: auto}  ___ *Shows page navigation arrows (prev/next). If true, the arrows are always displayed, when set to false, arrows are not shown. If set to auto, it will display arrows on mouse over*
+
+
+* **animationType**: {'slide' | 'fade' | 'none'}  ___ *Transition effect to be used when navigating pages*
+* **moveSpeed**: {number - default: 1000}  ___ *Duration of the transition animations (in milliseconds)*
+
+* **loadingType**: {'lazy' | 'eager'}  ___ *Sets the items loading strategy. "Lazy" will delay the item's image loading until that item is displayed (showing an animation while loading). "Eager" will load all images as soon as possible*
+
+* **responsive**: {true | false | rangesObject} __ *Enables/disables responsive behaviour in all cases (when booleans) or it does dynamically for different resolutions. See below in this guide for more details.*
+
+
+		rangesObject : { "*..320" : true,
+				 		 "321..768" : false,
+						 "769..*" : true
+				        }
+
+
+ this stands for: 
+ - max-width 320px: carousel responsive enabled.
+ - min-width 321px and max-width 768px: carousel responsive disabled.
+ - min-width 769px: carousel responsive enabled.
 
 
 ## Documentation
@@ -166,38 +186,7 @@ The component requires jQuery 1.9.
 * **carousel:itemsCleared** *Thrown after the carousel items are cleared*
 
 
-### Component options:
 
-* **touchEnabled**: {true | false}  ___ *Enables or disables the touch behavior*
-* **circularNavigation**: {true | false}  ___ *True enables the circular (loop) navigation*
-* **itemTemplate**: {function}  ___ *Function that receives an item and returns the HTML to be used when rendering that item*
-
-
-* **pageSize**: {1..n}  ___ *Number of items per page*
-* **pagingIndicators**: {true | false}  ___ *True to display the page indicators. False to hide them*
-
-
-* **animationType**: {'slide' | 'fade' | 'none'}  ___ *Transition effect to be used when navigating pages*
-* **animationSpeed**: {1..n}  ___ *Duration of the transition animations (in milliseconds)*
-* **afterAnimationCallback**: {function}  ___ *Callback to be executed after animations*
-
-
-* **loadingType**: {'lazy' | 'eager'}  ___ *Sets the items loading strategy. "Lazy" will delay the item's image loading until that item is displayed*
-* **afterLoadedCallback**: {function}  ___ *Callback to be executed after images loaded*
-
-* **responsive**: {true | false | rangesObject} __ *Enables/disables responsive behaviour in all cases (when booleans) or it does dynamically for different resolutions. See below in this guide for more details.*
-
-
-		rangesObject : { "*..320" : true,
-				 		 "321..768" : false,
-						 "769..*" : true
-				        }
-
-
- this stands for: 
- - max-width 320px: carousel responsive enabled.
- - min-width 321px and max-width 768px: carousel responsive disabled.
- - min-width 769px: carousel responsive enabled.
 
 
 
