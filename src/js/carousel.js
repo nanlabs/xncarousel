@@ -53,6 +53,7 @@ module.exports = Class.extend({
 		};
 
 		this.$viewport = $(selector);
+		this.$viewport.addClass('xn-viewport');
 		this.settings = $.extend({}, defaults, options);
 
 		consoleShim();

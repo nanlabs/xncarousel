@@ -126,6 +126,14 @@ module.exports = (grunt) ->
 					rename: (dest) ->
 						"#{dest}/<%= OUTPUT_JS %>.less"
 				]
+			scss:
+				files: [
+					expand: true,
+					src: ['src/less/style.less'],
+					dest: 'dist'
+					rename: (dest) ->
+						"#{dest}/<%= OUTPUT_JS %>.scss"
+				]
 
 		connect:
 			options:
@@ -176,7 +184,7 @@ module.exports = (grunt) ->
 
 	## Internal tasks
 	grunt.registerTask '_compile', ['clean', 'jshint', 'coffeelint', 'browserify']
-	grunt.registerTask '_package', ['less', 'copy:less', 'uglify', 'clean:tmp']
+	grunt.registerTask '_package', ['less', 'copy:less', 'copy:scss', 'uglify', 'clean:tmp']
 
 	# Partial (dev) tasks
 	grunt.registerTask 'test', ['_compile', 'mocha', 'clean:tmp', 'notify:test']
