@@ -134,6 +134,23 @@ $(".carousel-container").xnCarousel("render", itemsArray);
  - min-width 769px: carousel responsive enabled.
 
 
+### Pagination
+
+_TODO_ Pagination classes instructions
+
+
+
+## Styling
+
+The carousel includes a base stylesheet that must be included/imported in your code and extended for your custom look.
+The stylesheet is located in the _"dist"_ directory (and included in the bower component) and is provided as:
+ - a minified css (_jquery.xnCarousel.min.css_) which can be included using the <link> tag.
+ - a LESS file (_jquery.xnCarousel.less_) which you can import if you are using LESS
+ 
+
+_TODO_ LESS INSTRUCTIONS
+
+
 ## API Documentation
 
 ### Methods
@@ -197,7 +214,7 @@ $(".carousel-container").on("carousel:pageSelected", function(event, pageIndex) 
 * **pageAdded [pageIndex]** *Triggered after a carousel page has been added, because an item has been added*
 
 
-###Responsive behaviour
+## Responsive behaviour
 
 Let's put an example to get this better. Suppose that the carousel viewport has a media query like this setted:
 
