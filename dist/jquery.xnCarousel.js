@@ -1781,11 +1781,11 @@ module.exports = AbstractStrategy.extend({
 		var offset;
 		// Checks if item has fixed width and it is the last page.
 		if ($overview.children()[0].style.width.indexOf('px') !== -1 && this.animationObject.carouselApi.getCurrentPage() ===  this.animationObject.carouselApi.getPageCount() - 1) {
-			var itemWidth = $($overview.children()[0]).width();
+			var itemWidth = $($overview.children()[0]).outerWidth(true);
 			var itemsCount = $overview.children().length;
 			var pageSize = $pageToShow.length;
 			var pageWidth = pageSize * itemWidth;
-			var diffToFill = pageWidth - $overview.width();
+			var diffToFill = pageWidth - $overview.outerWidth(true);
 			offset = itemsCount * itemWidth - pageWidth + diffToFill;
 		} else {
 			offset = this.getPixels($pageToShow, 'left');
