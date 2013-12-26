@@ -1,0 +1,59 @@
+@import '../../src/less/style';
+
+.xn-viewport {
+
+	height: 340px;
+
+	@media (max-width: 2048px) {
+		width: 100%;
+		height: 510px;
+	}
+
+  .xn-overview {
+    padding: 0; margin: 0; position: relative;
+    height: 100%;
+
+
+	.xn-carousel-item {
+			float: left;
+	    border: 1px solid white;
+	    position: absolute;
+	    top: 0;
+	    background-color: white;
+	    height: 61%;
+	  	text-align: center;
+	  	font-size: 1.3vw;
+
+	  	img {
+	  		width: 100%
+	  	}
+
+      .thumbnail-wrapper {
+        .thumbnail {
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+  }
+
+	div[class*='-indicator'] {
+	    height: 20%;
+	    width: 50px;
+	    top: 40%;
+	}
+
+  	.xn-left-indicator {
+    	border-radius: 0 50% 50% 0;
+  	}
+
+  	.xn-right-indicator {
+    	border-radius: 50% 0 0 50%;
+  	}
+
+  	.xn-pagination {
+  		width: 74%;
+  		bottom: 22%;
+  	}
+
+}

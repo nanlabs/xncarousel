@@ -1,0 +1,8 @@
+libs/bower/
+dist/
+tmp/
+test/
+*.orig
+.idea
+.jshintrc
+precommit.sh

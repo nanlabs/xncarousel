@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+    <title>Carousel automated tests</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="../../libs/bower/mocha/mocha.css"/>
+    <script src="../../libs/bower/jquery/jquery.js"></script>
+    <script src="../../libs/bower/jquery-simulate/jquery.simulate.js"></script>
+    <script src="../../tmp/automated-tests.js" data-cover></script>
+
+    <script src="../../libs/bower/mocha/mocha.js"></script>
+    <script>mocha.setup('bdd')</script>
+    <script src="/testem.js"></script>
+
+    <script src="../../libs/bower/chai/chai.js"></script>
+    <script src="../../libs/bower/sinon-chai/lib/sinon-chai.js"></script>
+    <script src="../../libs/bower/sinon/index.js"></script>
+
+    <script type="text/javascript"
+            data-cover-adapter="../lib/mocha-blanket.js"
+            src="../../libs/bower/blanket/dist/qunit/blanket.js" data-cover-flags="debug"></script>
+
+    <style type="text/css">
+
+        #element {
+            width: 1042px;
+        }
+        .xn-carousel-item {
+            width: 300px;
+        }
+    </style>
+
+    <script>
+        var assert = chai.assert;
+        var expect = chai.expect;
+    </script>
+
+</head>
+
+<body>
+<div id="mocha"></div>
+<div id="element"></div>
+
+<script>
+    onload = function () {
+    };
+</script>
+</body>
+</html>

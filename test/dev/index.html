@@ -1,0 +1,270 @@
+<!doctype html>
+<!--[if lt IE 7]>
+<html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+        <title>Carousel development/debugging version</title>
+        <meta name="description" content="Carousel component">
+        <meta name="author" content="">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+        <link rel="stylesheet/less" type="text/css" href="./style-demo.less">
+
+        <script src="http://localhost:35729/livereload.js"></script>
+        <script src="./jquery.js"></script>
+        <script src="./less-1.3.3.min.js"></script>
+        <script src="../../dist/jquery.xnCarousel.js"></script>
+    </head>
+    <body>
+    	<div id="apiDemo">
+    		<div>API</div>
+        	<div class="xn-viewport api">
+        	</div>
+        	<div class="buttonbar">
+        		<div class="modifiers">
+					<input type="button" id="btnAddItem" value="Add item"></input>
+	        		<input type="button" id="btnRemoveFirst" value="Remove first item"></input>
+	        		<input type="button" id="btnRemoveSelected" value="Remove selected item"></input>
+	        		<input type="button" id="btnClear" value="Clear"></input>
+	        		<input type="button" id="btnSelect" value="Select 2nd item"></input>
+	        		<input type="button" id="btnClearSelect" value="Clear Selection"></input>
+        		</div>
+        		<div class="xn-pagination">
+        			<input type="button" id="btnBack" value="Go Back"></input>
+        			<input type="button" id="btnNext" value="Go Next"></input>
+        			<input type="button" id="btnFirst" value="Go to First"></input>
+        			<input type="button" id="btnLast" value="Go to Last"></input>
+        			<input type="button" id="btnGotoPage" value="Go to 3rd Page"></input>
+        		</div>
+        		<div class="state">
+        			<div class="row">
+						<input type="button" id="btnGetItemCount" value="Get Item Count"></input>
+	        			<input type="button" id="btnGetPageCount" value="Get Page Count"></input>
+	        			<input type="button" id="btnGetSelectedIndex" value="Get Selected Index"></input>
+        			</div>
+        			<div class="row">
+        				<input type="button" id="btnGetItemsForPage" value="Get Items For 2nd Page"></input>
+        				<input type="button" id="btnGetCurrentPage" value="Get Current Page Index"></input>
+	        			<input type="button" id="btnGetLastItem" value="Get Last Item"></input>
+        			</div>
+        			<div id="output" style="border-style:solid;"></div>
+        		</div>
+        	</div>
+
+        </div>
+        <div>No Animation</div>
+        <div class="xn-viewport standalone hero">
+        </div>
+        <div>Fade Animation</div>
+        <div class="xn-viewport plugin hero">
+        </div>
+        <div>Page Slide Mode (w/ touch support)</div>
+        <div class="xn-viewport plugin slide">
+        </div>
+
+        <script type="text/javascript">
+
+			var randomizeColor = function() {
+				var color = Math.floor(Math.random() * 256).toString(16);
+
+				if(color.length == 1) { color += '0'; }
+
+				return color;
+			};
+
+			var buildImageUrl = function(item, size) {
+                var delay = item.delay || 0;
+				return	"http://deelay.me/" + delay + "/http://dummyimage.com/" + size + "/" + randomizeColor() + randomizeColor() + randomizeColor() + ".png&text=%23%20" + item.id;
+			};
+
+            var sliderItemTemplate = function (item) {
+				var itemTemplate = '<span class="thumbnail-wrapper"><img class="thumbnail" src="' + buildImageUrl(item, "190x200") + '"/></span>';
+                itemTemplate += '<div class="name">' + item.id + ' - ' +item.name + '</div>';
+                itemTemplate += '<div class="date">' + item.date + '</div>';
+
+                return itemTemplate;
+            };
+
+            var heroItemTemplate = function (item) {
+                var itemTemplate = '<span class="thumbnail-wrapper"><img class="thumbnail-full" src="' + buildImageUrl(item, "1200x220") + '"/></span>';
+
+                return itemTemplate;
+            };
+
+            $(function () {
+                $.getJSON('data.json', function (data) {
+                    $(".xn-viewport.standalone.hero").xnCarousel({
+                        touchEnabled: true,
+                        pageSize: 1,
+                        pagingIndicators: true,
+                        animationType: 'none',
+                        moveSpeed: 500,
+						showNavigationArrows: true,
+                        itemTemplate: heroItemTemplate,
+                        loadingType:'lazy',
+                        afterLoadedCallback:function(){
+                            console.log('callllllllllback');
+                        }
+                    });
+
+					$(".xn-viewport.standalone.hero").xnCarousel("render", data.results);
+
+                    $(".xn-viewport.plugin.hero").xnCarousel({
+                        touchEnabled: true,
+                        pageSize: 1,
+                        pagingIndicators: true,
+                        animationType: 'fade',
+                        moveSpeed: 1000,
+                        itemHeight: 110,
+						showNavigationArrows: false,
+                        loadingType:'lazy',
+                        itemTemplate: heroItemTemplate
+                    });
+
+					$(".xn-viewport.plugin.hero").xnCarousel("render", data.results);
+
+                    $(".xn-viewport.plugin.slide").xnCarousel({
+                        touchEnabled: true,
+                        pageSize: 4,
+                        pagingIndicators: true,
+                        circularNavigation: true,
+                        animationType: 'fade',
+                        moveSpeed: 500,
+						showNavigationArrows: 'auto',
+                        //pageInterval: 3000,
+                        itemHeight: 110,
+                        loadingType:'lazy',
+                        itemTemplate: sliderItemTemplate
+                    });
+
+					$(".xn-viewport.plugin.slide").xnCarousel("render", data.results);
+
+					var carousel = $(".xn-viewport.api").xnCarousel({
+                        touchEnabled: true,
+                        pageSize: 3,
+                        pagingIndicators: true,
+                        circularNavigation: false,
+                        animationType: 'slide',
+                        moveSpeed: 500,
+                        itemHeight: 110,
+                        loadingType:'lazy',
+                        itemTemplate: sliderItemTemplate,
+						api: true
+                    });
+
+
+					carousel.render(data.results);
+
+                    // Modification API
+
+                    function notify(text) {
+                    	$("#output").html("<i>" + text + "</i><br>");
+                    }
+
+	                $("#btnAddItem").click(function(e) {
+	                	var total = carousel.getItemCount();
+						carousel.addItem({
+				            "id": total,
+				            "name": "Item " + total,
+				            "date": "2013-09-22"
+				        });
+
+				        notify("Item Added");
+                    });
+
+	                $("#btnRemoveFirst").click(function(e) {
+						carousel.removeItem(0);
+	                	notify("Item 0 removed");
+                    });
+
+                    $("#btnRemoveSelected").click(function(e) {
+						carousel.removeItem(carousel.getSelectedIndex());
+	                	notify("Selected Item Removed");
+                    });
+
+                    $("#btnClear").click(function(e) {
+						carousel.clear();
+	                	notify("Cleared");
+                    });
+
+                    $("#btnSelect").click(function(e) {
+						carousel.selectItem(1);
+	                	notify("Second Item selected");
+                    });
+
+                     $("#btnClearSelect").click(function(e) {
+						carousel.clearSelection();
+                     	notify("Selection Removed");
+                    });
+
+                    // Pagination API
+
+                    $("#btnBack").click(function(e) {
+						carousel.goBack();
+	                	notify("Navigated to previous page");
+                    });
+
+                    $("#btnNext").click(function(e) {
+						carousel.goNext();
+	                	notify("Navigated to next page");
+                    });
+
+                    $("#btnFirst").click(function(e) {
+						carousel.goToFirstPage();
+	                	notify("Navigated to first page");
+                    });
+
+                    $("#btnLast").click(function(e) {
+						carousel.goToLastPage();
+	                	notify("Navigated to last page");
+                    });
+
+                    $("#btnGotoPage").click(function(e) {
+						carousel.goToPage(2);
+	                	notify("Navigated to 3rd page");
+                    });
+
+
+                    // Information API
+
+                    function display(text, value) {
+                    	$("#output").html("<i>" + text + "</i>: <strong>" + value + "</strong><br>");
+                    }
+
+                    $("#btnGetItemCount").click(function(e) {
+	                	display('Item Count', carousel.getItemCount());
+                    });
+
+                    $("#btnGetPageCount").click(function(e) {
+	                	display('Page Count', carousel.getPageCount());
+                    });
+
+                    $("#btnGetSelectedIndex").click(function(e) {
+	                	display('Selected Index', carousel.getSelectedIndex());
+                    });
+
+                    $("#btnGetItemsForPage").click(function(e) {
+	                	display('Item indices for 2nd page', carousel.getItemIndicesForPage(1));
+                    });
+
+                    $("#btnGetCurrentPage").click(function(e) {
+	                	display('Current Page Index', carousel.getCurrentPage());
+                    });
+
+                    $("#btnGetLastItem").click(function(e) {
+	                	display('Last Item Index', carousel.getLastItemIndex());
+                    });
+                });
+
+            });
+        </script>
+    </body>
+</html>
