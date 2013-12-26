@@ -142,6 +142,7 @@ $(".carousel-container").xnCarousel("render", itemsArray);
 
 
 * **pageSize**: {number - default: 1}  ___ *Number of items per page*
+* **itemWidth**: {number - default: none}  ___ *Item width in pixels. When defined, pageSize is ignored as there are as many items as can fit in the carousel viewport*
 * **pagingIndicators**: {boolean - default: false}  ___ *True to display the page indicators (bullets). False to hide them*
 * **pageInterval**: {number - default: 0}  ___ *If > 0, carousel will automatically move to the next page using the value as interval in milliseconds, ie 1000 means the carousel will change the page once a second. If set to 0, automatic navigation is disabled.*
 * **showNavigationArrows**: {true | false | "auto" - default: auto}  ___ *Shows page navigation arrows (prev/next). If true, the arrows are always displayed, when set to false, arrows are not shown. If set to auto, it will display arrows on mouse over*
