@@ -29,7 +29,18 @@ The component only requires jQuery 1.9
 
 ### Bower
 
-*TODO* Bower instructions.
+Install the carousel as bower component by executing:
+`bower install http://github.com/nanlabs/xncarousel.git`
+
+or by adding the following line to the dependencies on your bower.json
+`"xnCarousel": "http://github.com/nanlabs/xncarousel.git"`
+and executing
+`bower install`
+
+After doing this, the carousel distribution files should be located at `<bower libs>/xnCarousel/dist`.
+
+`<bower libs>` is usually `<root>/bower_components`, but it could be different in your environment.
+
 
 ### Initialization
 
@@ -151,16 +162,41 @@ The carousel includes a base stylesheet that must be included/imported in your c
 The stylesheet is located in the _"dist"_ directory (and included in the bower component) and is provided as:
  - a minified css (_jquery.xnCarousel.min.css_) which can be included using the _link_ tag.
  - a LESS file (_jquery.xnCarousel.less_) which you can import if you are using LESS
+ - a SASS file (_jquery.xnCarousel.scss_) which you can import if you are using SASS
  
 
-*TODO*  LESS INSTRUCTIONS
+*TODO*  LESS/SASS INSTRUCTIONS
 
 
 ## API Documentation
 
 ### Methods
 
-The following methods can be used by the JS client code to interact with the carousel:
+The carousel includes many methods which can be used to interact with it.
+There are 2 ways of calling these methods:
+- Using the jQuery plugin directly
+```
+var result = $(<selector>).xnCarousel("<method name>", <param1>, <param2>, ...) 
+```
+
+Example:
+```javascript
+var itemIndex = $(".carousel-container").xnCarousel("getPageIndex", 2);
+``` 
+
+- Using the carousel instance
+```
+var carousel = $(<selector>).xnCarousel({api: true});
+var result = carousel.<method name>(<param1>, <param2>, ...);
+```
+
+Example:
+```javascript
+var carousel = $(".carousel-container").xnCarousel({api: true});
+var itemIndex = carousel.getPageIndex(2);
+``` 
+
+List of methods:
 
 * **goToPage(pageNumber)** *Navigates to the provided page*
 * **goNext()** *Navigates to the next page if available (might be the first when loop navigation is enabled)*
