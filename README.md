@@ -29,16 +29,17 @@ The component only requires jQuery 1.9
 
 ### Bower
 
-Install the carousel as bower component by executing:
+Install the carousel as bower component by:
+
+ - executing:
 `bower install http://github.com/nanlabs/xncarousel.git`
 
-or by adding the following line to the dependencies on your bower.json
+ - or by adding the following line to the dependencies on your bower.json
 `"xnCarousel": "http://github.com/nanlabs/xncarousel.git"`
 and executing
 `bower install`
 
 After doing this, the carousel distribution files should be located at `<bower libs>/xnCarousel/dist`.
-
 `<bower libs>` is usually `<root>/bower_components`, but it could be different in your environment.
 
 
