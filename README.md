@@ -2,6 +2,17 @@
 
 jQuery plugin to create a fully featured Carousel component 
 
+## Features
+
+ - Very Flexible (easy to adapt using the settings and templates)
+ - Paginable (One or multiple items per page). Includes pagination components (arrows and bullets)
+ - Responsive 
+ - Touch enabled
+ - Different layout/animation strategies (slide, fade, no animation)
+ - Uses Hardware accelerated CSS3 animations when available (with fallback to jQuery animations)
+ - Item Data can be provided via DOM elements or using JSON
+ - Complete API to interact with the carousel using Javascript
+
 ## Getting Started
 
  - Download the project
