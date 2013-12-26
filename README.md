@@ -23,9 +23,13 @@ The component only requires jQuery 1.9
 
 ### Download
 
- - If you are building the component, read the "Development" section at the end of the document.
- - or Add this component as a bower dependency, poiting to this repo (develop branch).
+ - If you are building the component. Read the _"Development"_ section at the end of the document.
+ - or Add this component as a bower dependency, poiting to this repo (develop branch). Read the _"Bower"_ section.
  - or Download the files in the dist directory in this repo.
+
+### Bower
+
+*TODO* Bower instructions.
 
 ### Initialization
 
@@ -34,10 +38,12 @@ To use the component, follow these steps:
 1. Include the minified js library in the html page as follows:
 ```<script src="<carousel dir>/jquery.xnCarousel.min.js"></script>``` 
 
-2. Include the html dom element to hold the component
+2. Include the stylesheet css or less (read the *"Styling"* section)
+
+3. Include the html dom element to hold the component
 ```<div class="carousel-container"></div>``` 
 
-3. Initialize it from your javascript code 
+4. Initialize it from your javascript code 
 
 ```javascript
 
@@ -51,20 +57,19 @@ $(function () {
 
 There are 2 ways to define the items, via DOM elements or using a template and JSON. 
 
-1. DOM Definition
-
+#### DOM Definition
 Put the items markup inside a wrapper with "xn-items" class defined. The wrapper must be a child of the main carousel container. 
 
-eg:
-	```
+Example (which creates 3 items):
+```html
 	<div class="carousel-container">
 		<div class="xn-items">
-			<div class="template"><img src="test1.jpg"></img></div>
-			<div class="template"><img src="test2.jpg"></img></div>
-			<div class="template"><img src="test3.jpg"></img></div>
+			<div class="some-class"><img src="test1.jpg"></img></div>
+			<div class="some-class"><img src="test2.jpg"></img></div>
+			<div class="some-class"><img src="test3.jpg"></img></div>
 		</div>
 	</div>
-	``` 
+``` 
 	
 No special option must be used since the component will look for items insde a "xn-items" wrapper. 
 Then render the items by calling
@@ -72,7 +77,7 @@ Then render the items by calling
 $(".carousel-container").xnCarousel("render");
 ``` 
 
-2. JSON items (with a template)
+#### JSON items (with a template)
 
 If you need to load items using JSON, don't define the items in the DOM. Instead, create a JS function that receieves a single item and returns the HTML as a string.
 Example:
@@ -136,7 +141,7 @@ $(".carousel-container").xnCarousel("render", itemsArray);
 
 ### Pagination
 
-_TODO_ Pagination classes instructions
+*TODO*  Pagination classes instructions
 
 
 
@@ -144,11 +149,11 @@ _TODO_ Pagination classes instructions
 
 The carousel includes a base stylesheet that must be included/imported in your code and extended for your custom look.
 The stylesheet is located in the _"dist"_ directory (and included in the bower component) and is provided as:
- - a minified css (_jquery.xnCarousel.min.css_) which can be included using the <link> tag.
+ - a minified css (_jquery.xnCarousel.min.css_) which can be included using the _link_ tag.
  - a LESS file (_jquery.xnCarousel.less_) which you can import if you are using LESS
  
 
-_TODO_ LESS INSTRUCTIONS
+*TODO*  LESS INSTRUCTIONS
 
 
 ## API Documentation
