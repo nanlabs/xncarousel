@@ -25,6 +25,11 @@ module.exports = AbstractStrategy.extend({
 	load: function ($item) {
 		console.debug('Loading item');
 		var self = this;
+
+		// Only load items that are not already loaded (ie. has the 'proxy' class)
+		$item = $item.filter(function() {
+			return $(this).hasClass('proxy');
+		});
 		$item.removeClass('proxy');
 		$item.addClass('loading');
 		$item.find('img[data-src]').each(function(){

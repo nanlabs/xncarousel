@@ -27,7 +27,7 @@ The component only requires [jQuery][1] 1.9
 ### Download
 
  - If you are building the component. Read the [Development][2] section at the end of the document.
- - or Add this component as a bower dependency, poiting to this repo (develop branch). Read the [Bower][3] section.
+ - or Add this component as a bower dependency, poiting to this repo. Read the [Bower][3] section.
  - or Download the files in the dist directory in this repo.
 
 <a name="bower"></a>
@@ -56,6 +56,24 @@ To use the component, follow these steps:
 ```html
 <script src="<carousel dir>/jquery.xnCarousel.min.js"></script>
 ```
+
+> **NOTE on Module Loading:**
+If you want to use a module loader library (requirejs, browserify, etc), you will need to use the *shim* functionality they provide. For example, for requirejs, you'll need to add the following configuration:
+```
+require.config({
+	paths: {
+		jquery: '<path to jquery dir>/jquery.min',
+		xnCarousel: '<path to xnCarousel dir>/jquery.xnCarousel.min'
+	},
+	shim: {
+		xnCarousel: {
+                    deps: ['jquery'],
+                    exports: 'jQuery.fn.xnCarousel'
+                }
+	}
+});
+```
+
 
 2. Include the stylesheet [css][5] or [less][6] (read the [Styling][7] section)
 
@@ -145,7 +163,8 @@ Name | Type | Default | Description
 **animationType** | ```'slide'``` or ```'fade'``` or ```'none'``` | ```'none'``` | Transition effect to be used when navigating pages
 **moveSpeed** | ```number``` | 1000 | Duration of the transition animations (in milliseconds)
 **loadingType** | ```'lazy'``` or ```'eager'``` | ```lazy``` | Sets the items loading strategy. ```lazy``` will delay the item's image loading until that item is displayed (showing an animation while loading). ```eager``` will load all images as soon as possible
-**responsive** | ```true``` or ```false``` or ```rangesObject``` | ```true``` | Enables/disables responsive behaviour in all cases (when booleans) or it does dynamically for different resolutions. See [below][10]* in this guide for more details
+**responsive** | ```true``` or ```false``` or ```rangesObject``` | ```false``` | Enables/disables responsive behaviour in all cases (when booleans) or it does dynamically for different resolutions. See [below][10]* in this guide for more details
+**paginationContainerSelector** | ```string``` | ```null``` | Defines an existing DOM element where the pagination indicators will be rendered. If ```null```, the default container will be created by the carousel
 
 
 <a name="responsive_details"></a>
@@ -169,7 +188,7 @@ rangesObject :
  
 ### Pagination
 
-The carousel includes a pagination modules that enables this feature.
+The carousel includes a pagination module that enables this feature.
 
 <a name="pagination_indicators"></a>
 #### Indicators
@@ -257,7 +276,7 @@ Name | Returns | Description
 **getItemIndicesForPage(pageIndex)** | ```[number]``` | Returns an array with the item indices that belong to the provided page
 **getItemIndicesForCurrentPage()** | ```[number]``` | Returns an array with the item indices that belong to the current page
 **clear(options)** | - | Removes all the items. The event is not fired if ```options.silent = true```
-**isValidItemIndex(index)** | Boolean | Returns ```true``` if the provided index is valid (within range). ```false``` otherwise
+**isValidItemIndex(index)** | ```boolean``` | Returns ```true``` if the provided index is valid (within range). ```false``` otherwise
 **removeItem(index)** | - | Removes an item by index
 **selectItem(index, options)** | - | Changes the current selection to an item by index. The event is not fired if ```options.silent = true```
 **clearSelection(options)** | - | Clears the selected item. The event is not fired if ```options.silent = true```
@@ -273,7 +292,7 @@ Name | Returns | Description
 The Carousel triggers many events to notify the client code of situations. The component uses jQuery's event infrastructure.
 Listeners for this events might be added to the same DOM element to which the plugin was applied (in the example, ``` $(".carousel-container")```)
 
-To avoid conflicts, all event names contain a namespace prefix: "carousel:".
+> **To avoid conflicts, all event names contain a namespace prefix: "carousel:"**
 
 For example, to add a listener for the pageSelected event, use the following code:
 ```javascript

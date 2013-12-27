@@ -71,7 +71,7 @@ module.exports = AbstractStrategy.extend({
 	},
 
 	calculateItemOffset: function($item) {
-		return this.animationObject.size.initialItemWidth * $item.index();
+		return this.animationObject.size.unitType === 'px' ? $item.outerWidth(true)  * $item.index() : this.animationObject.size.initialItemWidth * $item.index();
 	},
 
 	supportsTouch: function() {
@@ -79,7 +79,7 @@ module.exports = AbstractStrategy.extend({
 	},
 
 	animatePartial: function($overview, pcn) {
-		$overview.css('left', pcn + '%');
+		$overview.css('left', pcn + this.animationObject.size.unitType);
 	}
 
 });

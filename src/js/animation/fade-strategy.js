@@ -20,7 +20,7 @@ module.exports = AbstractStrategy.extend({
 
 	calculateItemOffset: function($item) {
 		var itemPositionWithinPage = $item.index() % this.animationObject.pageSize;
-		return this.animationObject.size.initialItemWidth * itemPositionWithinPage;
+		return this.animationObject.size.unitType === 'px' ? $item.outerWidth(true) * itemPositionWithinPage : this.animationObject.size.initialItemWidth * itemPositionWithinPage;
 	},
 
 	_animateItem: function ($currentItem, $nextItem) {
