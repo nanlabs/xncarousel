@@ -21,7 +21,8 @@
   "files": [
     "src/js",
     "src/less",
-    "style.less"
+    "style.less",
+	"libs/*.js"
   ],
   "scripts": {
     "test": "grunt test",
