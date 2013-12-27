@@ -2388,7 +2388,7 @@ module.exports = Class.extend({
 
 	_updatePaginator: function () {
 		var pageSize = ~~(this.$viewport.width() / this.settings.itemWidth);
-		if (pageSize !== this.settings.pageSize)  {
+		if (pageSize !== this.settings.pageSize && pageSize > 0)  {
 			var actualPage = this.pagingModule.getCurrentPage(),
 			self = this;
 			this.settings.pageSize = pageSize;
@@ -3490,15 +3490,15 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"xlgdQ9":[function(require,module,exports){
+},{"./carousel":41,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"jquery":[function(require,module,exports){
+module.exports=require('xlgdQ9');
+},{}],"xlgdQ9":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
  */
 module.exports = jQuery;
 
-},{}],"jquery":[function(require,module,exports){
-module.exports=require('xlgdQ9');
 },{}],48:[function(require,module,exports){
 var Class = require('class');
 
@@ -3581,14 +3581,14 @@ module.exports = AbstractStrategy.extend({
 		console.debug('Preloading item');
 
 		var imgSrcAltered =  carouselItemInnerHtml.replace(' src=', ' data-src=');
-		var $itemContent = $(imgSrcAltered);
+		var $itemContent = $(imgSrcAltered); 
 
 		$item.append($itemContent);
 		$item.addClass('proxy');
 
 		this.loadingObject.$overview.append($item);
 	},
-
+	
 	load: function ($item) {
 		console.debug('Loading item');
 		var self = this;
