@@ -21,8 +21,11 @@ describe 'Pagination indicator', ->
     cleanElement()
     pageSelectedCallback ?= ->
     pageCount ?= 0
+    getPageCount = ->
+      return pageCount
 
-    paginator = new PagingIndicator($elem, { pageCount: pageCount, onPageSelected: pageSelectedCallback} )
+    paginator = new PagingIndicator({ getPageCount: getPageCount, onPageSelected: pageSelectedCallback})
+    paginator.render($elem)
 
   cleanElement = ->
     $elem.off()

@@ -518,7 +518,8 @@ module.exports = Class.extend({
 			onPageSelected: $.proxy(function (pageIndex) {
 				this._disableNavigators();
 				this.goToPage(pageIndex);
-			}, this)
+			}, this),
+			paginationContainerSelector : this.settings.paginationContainerSelector || null
 		});
 	},
 
@@ -528,14 +529,13 @@ module.exports = Class.extend({
 			var actualPage = this.pagingModule.getCurrentPage(),
 			self = this;
 			this.settings.pageSize = pageSize;
-			this.$viewport.find('.xn-pagination').remove();
 			this.pagingModule.updatePageSize(pageSize);
 			this.animationModule.updatePageSize(pageSize);
 			this.animationModule.updateAfterRemoval(this.$viewport.find('.xn-carousel-item'));
 			this.pagingModule.renderIndicator();
 			this.pagingModule.pagingIndicator.select(actualPage);
 			setTimeout(function () {
-				var pageCount = self.$viewport.find('.xn-pagination .item-container').children().length;
+				var pageCount = self.pagingModule.pagingIndicator.$itemContainer.children().length;
 				self.goToPage(actualPage < pageCount ? actualPage : pageCount - 1);
 			}, 0);
 		}

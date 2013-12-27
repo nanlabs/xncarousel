@@ -16,22 +16,26 @@ var DEFAULTS = {
 module.exports = Class.extend({
 	itemCount: 0,
 
-	init: function ($parent, options) {
-		options = $.extend({}, DEFAULTS, options);
+	init: function (options) {
+		this.options = $.extend({}, DEFAULTS, options);
 
+		this.paginationContainerSelector = options.paginationContainerSelector || ITEM_CONTAINER_SELECTOR;
 		this.notifyPageSelected = options.onPageSelected;
+	},
 
-		this.render($parent, options.pageCount);
+	render: function ($parent) {
+		if (this.options.paginationContainerSelector) {
+			this.$itemContainer = this.$itemContainer || $(this.options.paginationContainerSelector);
+		} else {
+			this.$itemContainer = this.$itemContainer || this._renderContainer($parent);
+		}
+
+		this._renderPageItems(this.$itemContainer, this.options.getPageCount());
 
 		this.enablePaginationUI();
 
 		// Set the first page item as selected
 		this._getItems().first().addClass(SELECTED_CLASS);
-	},
-
-	render: function ($parent, pageCount) {
-		this.$itemContainer = this._renderContainer($parent);
-		this._renderPageItems(this.$itemContainer, pageCount);
 
 		return this.$itemContainer;
 	},
@@ -44,6 +48,7 @@ module.exports = Class.extend({
 	},
 
 	_renderPageItems: function ($container, pageCount) {
+		this.clear();
 		for (var i = 0; i < pageCount; i++) {
 			this.addItem();
 		}
