@@ -32,7 +32,7 @@
     "lib": "./src"
   },
   "pre-commit": [
-    "sh precommit.sh"
+    
   ],
   "optionalDependencies": {
     "jquery": ">=1.9.1"

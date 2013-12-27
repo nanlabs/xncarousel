@@ -1396,7 +1396,9 @@ MediaQueryWatcher.prototype = {
 
 // Exports the class
 module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"6obL00"}],"MFFfPr":[function(require,module,exports){
+},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"6obL00"}],"class":[function(require,module,exports){
+module.exports=require('MFFfPr');
+},{}],"MFFfPr":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1462,8 +1464,6 @@ module.exports = MediaQueryWatcher;
 })();
 
 module.exports = Class;
-},{}],"class":[function(require,module,exports){
-module.exports=require('MFFfPr');
 },{}],36:[function(require,module,exports){
 var Class = require('class');
 require('browsernizr/test/css/transitions');
@@ -3462,15 +3462,15 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"6obL00","jquery-plugin-wrapper":30}],"jquery":[function(require,module,exports){
-module.exports=require('6obL00');
-},{}],"6obL00":[function(require,module,exports){
+},{"./carousel":41,"jquery":"6obL00","jquery-plugin-wrapper":30}],"6obL00":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
  */
 module.exports = jQuery;
 
+},{}],"jquery":[function(require,module,exports){
+module.exports=require('6obL00');
 },{}],48:[function(require,module,exports){
 var Class = require('class');
 
