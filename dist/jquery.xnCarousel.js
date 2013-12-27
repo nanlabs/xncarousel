@@ -2388,7 +2388,7 @@ module.exports = Class.extend({
 
 	_updatePaginator: function () {
 		var pageSize = ~~(this.$viewport.width() / this.settings.itemWidth);
-		if (pageSize !== this.settings.pageSize)  {
+		if (pageSize !== this.settings.pageSize && pageSize > 0)  {
 			var actualPage = this.pagingModule.getCurrentPage(),
 			self = this;
 			this.settings.pageSize = pageSize;
@@ -3480,7 +3480,9 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"GXCbp8","jquery":"xlgdQ9"}],"kV8X1M":[function(require,module,exports){
+},{"class":"GXCbp8","jquery":"xlgdQ9"}],"wrapper":[function(require,module,exports){
+module.exports=require('kV8X1M');
+},{}],"kV8X1M":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3488,8 +3490,8 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"wrapper":[function(require,module,exports){
-module.exports=require('kV8X1M');
+},{"./carousel":41,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"jquery":[function(require,module,exports){
+module.exports=require('xlgdQ9');
 },{}],"xlgdQ9":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
@@ -3497,8 +3499,6 @@ module.exports=require('kV8X1M');
  */
 module.exports = jQuery;
 
-},{}],"jquery":[function(require,module,exports){
-module.exports=require('xlgdQ9');
 },{}],48:[function(require,module,exports){
 var Class = require('class');
 

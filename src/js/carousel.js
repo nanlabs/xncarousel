@@ -530,7 +530,7 @@ module.exports = Class.extend({
 
 	_updatePaginator: function () {
 		var pageSize = ~~(this.$viewport.width() / this.settings.itemWidth);
-		if (pageSize !== this.settings.pageSize)  {
+		if (pageSize !== this.settings.pageSize && pageSize > 0)  {
 			var actualPage = this.pagingModule.getCurrentPage(),
 			self = this;
 			this.settings.pageSize = pageSize;
