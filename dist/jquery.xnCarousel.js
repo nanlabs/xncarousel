@@ -1396,9 +1396,7 @@ MediaQueryWatcher.prototype = {
 
 // Exports the class
 module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"6obL00"}],"class":[function(require,module,exports){
-module.exports=require('MFFfPr');
-},{}],"MFFfPr":[function(require,module,exports){
+},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"xlgdQ9"}],"GXCbp8":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1464,6 +1462,8 @@ module.exports=require('MFFfPr');
 })();
 
 module.exports = Class;
+},{}],"class":[function(require,module,exports){
+module.exports=require('GXCbp8');
 },{}],36:[function(require,module,exports){
 var Class = require('class');
 require('browsernizr/test/css/transitions');
@@ -1502,7 +1502,7 @@ module.exports = Class.extend({
 
 });
 
-},{"browsernizr":2,"browsernizr/test/css/transitions":29,"class":"MFFfPr"}],37:[function(require,module,exports){
+},{"browsernizr":2,"browsernizr/test/css/transitions":29,"class":"GXCbp8"}],37:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -1672,7 +1672,7 @@ module.exports = Class.extend({
 	}
 });
 
-},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"MFFfPr","jquery":"6obL00"}],38:[function(require,module,exports){
+},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"GXCbp8","jquery":"xlgdQ9"}],38:[function(require,module,exports){
 var AbstractStrategy = require('./abstract-strategy');
 
 module.exports = AbstractStrategy.extend({
@@ -1695,7 +1695,7 @@ module.exports = AbstractStrategy.extend({
 
 	calculateItemOffset: function($item) {
 		var itemPositionWithinPage = $item.index() % this.animationObject.pageSize;
-		return this.animationObject.size.initialItemWidth * itemPositionWithinPage;
+		return this.animationObject.size.unitType === 'px' ? $item.outerWidth(true) * itemPositionWithinPage : this.animationObject.size.initialItemWidth * itemPositionWithinPage;
 	},
 
 	_animateItem: function ($currentItem, $nextItem) {
@@ -1842,7 +1842,7 @@ module.exports = AbstractStrategy.extend({
 	},
 
 	calculateItemOffset: function($item) {
-		return this.animationObject.size.initialItemWidth * $item.index();
+		return this.animationObject.size.unitType === 'px' ? $item.outerWidth(true)  * $item.index() : this.animationObject.size.initialItemWidth * $item.index();
 	},
 
 	supportsTouch: function() {
@@ -1850,12 +1850,12 @@ module.exports = AbstractStrategy.extend({
 	},
 
 	animatePartial: function($overview, pcn) {
-		$overview.css('left', pcn + '%');
+		$overview.css('left', pcn + this.animationObject.size.unitType);
 	}
 
 });
 
-},{"./abstract-strategy":36,"jquery":"6obL00"}],41:[function(require,module,exports){
+},{"./abstract-strategy":36,"jquery":"xlgdQ9"}],41:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 var util = require('./util');
@@ -2358,6 +2358,8 @@ module.exports = Class.extend({
 
 		this._startAutomaticPaging();
 
+		this._buildLastPage();
+
 		this._trigger('carousel:rendered');
 	},
 
@@ -2529,8 +2531,8 @@ module.exports = Class.extend({
 	},
 
 	_processAddedItem: function($item) {
-		this.animationModule.initItem($item);
 		$item.css({'width': this.size.initialItemWidth + this.size.unitType});
+		this.animationModule.initItem($item);
 	},
 
 	_hasNextPage: function () {
@@ -2844,6 +2846,32 @@ module.exports = Class.extend({
 		return this._getDOMItemsForPage(this.getCurrentPage());
 	},
 
+	//this method adresses the case when there are not enough items to fill the last page for fade animation strategy.
+	_buildLastPage: function () {
+		//TODO: remove this condition as this should be available for fixed size items also. Do it when this logic is able to deal with dynamic pages (_updatePaginator()).
+		if (!this.settings.itemWidth) {
+		if (this.settings.animationType === 'fade' && this.$overview.children().length / this.pagingModule.getPageCount() % 2 !== 1) {
+			var newPage,
+			lastItems = this._getDOMItemsForPage(this.pagingModule.getLastPage()).not(this._getDOMItemsForPage(this.pagingModule.getLastPage()-1)).get(),
+			prevPageNotSharedItems = this._getDOMItemsForPage(this.pagingModule.getLastPage()-1).not(this._getDOMItemsForPage(this.pagingModule.getLastPage())).get(),
+			sharedItems = this._getDOMItemsForPage(this.pagingModule.getLastPage()-1).not(prevPageNotSharedItems).get();
+
+			sharedItems = $(sharedItems).clone();
+			$(lastItems[0]).before(sharedItems);
+			newPage = sharedItems.add(lastItems);
+
+			var step = this.settings.itemWidth ? $(lastItems[0]).outerWidth(true) : parseFloat(lastItems[0].style.width, 10);
+			// var count = this.settings.itemWidth ? -(this.pagingModule.pageSize * $(lastItems[0]).outerWidth(true) - this.$overview.outerWidth(true)) : 0;
+			var count = 0;
+			var self = this;
+			$.each(newPage, function (i, el) {
+				$(el).css('left', count + self.size.unitType);
+				count += step;
+			});
+		}
+		}
+	},
+
 	//************************************Event Handlers***************************************
 
 	selectItemHandlerTouch: function (e) {
@@ -2998,7 +3026,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":51,"./pagination/paging-module":54,"./responsive-module":55,"./util":56,"class":"MFFfPr","jquery":"6obL00"}],42:[function(require,module,exports){
+},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":51,"./pagination/paging-module":54,"./responsive-module":55,"./util":56,"class":"GXCbp8","jquery":"xlgdQ9"}],42:[function(require,module,exports){
 /**
 * Returns a function which calls the specified function in the specified
 * scope.
@@ -3452,9 +3480,7 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"MFFfPr","jquery":"6obL00"}],"wrapper":[function(require,module,exports){
-module.exports=require('8VJE8H');
-},{}],"8VJE8H":[function(require,module,exports){
+},{"class":"GXCbp8","jquery":"xlgdQ9"}],"kV8X1M":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3462,7 +3488,9 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"6obL00","jquery-plugin-wrapper":30}],"6obL00":[function(require,module,exports){
+},{"./carousel":41,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"wrapper":[function(require,module,exports){
+module.exports=require('kV8X1M');
+},{}],"xlgdQ9":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
@@ -3470,7 +3498,7 @@ module.exports = Carousel;
 module.exports = jQuery;
 
 },{}],"jquery":[function(require,module,exports){
-module.exports=require('6obL00');
+module.exports=require('xlgdQ9');
 },{}],48:[function(require,module,exports){
 var Class = require('class');
 
@@ -3488,7 +3516,7 @@ module.exports = Class.extend({
 	
 });
 
-},{"class":"MFFfPr"}],49:[function(require,module,exports){
+},{"class":"GXCbp8"}],49:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3536,7 +3564,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":48,"./spinner":52,"jquery":"6obL00"}],50:[function(require,module,exports){
+},{"./abstract-strategy":48,"./spinner":52,"jquery":"xlgdQ9"}],50:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3589,7 +3617,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":48,"./spinner":52,"jquery":"6obL00"}],51:[function(require,module,exports){
+},{"./abstract-strategy":48,"./spinner":52,"jquery":"xlgdQ9"}],51:[function(require,module,exports){
 var Class = require('class');
 
 var LazyStrategy = require('./lazy-strategy');
@@ -3671,7 +3699,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./eager-strategy":49,"./lazy-strategy":50,"class":"MFFfPr"}],52:[function(require,module,exports){
+},{"./eager-strategy":49,"./lazy-strategy":50,"class":"GXCbp8"}],52:[function(require,module,exports){
 var Class = require('class'),
 SpinJs = require('../../../libs/spin.js'),
 $ = require('jquery');
@@ -3778,7 +3806,7 @@ module.exports = Class.extend({
     }
 });
 
-},{"../../../libs/spin.js":1,"class":"MFFfPr","jquery":"6obL00"}],53:[function(require,module,exports){
+},{"../../../libs/spin.js":1,"class":"GXCbp8","jquery":"xlgdQ9"}],53:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -3887,7 +3915,7 @@ module.exports = Class.extend({
 
 });
 
-},{"class":"MFFfPr","jquery":"6obL00"}],54:[function(require,module,exports){
+},{"class":"GXCbp8","jquery":"xlgdQ9"}],54:[function(require,module,exports){
 var Class = require('class');
 var PaginationIndicator = require('./paging-indicator.js');
 var $ = require('jquery');
@@ -4163,7 +4191,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./paging-indicator.js":53,"class":"MFFfPr","jquery":"6obL00"}],55:[function(require,module,exports){
+},{"./paging-indicator.js":53,"class":"GXCbp8","jquery":"xlgdQ9"}],55:[function(require,module,exports){
 var Class = require('class'),
 MediaQueryWatcher = require('mediaquerywatcher'),
 $ = require('jquery');
@@ -4368,7 +4396,7 @@ module.exports = Class.extend({
 	}
 	
 });
-},{"class":"MFFfPr","jquery":"6obL00","mediaquerywatcher":33}],56:[function(require,module,exports){
+},{"class":"GXCbp8","jquery":"xlgdQ9","mediaquerywatcher":33}],56:[function(require,module,exports){
 exports.getDependency = function(dependencies, name, defaultDep) {
 	dependencies = dependencies || {};
 	return dependencies[name] || defaultDep;
@@ -4462,6 +4490,5 @@ exports.isIE = function() {
   return (myNav.indexOf('msie') !== -1) ? parseFloat(myNav.split('msie')[1], 10) : false;
 };
 
-},{}]},{},["8VJE8H"])
-;
+},{}]},{},["kV8X1M"])
 })(this, jQuery);

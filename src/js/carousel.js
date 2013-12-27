@@ -500,6 +500,8 @@ module.exports = Class.extend({
 
 		this._startAutomaticPaging();
 
+		this._buildLastPage();
+
 		this._trigger('carousel:rendered');
 	},
 
@@ -671,8 +673,8 @@ module.exports = Class.extend({
 	},
 
 	_processAddedItem: function($item) {
-		this.animationModule.initItem($item);
 		$item.css({'width': this.size.initialItemWidth + this.size.unitType});
+		this.animationModule.initItem($item);
 	},
 
 	_hasNextPage: function () {
@@ -984,6 +986,32 @@ module.exports = Class.extend({
 
 	_getDOMItemsForCurrentPage: function () {
 		return this._getDOMItemsForPage(this.getCurrentPage());
+	},
+
+	//this method adresses the case when there are not enough items to fill the last page for fade animation strategy.
+	_buildLastPage: function () {
+		//TODO: remove this condition as this should be available for fixed size items also. Do it when this logic is able to deal with dynamic pages (_updatePaginator()).
+		if (!this.settings.itemWidth) {
+		if (this.settings.animationType === 'fade' && this.$overview.children().length / this.pagingModule.getPageCount() % 2 !== 1) {
+			var newPage,
+			lastItems = this._getDOMItemsForPage(this.pagingModule.getLastPage()).not(this._getDOMItemsForPage(this.pagingModule.getLastPage()-1)).get(),
+			prevPageNotSharedItems = this._getDOMItemsForPage(this.pagingModule.getLastPage()-1).not(this._getDOMItemsForPage(this.pagingModule.getLastPage())).get(),
+			sharedItems = this._getDOMItemsForPage(this.pagingModule.getLastPage()-1).not(prevPageNotSharedItems).get();
+
+			sharedItems = $(sharedItems).clone();
+			$(lastItems[0]).before(sharedItems);
+			newPage = sharedItems.add(lastItems);
+
+			var step = this.settings.itemWidth ? $(lastItems[0]).outerWidth(true) : parseFloat(lastItems[0].style.width, 10);
+			// var count = this.settings.itemWidth ? -(this.pagingModule.pageSize * $(lastItems[0]).outerWidth(true) - this.$overview.outerWidth(true)) : 0;
+			var count = 0;
+			var self = this;
+			$.each(newPage, function (i, el) {
+				$(el).css('left', count + self.size.unitType);
+				count += step;
+			});
+		}
+		}
 	},
 
 	//************************************Event Handlers***************************************
