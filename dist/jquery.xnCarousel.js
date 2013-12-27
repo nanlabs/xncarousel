@@ -1396,7 +1396,9 @@ MediaQueryWatcher.prototype = {
 
 // Exports the class
 module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"xlgdQ9"}],"GXCbp8":[function(require,module,exports){
+},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"xlgdQ9"}],"class":[function(require,module,exports){
+module.exports=require('GXCbp8');
+},{}],"GXCbp8":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1462,8 +1464,6 @@ module.exports = MediaQueryWatcher;
 })();
 
 module.exports = Class;
-},{}],"class":[function(require,module,exports){
-module.exports=require('GXCbp8');
 },{}],36:[function(require,module,exports){
 var Class = require('class');
 require('browsernizr/test/css/transitions');
@@ -2376,7 +2376,8 @@ module.exports = Class.extend({
 			onPageSelected: $.proxy(function (pageIndex) {
 				this._disableNavigators();
 				this.goToPage(pageIndex);
-			}, this)
+			}, this),
+			paginationContainerSelector : this.settings.paginationContainerSelector || null
 		});
 	},
 
@@ -2386,14 +2387,13 @@ module.exports = Class.extend({
 			var actualPage = this.pagingModule.getCurrentPage(),
 			self = this;
 			this.settings.pageSize = pageSize;
-			this.$viewport.find('.xn-pagination').remove();
 			this.pagingModule.updatePageSize(pageSize);
 			this.animationModule.updatePageSize(pageSize);
 			this.animationModule.updateAfterRemoval(this.$viewport.find('.xn-carousel-item'));
 			this.pagingModule.renderIndicator();
 			this.pagingModule.pagingIndicator.select(actualPage);
 			setTimeout(function () {
-				var pageCount = self.$viewport.find('.xn-pagination .item-container').children().length;
+				var pageCount = self.pagingModule.pagingIndicator.$itemContainer.children().length;
 				self.goToPage(actualPage < pageCount ? actualPage : pageCount - 1);
 			}, 0);
 		}
@@ -3461,15 +3461,15 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"jquery":[function(require,module,exports){
-module.exports=require('xlgdQ9');
-},{}],"xlgdQ9":[function(require,module,exports){
+},{"./carousel":41,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"xlgdQ9":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
  */
 module.exports = jQuery;
 
+},{}],"jquery":[function(require,module,exports){
+module.exports=require('xlgdQ9');
 },{}],48:[function(require,module,exports){
 var Class = require('class');
 
@@ -3791,22 +3791,26 @@ var DEFAULTS = {
 module.exports = Class.extend({
 	itemCount: 0,
 
-	init: function ($parent, options) {
-		options = $.extend({}, DEFAULTS, options);
+	init: function (options) {
+		this.options = $.extend({}, DEFAULTS, options);
 
+		this.paginationContainerSelector = options.paginationContainerSelector || ITEM_CONTAINER_SELECTOR;
 		this.notifyPageSelected = options.onPageSelected;
+	},
 
-		this.render($parent, options.pageCount);
+	render: function ($parent) {
+		if (this.options.paginationContainerSelector) {
+			this.$itemContainer = this.$itemContainer || $(this.options.paginationContainerSelector);
+		} else {
+			this.$itemContainer = this.$itemContainer || this._renderContainer($parent);
+		}
+
+		this._renderPageItems(this.$itemContainer, this.options.getPageCount());
 
 		this.enablePaginationUI();
 
 		// Set the first page item as selected
 		this._getItems().first().addClass(SELECTED_CLASS);
-	},
-
-	render: function ($parent, pageCount) {
-		this.$itemContainer = this._renderContainer($parent);
-		this._renderPageItems(this.$itemContainer, pageCount);
 
 		return this.$itemContainer;
 	},
@@ -3819,6 +3823,7 @@ module.exports = Class.extend({
 	},
 
 	_renderPageItems: function ($container, pageCount) {
+		this.clear();
 		for (var i = 0; i < pageCount; i++) {
 			this.addItem();
 		}
@@ -3879,6 +3884,7 @@ module.exports = Class.extend({
 },{"class":"GXCbp8","jquery":"xlgdQ9"}],54:[function(require,module,exports){
 var Class = require('class');
 var PaginationIndicator = require('./paging-indicator.js');
+var $ = require('jquery');
 
 var CURRENT_PAGE_CLASS = 'active';
 
@@ -3902,6 +3908,7 @@ module.exports = Class.extend({
 		this.onPageSelected = options.onPageSelected;
 		this.pageSize = options.pageSize;
 		this.circularNavigation = options.circularNavigation;
+		this.paginationContainerSelector = options.paginationContainerSelector || null;
 		this.currentPage = 0;
 		this.prevCurrentPage = 0;
 	},
@@ -3912,10 +3919,12 @@ module.exports = Class.extend({
 	 * @this {PagingModule}
 	 */
 	renderIndicator: function() {
-		this.pagingIndicator = new PaginationIndicator(this.carouselApi.container, {
-			pageCount: this.getPageCount(),
-			onPageSelected: this.onPageSelected
+		this.pagingIndicator = this.pagingIndicator || new PaginationIndicator({
+			getPageCount: $.proxy(this.getPageCount, this),
+			onPageSelected: this.onPageSelected,
+			paginationContainerSelector : this.paginationContainerSelector || null
 		});
+		this.pagingIndicator.render(this.carouselApi.container);
 	},
 
 	/**
@@ -4148,7 +4157,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./paging-indicator.js":53,"class":"GXCbp8"}],55:[function(require,module,exports){
+},{"./paging-indicator.js":53,"class":"GXCbp8","jquery":"xlgdQ9"}],55:[function(require,module,exports){
 var Class = require('class'),
 MediaQueryWatcher = require('mediaquerywatcher'),
 $ = require('jquery');
