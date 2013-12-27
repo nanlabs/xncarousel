@@ -39,6 +39,7 @@ module.exports = Class.extend({
 		var defaults = {
 			touchEnabled: false,
 			pageSize: 1,
+			itemWidth: null,
 			animationType: 'none',
 			loadingType: 'lazy',
 			moveSpeed: 1000,
@@ -46,7 +47,8 @@ module.exports = Class.extend({
 			pageInterval: 0,
 			showNavigationArrows: 'auto',
 			circularNavigation: false,
-			responsive: true,
+			responsive: false,
+			paginationContainerSelector: null,
 			itemTemplate: function () {
 				return '<div></div>';
 			}
@@ -226,7 +228,8 @@ module.exports = Class.extend({
 	 */
 	getItemIndicesForPage: function (pageNumber) {
 		var indexes = this.pagingModule.getIndicesForPage(pageNumber);
-		if (this.settings.itemWidth && this.settings.animationType === "slide" && indexes.length > 0) {
+		//When fixed size items we always retrieve one more element than the logical pageSize for rendering purposes.
+		if (this.settings.itemWidth && this.settings.animationType === "slide" && indexes.length > 0 && (indexes[indexes.length - 1] < this.getItemCount() -1)) {
 			indexes.push(indexes[indexes.length -1 ] + 1);
 		}
 		return indexes;
@@ -519,7 +522,7 @@ module.exports = Class.extend({
 				this._disableNavigators();
 				this.goToPage(pageIndex);
 			}, this),
-			paginationContainerSelector : this.settings.paginationContainerSelector || null
+			paginationContainerSelector : this.settings.paginationContainerSelector
 		});
 	},
 
@@ -693,7 +696,7 @@ module.exports = Class.extend({
 		var lastPageItems = this.getItemIndicesForPage(this.pagingModule.getLastPage());
 		//isDifferentItem tells if the carousel has next page. When adding a new item in runtime, an inconsistent state
 		// may become between actual rendered page (the last one) and total static pages.
-		var isDifferentItem = this.$overview.find('.active').last().index() !== lastPageItems[lastPageItems.length-1];
+		var isDifferentItem = (this.pagingModule.getCurrentPage() !== this.pagingModule.getPageCount() - 1) || (this.$overview.find('.active').last().index() !== lastPageItems[lastPageItems.length-1]);
 
 		if (displayBlock) {
 			this.$rightIndicator.css('display', 'block');
@@ -802,11 +805,9 @@ module.exports = Class.extend({
 	},
 
 	_disableNavigators: function () {
-		if (this.settings.animationType === 'slide') {
-			this.$leftIndicator.off('click', this.leftIndicatorClickHandler);
-			this.$rightIndicator.off('click', this.rightIndicatorClickHandler);
-			this.pagingModule.disableUI();
-		}
+		this.$leftIndicator.off('click', this.leftIndicatorClickHandler);
+		this.$rightIndicator.off('click', this.rightIndicatorClickHandler);
+		this.pagingModule.disableUI();
 	},
 
 	_trigger: function (eventName, params) {
