@@ -1396,7 +1396,9 @@ MediaQueryWatcher.prototype = {
 
 // Exports the class
 module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"6obL00"}],"MFFfPr":[function(require,module,exports){
+},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"6obL00"}],"class":[function(require,module,exports){
+module.exports=require('MFFfPr');
+},{}],"MFFfPr":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1462,8 +1464,6 @@ module.exports = MediaQueryWatcher;
 })();
 
 module.exports = Class;
-},{}],"class":[function(require,module,exports){
-module.exports=require('MFFfPr');
 },{}],36:[function(require,module,exports){
 var Class = require('class');
 require('browsernizr/test/css/transitions');
@@ -3451,7 +3451,9 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"MFFfPr","jquery":"6obL00"}],"8VJE8H":[function(require,module,exports){
+},{"class":"MFFfPr","jquery":"6obL00"}],"wrapper":[function(require,module,exports){
+module.exports=require('8VJE8H');
+},{}],"8VJE8H":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3459,17 +3461,15 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"6obL00","jquery-plugin-wrapper":30}],"wrapper":[function(require,module,exports){
-module.exports=require('8VJE8H');
-},{}],"jquery":[function(require,module,exports){
-module.exports=require('6obL00');
-},{}],"6obL00":[function(require,module,exports){
+},{"./carousel":41,"jquery":"6obL00","jquery-plugin-wrapper":30}],"6obL00":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
  */
 module.exports = jQuery;
 
+},{}],"jquery":[function(require,module,exports){
+module.exports=require('6obL00');
 },{}],48:[function(require,module,exports){
 var Class = require('class');
 
@@ -3552,17 +3552,22 @@ module.exports = AbstractStrategy.extend({
 		console.debug('Preloading item');
 
 		var imgSrcAltered =  carouselItemInnerHtml.replace(' src=', ' data-src=');
-		var $itemContent = $(imgSrcAltered); 
+		var $itemContent = $(imgSrcAltered);
 
 		$item.append($itemContent);
 		$item.addClass('proxy');
 
 		this.loadingObject.$overview.append($item);
 	},
-	
+
 	load: function ($item) {
 		console.debug('Loading item');
 		var self = this;
+
+		// Only load items that are not already loaded (ie. has the 'proxy' class)
+		$item = $item.filter(function() {
+			return $(this).hasClass('proxy');
+		});
 		$item.removeClass('proxy');
 		$item.addClass('loading');
 		$item.find('img[data-src]').each(function(){
