@@ -1,5 +1,4 @@
 
-
 # xnCarousel jQuery Plugin
 
 jQuery plugin to create a fully featured Carousel component 
@@ -27,7 +26,7 @@ The component only requires [jQuery][1] 1.9
 ### Download
 
  - If you are building the component. Read the [Development][2] section at the end of the document.
- - or Add this component as a bower dependency, poiting to this repo (develop branch). Read the [Bower][3] section.
+ - or Add this component as a bower dependency, poiting to this repo. Read the [Bower][3] section.
  - or Download the files in the dist directory in this repo.
 
 <a name="bower"></a>
@@ -169,7 +168,7 @@ rangesObject :
  
 ### Pagination
 
-The carousel includes a pagination modules that enables this feature.
+The carousel includes a pagination module that enables this feature.
 
 <a name="pagination_indicators"></a>
 #### Indicators
