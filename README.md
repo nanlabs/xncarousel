@@ -161,7 +161,7 @@ Name | Type | Default | Description
 **animationType** | ```'slide'``` or ```'fade'``` or ```'none'``` | ```'none'``` | Transition effect to be used when navigating pages
 **moveSpeed** | ```number``` | 1000 | Duration of the transition animations (in milliseconds)
 **loadingType** | ```'lazy'``` or ```'eager'``` | ```lazy``` | Sets the items loading strategy. ```lazy``` will delay the item's image loading until that item is displayed (showing an animation while loading). ```eager``` will load all images as soon as possible
-**responsive** | ```true``` or ```false``` or ```rangesObject``` | ```true``` | Enables/disables responsive behaviour in all cases (when booleans) or it does dynamically for different resolutions. See [below][10]* in this guide for more details
+**responsive** | ```true``` or ```false``` or ```rangesObject``` | ```false``` | Enables/disables responsive behaviour in all cases (when booleans) or it does dynamically for different resolutions. See [below][10]* in this guide for more details
 **paginationContainerSelector** | ```string``` | ```null``` | Defines an existing DOM element where the pagination indicators will be rendered. If ```null```, the default container will be created by the carousel
 
 
