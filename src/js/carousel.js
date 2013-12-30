@@ -526,7 +526,6 @@ module.exports = Class.extend({
 			getItemsForCurrentPage: $.proxy(this._getDOMItemsForCurrentPage, this),
 			getContainerSize: $.proxy(this._getCarouselSize, this)
 		};
-
 		this.pagingModule = new PaginationModule(api, {
 			pageSize: this.settings.pageSize,
 			circularNavigation: this.settings.circularNavigation,
@@ -534,7 +533,8 @@ module.exports = Class.extend({
 				this._disableNavigators();
 				this.goToPage(pageIndex);
 			}, this),
-			paginationContainerSelector : this.settings.paginationContainerSelector
+			paginationContainerSelector : this.settings.paginationContainerSelector,
+			paginationItemSelector : this.settings.paginationItemSelector,
 		});
 	},
 

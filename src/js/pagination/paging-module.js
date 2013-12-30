@@ -25,6 +25,7 @@ module.exports = Class.extend({
 		this.pageSize = options.pageSize;
 		this.circularNavigation = options.circularNavigation;
 		this.paginationContainerSelector = options.paginationContainerSelector || null;
+		this.paginationItemSelector = options.paginationItemSelector || null;
 		this.currentPage = 0;
 		this.prevCurrentPage = 0;
 	},
@@ -38,7 +39,8 @@ module.exports = Class.extend({
 		this.pagingIndicator = this.pagingIndicator || new PaginationIndicator({
 			getPageCount: $.proxy(this.getPageCount, this),
 			onPageSelected: this.onPageSelected,
-			paginationContainerSelector : this.paginationContainerSelector || null
+			paginationContainerSelector : this.paginationContainerSelector || null,
+			paginationItemSelector : this.paginationItemSelector || null
 		});
 		this.pagingIndicator.render(this.carouselApi.container);
 	},

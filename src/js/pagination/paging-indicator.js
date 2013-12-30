@@ -20,6 +20,7 @@ module.exports = Class.extend({
 		this.options = $.extend({}, DEFAULTS, options);
 
 		this.paginationContainerSelector = options.paginationContainerSelector || ITEM_CONTAINER_SELECTOR;
+		this.paginationItemSelector = options.paginationItemSelector || PAGE_ITEM_SELECTOR;
 		this.notifyPageSelected = options.onPageSelected;
 	},
 
@@ -30,7 +31,9 @@ module.exports = Class.extend({
 			this.$itemContainer = this.$itemContainer || this._renderContainer($parent);
 		}
 
-		this._renderPageItems(this.$itemContainer, this.options.getPageCount());
+		if (!this.options.paginationItemSelector){
+			this._renderPageItems(this.$itemContainer, this.options.getPageCount());
+		}
 
 		this.enablePaginationUI();
 
@@ -91,6 +94,7 @@ module.exports = Class.extend({
 			console.debug('Page item clicked: ' + pageIndex);
 			this.select(pageIndex);
 			this.notifyPageSelected(pageIndex);
+			event.preventDefault();
 		}
 	},
 
