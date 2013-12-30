@@ -2992,12 +2992,11 @@ module.exports = Class.extend({
 
 		var overviewWidth = this.$overview.width();
 
-		var dragPcn = amount * 100 / overviewWidth;
+		var dragEscalar = this.settings.itemWidth?amount: amount * 100 / overviewWidth;
 
-		var positionDifference = (currentOffset - dragPcn);
+		var positionDifference = (currentOffset - dragEscalar);
 
-		console.log('updatePageWhileDragging, currentOffset: ' + this.$overview[0].style.left + ', difference: ' + dragPcn);
-
+		console.log('updatePageWhileDragging, currentOffset: ' + this.$overview[0].style.left + ', difference: ' + positionDifference);
 		if (positionDifference >= 30 || positionDifference > -(this.size.contentWidth + 30)) {
 			this.animationModule.animatePartial(positionDifference);
 			this._updateNavigators();
@@ -3519,9 +3518,7 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"GXCbp8","jquery":"xlgdQ9"}],"wrapper":[function(require,module,exports){
-module.exports=require('kV8X1M');
-},{}],"kV8X1M":[function(require,module,exports){
+},{"class":"GXCbp8","jquery":"xlgdQ9"}],"kV8X1M":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3529,8 +3526,8 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"jquery":[function(require,module,exports){
-module.exports=require('xlgdQ9');
+},{"./carousel":41,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"wrapper":[function(require,module,exports){
+module.exports=require('kV8X1M');
 },{}],"xlgdQ9":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
@@ -3538,6 +3535,8 @@ module.exports=require('xlgdQ9');
  */
 module.exports = jQuery;
 
+},{}],"jquery":[function(require,module,exports){
+module.exports=require('xlgdQ9');
 },{}],48:[function(require,module,exports){
 var Class = require('class');
 
