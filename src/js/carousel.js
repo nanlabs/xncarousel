@@ -1095,12 +1095,11 @@ module.exports = Class.extend({
 
 		var overviewWidth = this.$overview.width();
 
-		var dragPcn = amount * 100 / overviewWidth;
+		var dragEscalar = this.settings.itemWidth?amount: amount * 100 / overviewWidth;
 
-		var positionDifference = (currentOffset - dragPcn);
+		var positionDifference = (currentOffset - dragEscalar);
 
-		console.log('updatePageWhileDragging, currentOffset: ' + this.$overview[0].style.left + ', difference: ' + dragPcn);
-
+		console.log('updatePageWhileDragging, currentOffset: ' + this.$overview[0].style.left + ', difference: ' + positionDifference);
 		if (positionDifference >= 30 || positionDifference > -(this.size.contentWidth + 30)) {
 			this.animationModule.animatePartial(positionDifference);
 			this._updateNavigators();
