@@ -39,6 +39,7 @@ module.exports = Class.extend({
 		var defaults = {
 			touchEnabled: false,
 			pageSize: 1,
+			pageSizeIntervals: null,
 			itemWidth: null,
 			animationType: 'none',
 			loadingType: 'lazy',
@@ -58,20 +59,29 @@ module.exports = Class.extend({
 		this.$viewport.addClass('xn-viewport');
 		this.settings = $.extend({}, defaults, options);
 
+		if (typeof(this.settings.pageSize) !== 'number') {
+			this.settings.pageSizeIntervals =  this.settings.pageSize;
+			this.settings.pageSize = this._getIntervalsProperty(this.settings.pageSizeIntervals);
+		}
+
 		consoleShim();
 
 		this.size = {
 			contentWidth: 0,
 			overviewWidth: 0,
 			initialItemWidth: this.settings.itemWidth ? this.settings.itemWidth : 100 / this.settings.pageSize,
+			itemWidth: null,
 			unitType: this.settings.itemWidth ? "px" : "%"
 		};
 
 		//When the items width is fixed we need to update the paginator as the viewport size changes.
 		if (this.settings.itemWidth){
 			this.settings.pageSize = ~~(this.$viewport.width() / this.settings.itemWidth);
+		}
+		if (this.settings.itemWidth || this.settings.pageSizeIntervals) {
 			$(window).resize($.proxy(this._updatePaginator, this));
 		}
+		
 		this._initPaginationModule();
 
 		this._initializeResponsiveModule(this.settings.responsive);
@@ -529,13 +539,17 @@ module.exports = Class.extend({
 	},
 
 	_updatePaginator: function () {
-		var pageSize = ~~(this.$viewport.width() / this.settings.itemWidth);
+		var pageSize = this.settings.itemWidth ? ~~(this.$viewport.width() / this.settings.itemWidth) : this._getIntervalsProperty(this.settings.pageSizeIntervals);
 		if (pageSize !== this.settings.pageSize && pageSize > 0)  {
 			var actualPage = this.pagingModule.getCurrentPage(),
 			self = this;
 			this.settings.pageSize = pageSize;
 			this.pagingModule.updatePageSize(pageSize);
 			this.animationModule.updatePageSize(pageSize);
+			if (!this.settings.itemWidth) {
+				this.size.initialItemWidth = 100 / pageSize;
+				this._processAddedItems();
+			}
 			this.animationModule.updateAfterRemoval(this.$viewport.find('.xn-carousel-item'));
 			this.pagingModule.renderIndicator();
 			this.pagingModule.pagingIndicator.select(actualPage);
@@ -614,6 +628,7 @@ module.exports = Class.extend({
 			new responsiveModule({
 				getSelectors : $.proxy(this._getCarouselSelectors, this),
 				getStylesheet : $.proxy(this._getCarouselStylesheet, this),
+				getIntervalsProperty : $.proxy(this._getIntervalsProperty, this)
 			}, this.$viewport, responsive);
 		}
 	},
@@ -1011,6 +1026,30 @@ module.exports = Class.extend({
 				count += step;
 			});
 		}
+		}
+	},
+
+	_getIntervalsProperty: function (intervals) {
+		var rule, descending = /\*\.\.([0-9]+)/, ascending = /([0-9]+)\.\.\*/, between = /([0-9]+)\.\.([0-9]+)/,
+		actualViewportWidth = window.innerWidth;
+		for (rule in intervals) {
+			if (intervals.hasOwnProperty(rule)) {
+				if (descending.test(rule) === true) {
+					if (actualViewportWidth <= descending.exec(rule)[1]) {
+						return intervals[rule];
+					}
+				}
+				if (between.test(rule) === true) {
+					if (actualViewportWidth >= between.exec(rule)[1] && actualViewportWidth <= between.exec(rule)[2]) {
+						return intervals[rule];
+					}
+				}
+				if (ascending.test(rule) === true) {
+					if (actualViewportWidth >= ascending.exec(rule)[1]) {
+						return intervals[rule];
+					}
+				}
+			}
 		}
 	},
 
