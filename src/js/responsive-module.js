@@ -24,32 +24,13 @@ module.exports = Class.extend({
 	},
 
 	//Determines if this module is active for the actual viewport width based on the provided options.
-	_isActiveForViewportWidth : function (actualViewportWidth) {
+	_isActiveForViewportWidth : function () {
 		if (this.activeIntervals === true) {
 			//this module is active in all resolutions
 			return true;
 		}
-		var rule, descending = /\*\.\.([0-9]+)/, ascending = /([0-9]+)\.\.\*/, between = /([0-9]+)\.\.([0-9]+)/;
-		for (rule in this.activeIntervals) {
-			if (this.activeIntervals.hasOwnProperty(rule)) {
-				if (descending.test(rule) === true) {
-					if (actualViewportWidth <= descending.exec(rule)[1]) {
-						return this.activeIntervals[rule];
-					}
-				}
-				if (between.test(rule) === true) {
-					if (actualViewportWidth >= between.exec(rule)[1] && actualViewportWidth <= between.exec(rule)[2]) {
-						return this.activeIntervals[rule];
-					}
-				}
-				if (ascending.test(rule) === true) {
-					if (actualViewportWidth >= ascending.exec(rule)[1]) {
-						return this.activeIntervals[rule];
-					}
-				}
-			}
-		}
-		return false;
+		var active = this.api.getIntervalsProperty(this.activeIntervals);
+		return active ? active : false;
 	},
 
 	//Whenever a media query changes, it gets the indicated CSS properties from a target stylesheet.
@@ -189,7 +170,7 @@ module.exports = Class.extend({
 		var actualAppliedMediaRule = this.mediaStylesProperties.actualAppliedMediaRule, height;
 		
 		if (this.mediaStylesProperties.actualAppliedProperties.height) {
-			if (this._isActiveForViewportWidth(window.innerWidth) === true && (actualAppliedMediaRule !== "noMediaRule")) {
+			if (this._isActiveForViewportWidth() === true && (actualAppliedMediaRule !== "noMediaRule")) {
 					height = window.innerWidth * parseInt(this.mediaStylesProperties.actualAppliedProperties.height, 10) / this.mediaStylesProperties.viewportWidth;
 			} else { //Default css behaviour
 					height = parseInt(this.mediaStylesProperties.actualAppliedProperties.height, 10);
