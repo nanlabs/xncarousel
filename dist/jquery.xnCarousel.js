@@ -1396,9 +1396,7 @@ MediaQueryWatcher.prototype = {
 
 // Exports the class
 module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"xlgdQ9"}],"class":[function(require,module,exports){
-module.exports=require('GXCbp8');
-},{}],"GXCbp8":[function(require,module,exports){
+},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"xlgdQ9"}],"GXCbp8":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1464,6 +1462,8 @@ module.exports=require('GXCbp8');
 })();
 
 module.exports = Class;
+},{}],"class":[function(require,module,exports){
+module.exports=require('GXCbp8');
 },{}],36:[function(require,module,exports){
 var Class = require('class');
 require('browsernizr/test/css/transitions');
@@ -1897,6 +1897,7 @@ module.exports = Class.extend({
 		var defaults = {
 			touchEnabled: false,
 			pageSize: 1,
+			pageSizeIntervals: null,
 			itemWidth: null,
 			animationType: 'none',
 			loadingType: 'lazy',
@@ -1916,20 +1917,29 @@ module.exports = Class.extend({
 		this.$viewport.addClass('xn-viewport');
 		this.settings = $.extend({}, defaults, options);
 
+		if (typeof(this.settings.pageSize) !== 'number') {
+			this.settings.pageSizeIntervals =  this.settings.pageSize;
+			this.settings.pageSize = this._getIntervalsProperty(this.settings.pageSizeIntervals);
+		}
+
 		consoleShim();
 
 		this.size = {
 			contentWidth: 0,
 			overviewWidth: 0,
 			initialItemWidth: this.settings.itemWidth ? this.settings.itemWidth : 100 / this.settings.pageSize,
+			itemWidth: null,
 			unitType: this.settings.itemWidth ? "px" : "%"
 		};
 
 		//When the items width is fixed we need to update the paginator as the viewport size changes.
 		if (this.settings.itemWidth){
 			this.settings.pageSize = ~~(this.$viewport.width() / this.settings.itemWidth);
+		}
+		if (this.settings.itemWidth || this.settings.pageSizeIntervals) {
 			$(window).resize($.proxy(this._updatePaginator, this));
 		}
+		
 		this._initPaginationModule();
 
 		this._initializeResponsiveModule(this.settings.responsive);
@@ -2387,13 +2397,17 @@ module.exports = Class.extend({
 	},
 
 	_updatePaginator: function () {
-		var pageSize = ~~(this.$viewport.width() / this.settings.itemWidth);
+		var pageSize = this.settings.itemWidth ? ~~(this.$viewport.width() / this.settings.itemWidth) : this._getIntervalsProperty(this.settings.pageSizeIntervals);
 		if (pageSize !== this.settings.pageSize && pageSize > 0)  {
 			var actualPage = this.pagingModule.getCurrentPage(),
 			self = this;
 			this.settings.pageSize = pageSize;
 			this.pagingModule.updatePageSize(pageSize);
 			this.animationModule.updatePageSize(pageSize);
+			if (!this.settings.itemWidth) {
+				this.size.initialItemWidth = 100 / pageSize;
+				this._processAddedItems();
+			}
 			this.animationModule.updateAfterRemoval(this.$viewport.find('.xn-carousel-item'));
 			this.pagingModule.renderIndicator();
 			this.pagingModule.pagingIndicator.select(actualPage);
@@ -2472,6 +2486,7 @@ module.exports = Class.extend({
 			new responsiveModule({
 				getSelectors : $.proxy(this._getCarouselSelectors, this),
 				getStylesheet : $.proxy(this._getCarouselStylesheet, this),
+				getIntervalsProperty : $.proxy(this._getIntervalsProperty, this)
 			}, this.$viewport, responsive);
 		}
 	},
@@ -2869,6 +2884,30 @@ module.exports = Class.extend({
 				count += step;
 			});
 		}
+		}
+	},
+
+	_getIntervalsProperty: function (intervals) {
+		var rule, descending = /\*\.\.([0-9]+)/, ascending = /([0-9]+)\.\.\*/, between = /([0-9]+)\.\.([0-9]+)/,
+		actualViewportWidth = window.innerWidth;
+		for (rule in intervals) {
+			if (intervals.hasOwnProperty(rule)) {
+				if (descending.test(rule) === true) {
+					if (actualViewportWidth <= descending.exec(rule)[1]) {
+						return intervals[rule];
+					}
+				}
+				if (between.test(rule) === true) {
+					if (actualViewportWidth >= between.exec(rule)[1] && actualViewportWidth <= between.exec(rule)[2]) {
+						return intervals[rule];
+					}
+				}
+				if (ascending.test(rule) === true) {
+					if (actualViewportWidth >= ascending.exec(rule)[1]) {
+						return intervals[rule];
+					}
+				}
+			}
 		}
 	},
 
@@ -4218,32 +4257,13 @@ module.exports = Class.extend({
 	},
 
 	//Determines if this module is active for the actual viewport width based on the provided options.
-	_isActiveForViewportWidth : function (actualViewportWidth) {
+	_isActiveForViewportWidth : function () {
 		if (this.activeIntervals === true) {
 			//this module is active in all resolutions
 			return true;
 		}
-		var rule, descending = /\*\.\.([0-9]+)/, ascending = /([0-9]+)\.\.\*/, between = /([0-9]+)\.\.([0-9]+)/;
-		for (rule in this.activeIntervals) {
-			if (this.activeIntervals.hasOwnProperty(rule)) {
-				if (descending.test(rule) === true) {
-					if (actualViewportWidth <= descending.exec(rule)[1]) {
-						return this.activeIntervals[rule];
-					}
-				}
-				if (between.test(rule) === true) {
-					if (actualViewportWidth >= between.exec(rule)[1] && actualViewportWidth <= between.exec(rule)[2]) {
-						return this.activeIntervals[rule];
-					}
-				}
-				if (ascending.test(rule) === true) {
-					if (actualViewportWidth >= ascending.exec(rule)[1]) {
-						return this.activeIntervals[rule];
-					}
-				}
-			}
-		}
-		return false;
+		var active = this.api.getIntervalsProperty(this.activeIntervals);
+		return active ? active : false;
 	},
 
 	//Whenever a media query changes, it gets the indicated CSS properties from a target stylesheet.
@@ -4383,7 +4403,7 @@ module.exports = Class.extend({
 		var actualAppliedMediaRule = this.mediaStylesProperties.actualAppliedMediaRule, height;
 		
 		if (this.mediaStylesProperties.actualAppliedProperties.height) {
-			if (this._isActiveForViewportWidth(window.innerWidth) === true && (actualAppliedMediaRule !== "noMediaRule")) {
+			if (this._isActiveForViewportWidth() === true && (actualAppliedMediaRule !== "noMediaRule")) {
 					height = window.innerWidth * parseInt(this.mediaStylesProperties.actualAppliedProperties.height, 10) / this.mediaStylesProperties.viewportWidth;
 			} else { //Default css behaviour
 					height = parseInt(this.mediaStylesProperties.actualAppliedProperties.height, 10);
