@@ -1396,7 +1396,9 @@ MediaQueryWatcher.prototype = {
 
 // Exports the class
 module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"xlgdQ9"}],"GXCbp8":[function(require,module,exports){
+},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"lrHQu6"}],"class":[function(require,module,exports){
+module.exports=require('hHRmiF');
+},{}],"hHRmiF":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1462,8 +1464,6 @@ module.exports = MediaQueryWatcher;
 })();
 
 module.exports = Class;
-},{}],"class":[function(require,module,exports){
-module.exports=require('GXCbp8');
 },{}],36:[function(require,module,exports){
 var Class = require('class');
 require('browsernizr/test/css/transitions');
@@ -1502,7 +1502,7 @@ module.exports = Class.extend({
 
 });
 
-},{"browsernizr":2,"browsernizr/test/css/transitions":29,"class":"GXCbp8"}],37:[function(require,module,exports){
+},{"browsernizr":2,"browsernizr/test/css/transitions":29,"class":"hHRmiF"}],37:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -1672,7 +1672,7 @@ module.exports = Class.extend({
 	}
 });
 
-},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"GXCbp8","jquery":"xlgdQ9"}],38:[function(require,module,exports){
+},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"hHRmiF","jquery":"lrHQu6"}],38:[function(require,module,exports){
 var AbstractStrategy = require('./abstract-strategy');
 
 module.exports = AbstractStrategy.extend({
@@ -1855,7 +1855,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":36,"jquery":"xlgdQ9"}],41:[function(require,module,exports){
+},{"./abstract-strategy":36,"jquery":"lrHQu6"}],41:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 var util = require('./util');
@@ -1876,6 +1876,8 @@ var rightIndicatorDefaultTemplate = '<div class="xn-right-indicator"><div class=
 var containerTemplate = '<div class="xn-overview"></div>';
 
 var SELECTED_CLASS = "selected";
+var VIEWPORT_CLASS = "xn-viewport";
+var ITEM_CLASS = "xn-carousel-item";
 
 /**
  *  Generic carousel with several features such as animations, pagination, loading strategy.
@@ -1914,7 +1916,7 @@ module.exports = Class.extend({
 		};
 
 		this.$viewport = $(selector);
-		this.$viewport.addClass('xn-viewport');
+		this.$viewport.addClass(VIEWPORT_CLASS);
 		this.settings = $.extend({}, defaults, options);
 
 		if (typeof(this.settings.pageSize) !== 'number') {
@@ -2074,7 +2076,7 @@ module.exports = Class.extend({
 	 * @return {array} Array containing the carousel items
 	 */
 	getItems: function () {
-		return this.$overview.children('.xn-carousel-item');
+		return this.$overview.children('.' + ITEM_CLASS);
 	},
 
 	/**
@@ -2280,7 +2282,7 @@ module.exports = Class.extend({
 
 		var pageCount = this.getPageCount();
 
-		var $carouselItem = $('<div class="xn-carousel-item"></div>');
+		var $carouselItem = $('<div class="'+ ITEM_CLASS +'"></div>');
 
 		this.loadingModule.preLoadItem($carouselItem, item);
 
@@ -2384,7 +2386,6 @@ module.exports = Class.extend({
 			getItemsForCurrentPage: $.proxy(this._getDOMItemsForCurrentPage, this),
 			getContainerSize: $.proxy(this._getCarouselSize, this)
 		};
-
 		this.pagingModule = new PaginationModule(api, {
 			pageSize: this.settings.pageSize,
 			circularNavigation: this.settings.circularNavigation,
@@ -2392,7 +2393,8 @@ module.exports = Class.extend({
 				this._disableNavigators();
 				this.goToPage(pageIndex);
 			}, this),
-			paginationContainerSelector : this.settings.paginationContainerSelector
+			paginationContainerSelector : this.settings.paginationContainerSelector,
+			paginationItemSelector : this.settings.paginationItemSelector,
 		});
 	},
 
@@ -2408,7 +2410,7 @@ module.exports = Class.extend({
 				this.size.initialItemWidth = 100 / pageSize;
 				this._processAddedItems();
 			}
-			this.animationModule.updateAfterRemoval(this.$viewport.find('.xn-carousel-item'));
+			this.animationModule.updateAfterRemoval(this.$viewport.find('.' + ITEM_CLASS));
 			this.pagingModule.renderIndicator();
 			this.pagingModule.pagingIndicator.select(actualPage);
 			setTimeout(function () {
@@ -2497,12 +2499,26 @@ module.exports = Class.extend({
 			container: this.$overview,
 			getCurrentPage: $.proxy(this.getCurrentPage, this),
 			getItemsForPage: $.proxy(this._getDOMItemsForPage, this),
-			getItemsForCurrentPage: $.proxy(this._getDOMItemsForCurrentPage, this)
+			getItemsForCurrentPage: $.proxy(this._getDOMItemsForCurrentPage, this),
+			getItemClass: function() {return ITEM_CLASS;}
+		};
+
+		//TODO remove this callback when xn-item is not absolute positioned anymore
+		var afterLoadedCallback = function($image) {
+			function updateViewportHeight ($image) {
+				var viewportHeight = $image.parents('.' + ITEM_CLASS).outerHeight(true);
+				$image.parents('.' + VIEWPORT_CLASS).height(viewportHeight);
+			}
+			if (!this._viewportHeightUpdated){
+				this._viewportHeightUpdated = true;
+				updateViewportHeight($image);
+				$(window).resize(function(){updateViewportHeight($image);});
+			}
 		};
 
 		var loadingOptions = {
 			loadingType: this.settings.loadingType,
-			afterLoadedCallback: $.proxy(function () {}, this)
+			afterLoadedCallback: afterLoadedCallback
 		};
 
 		this.loadingModule = new Loading(api, loadingOptions);
@@ -2992,12 +3008,11 @@ module.exports = Class.extend({
 
 		var overviewWidth = this.$overview.width();
 
-		var dragPcn = amount * 100 / overviewWidth;
+		var dragEscalar = this.settings.itemWidth?amount: amount * 100 / overviewWidth;
 
-		var positionDifference = (currentOffset - dragPcn);
+		var positionDifference = (currentOffset - dragEscalar);
 
-		console.log('updatePageWhileDragging, currentOffset: ' + this.$overview[0].style.left + ', difference: ' + dragPcn);
-
+		console.log('updatePageWhileDragging, currentOffset: ' + this.$overview[0].style.left + ', difference: ' + positionDifference);
 		if (positionDifference >= 30 || positionDifference > -(this.size.contentWidth + 30)) {
 			this.animationModule.animatePartial(positionDifference);
 			this._updateNavigators();
@@ -3065,7 +3080,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":51,"./pagination/paging-module":54,"./responsive-module":55,"./util":56,"class":"GXCbp8","jquery":"xlgdQ9"}],42:[function(require,module,exports){
+},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":51,"./pagination/paging-module":54,"./responsive-module":55,"./util":56,"class":"hHRmiF","jquery":"lrHQu6"}],42:[function(require,module,exports){
 /**
 * Returns a function which calls the specified function in the specified
 * scope.
@@ -3519,9 +3534,9 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"GXCbp8","jquery":"xlgdQ9"}],"wrapper":[function(require,module,exports){
-module.exports=require('kV8X1M');
-},{}],"kV8X1M":[function(require,module,exports){
+},{"class":"hHRmiF","jquery":"lrHQu6"}],"wrapper":[function(require,module,exports){
+module.exports=require('/91yud');
+},{}],"/91yud":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3529,15 +3544,15 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"jquery":[function(require,module,exports){
-module.exports=require('xlgdQ9');
-},{}],"xlgdQ9":[function(require,module,exports){
+},{"./carousel":41,"jquery":"lrHQu6","jquery-plugin-wrapper":30}],"lrHQu6":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
  */
 module.exports = jQuery;
 
+},{}],"jquery":[function(require,module,exports){
+module.exports=require('lrHQu6');
 },{}],48:[function(require,module,exports){
 var Class = require('class');
 
@@ -3555,7 +3570,7 @@ module.exports = Class.extend({
 	
 });
 
-},{"class":"GXCbp8"}],49:[function(require,module,exports){
+},{"class":"hHRmiF"}],49:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3563,9 +3578,10 @@ var Spinner = require('./spinner');
 
 module.exports = AbstractStrategy.extend({
 
-	init: function(loadingObject) {
+	init: function(loadingObject, itemClass) {
 		this._super(loadingObject);
 		this.spinner = new Spinner();
+		this.itemClass = itemClass;
 	},
 
 	preLoad: function ($item, carouselItemInnerHtml) {
@@ -3579,12 +3595,16 @@ module.exports = AbstractStrategy.extend({
 
 		this.loadingObject.$overview.append($item);
 
+
 		var self = this;
-		$item.find('img[data-src]').each(function(){
-			var src  = $(this).attr('data-src');
-			$(this).attr('src',src).error(self, self.postLoad).load(self, self.postLoad);
-			$(this).removeAttr('data-src');
+		$item.find('img').each(function(){
+			$(this).error(self, self.postLoad).load(self, self.postLoad);
 			self.spinner.showSpinner($(this));
+			if (this.hasAttribute('data-src')){
+				var src  = $(this).attr('data-src');
+				$(this).attr('src',src);
+				$(this).removeAttr('data-src');
+			}
 		});
 	},
 	
@@ -3595,15 +3615,16 @@ module.exports = AbstractStrategy.extend({
 
 	postLoad: function (event) {
 		console.log('After loaded');
-		$(this).parents('.xn-carousel-item').removeClass('loading');
+		$(this).parents('.' + this.itemClass).removeClass('loading');
 		var self = event.data;
+		self.spinner.setSpinnerSize({spinnerHeight : $(this).height(), spinnerWidth : $(this).width()});
 		self.spinner.hideSpinner($(this));
-		self.loadingObject.afterLoaded();
+		self.loadingObject.afterLoaded($(this));
 	}
 
 });
 
-},{"./abstract-strategy":48,"./spinner":52,"jquery":"xlgdQ9"}],50:[function(require,module,exports){
+},{"./abstract-strategy":48,"./spinner":52,"jquery":"lrHQu6"}],50:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3611,9 +3632,10 @@ var Spinner = require('./spinner');
 
 module.exports = AbstractStrategy.extend({
 
-	init: function(loadingObject) {
+	init: function(loadingObject, itemClass) {
 		this._super(loadingObject);
 		this.spinner = new Spinner();
+		this.itemClass = itemClass;
 	},
 
 	preLoad: function ($item, carouselItemInnerHtml) {
@@ -3638,25 +3660,29 @@ module.exports = AbstractStrategy.extend({
 		});
 		$item.removeClass('proxy');
 		$item.addClass('loading');
-		$item.find('img[data-src]').each(function(){
-			var src  = $(this).attr('data-src');
-			$(this).attr('src',src).error(self, self.postLoad).load(self, self.postLoad);
-			$(this).removeAttr('data-src');
+		$item.find('img').each(function(){
+			$(this).error(self, self.postLoad).load(self, self.postLoad);
 			self.spinner.showSpinner($(this));
+			if (this.hasAttribute('data-src')){
+				var src  = $(this).attr('data-src');
+				$(this).attr('src',src);
+				$(this).removeAttr('data-src');
+			}
 		});
 	},
 
 	postLoad: function (event) {
 		console.debug('After loaded');
 		var self = event.data;
-		$(this).parents('.xn-carousel-item').removeClass('loading');
+		$(this).parents('.' + this.itemClass).removeClass('loading');
+		self.spinner.setSpinnerSize({spinnerHeight : $(this).height(), spinnerWidth : $(this).width()});
 		self.spinner.hideSpinner($(this));
-		self.loadingObject.afterLoaded();
+		self.loadingObject.afterLoaded($(this));
 	}
 
 });
 
-},{"./abstract-strategy":48,"./spinner":52,"jquery":"xlgdQ9"}],51:[function(require,module,exports){
+},{"./abstract-strategy":48,"./spinner":52,"jquery":"lrHQu6"}],51:[function(require,module,exports){
 var Class = require('class');
 
 var LazyStrategy = require('./lazy-strategy');
@@ -3713,12 +3739,11 @@ module.exports = Class.extend({
 	 *
 	 * @this {LoadingModule}
 	 */
-	afterLoaded: function () {
+	afterLoaded: function ($image) {
 		var callback = this.afterLoadedCallback;
-		var self = this;
 
 		if (callback) {
-			callback.call(self);
+			callback.call(this, $image);
 		}
 	},
 
@@ -3730,15 +3755,15 @@ module.exports = Class.extend({
 	 */
 	_getStrategy: function () {
 		if (this.loadingType === 'lazy') {
-			return new LazyStrategy(this);
+			return new LazyStrategy(this, this.carouselApi.getItemClass());
 		}else{
-			return new EagerStrategy(this);
+			return new EagerStrategy(this, this.carouselApi.getItemClass());
 		}
 	},
 
 });
 
-},{"./eager-strategy":49,"./lazy-strategy":50,"class":"GXCbp8"}],52:[function(require,module,exports){
+},{"./eager-strategy":49,"./lazy-strategy":50,"class":"hHRmiF"}],52:[function(require,module,exports){
 var Class = require('class'),
 SpinJs = require('../../../libs/spin.js'),
 $ = require('jquery');
@@ -3789,24 +3814,10 @@ module.exports = Class.extend({
 
         $loadingElement.parent().append($spinner[0]);
 
-        //Transform spinner fixed container size to a relative one.
-        height = 0; width = 0;
-        if ($loadingElement[0].clientHeight > 0 && $spinner.parent().height() > 0) {
-            height = $loadingElement[0].clientHeight * 100 / $spinner.parent().height();
-        }
-        if (height === 0 || height > 100) {
-            height = 100;
-        }
-
-        if ($loadingElement[0].clientWidth > 0 && $spinner.parent().width() > 0) {
-            width = $loadingElement[0].clientWidth * 100 / $spinner.parent().width();
-        }
-        if (width === 0 || width > 100) {
-            width = 100;
-        }
-
-        $spinner.css('height', height + "%");
-        $spinner.css('width', width + "%");
+        height = this.size ? this.size.spinnerHeight : $loadingElement[0].clientHeight;
+        width = this.size ? this.size.spinnerWidth : $loadingElement[0].clientWidth;
+        $spinner.css('height', height + "px");
+        $spinner.css('width', width + "px");
 
         $spinnerChild = $spinner.find('.spinner');
         $spinnerChild.css('height', '100%');
@@ -3842,10 +3853,14 @@ module.exports = Class.extend({
         var $spinner = this.$spinners[this.loadingElements.indexOf($loadingElement[0])];
         $spinner.remove();
         $loadingElement.show();
+    },
+
+    setSpinnerSize: function(spinnerSize) {
+        this.size = spinnerSize;
     }
 });
 
-},{"../../../libs/spin.js":1,"class":"GXCbp8","jquery":"xlgdQ9"}],53:[function(require,module,exports){
+},{"../../../libs/spin.js":1,"class":"hHRmiF","jquery":"lrHQu6"}],53:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -3868,6 +3883,7 @@ module.exports = Class.extend({
 		this.options = $.extend({}, DEFAULTS, options);
 
 		this.paginationContainerSelector = options.paginationContainerSelector || ITEM_CONTAINER_SELECTOR;
+		this.paginationItemSelector = options.paginationItemSelector || PAGE_ITEM_SELECTOR;
 		this.notifyPageSelected = options.onPageSelected;
 	},
 
@@ -3878,7 +3894,9 @@ module.exports = Class.extend({
 			this.$itemContainer = this.$itemContainer || this._renderContainer($parent);
 		}
 
-		this._renderPageItems(this.$itemContainer, this.options.getPageCount());
+		if (!this.options.paginationItemSelector){
+			this._renderPageItems(this.$itemContainer, this.options.getPageCount());
+		}
 
 		this.enablePaginationUI();
 
@@ -3939,6 +3957,7 @@ module.exports = Class.extend({
 			console.debug('Page item clicked: ' + pageIndex);
 			this.select(pageIndex);
 			this.notifyPageSelected(pageIndex);
+			event.preventDefault();
 		}
 	},
 
@@ -3954,7 +3973,7 @@ module.exports = Class.extend({
 
 });
 
-},{"class":"GXCbp8","jquery":"xlgdQ9"}],54:[function(require,module,exports){
+},{"class":"hHRmiF","jquery":"lrHQu6"}],54:[function(require,module,exports){
 var Class = require('class');
 var PaginationIndicator = require('./paging-indicator.js');
 var $ = require('jquery');
@@ -3982,6 +4001,7 @@ module.exports = Class.extend({
 		this.pageSize = options.pageSize;
 		this.circularNavigation = options.circularNavigation;
 		this.paginationContainerSelector = options.paginationContainerSelector || null;
+		this.paginationItemSelector = options.paginationItemSelector || null;
 		this.currentPage = 0;
 		this.prevCurrentPage = 0;
 	},
@@ -3995,7 +4015,8 @@ module.exports = Class.extend({
 		this.pagingIndicator = this.pagingIndicator || new PaginationIndicator({
 			getPageCount: $.proxy(this.getPageCount, this),
 			onPageSelected: this.onPageSelected,
-			paginationContainerSelector : this.paginationContainerSelector || null
+			paginationContainerSelector : this.paginationContainerSelector || null,
+			paginationItemSelector : this.paginationItemSelector || null
 		});
 		this.pagingIndicator.render(this.carouselApi.container);
 	},
@@ -4230,7 +4251,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./paging-indicator.js":53,"class":"GXCbp8","jquery":"xlgdQ9"}],55:[function(require,module,exports){
+},{"./paging-indicator.js":53,"class":"hHRmiF","jquery":"lrHQu6"}],55:[function(require,module,exports){
 var Class = require('class'),
 MediaQueryWatcher = require('mediaquerywatcher'),
 $ = require('jquery');
@@ -4416,7 +4437,7 @@ module.exports = Class.extend({
 	}
 	
 });
-},{"class":"GXCbp8","jquery":"xlgdQ9","mediaquerywatcher":33}],56:[function(require,module,exports){
+},{"class":"hHRmiF","jquery":"lrHQu6","mediaquerywatcher":33}],56:[function(require,module,exports){
 exports.getDependency = function(dependencies, name, defaultDep) {
 	dependencies = dependencies || {};
 	return dependencies[name] || defaultDep;
@@ -4510,5 +4531,6 @@ exports.isIE = function() {
   return (myNav.indexOf('msie') !== -1) ? parseFloat(myNav.split('msie')[1], 10) : false;
 };
 
-},{}]},{},["kV8X1M"])
+},{}]},{},["/91yud"])
+;
 })(this, jQuery);
