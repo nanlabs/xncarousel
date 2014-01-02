@@ -1396,7 +1396,9 @@ MediaQueryWatcher.prototype = {
 
 // Exports the class
 module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"xlgdQ9"}],"GXCbp8":[function(require,module,exports){
+},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"xlgdQ9"}],"class":[function(require,module,exports){
+module.exports=require('GXCbp8');
+},{}],"GXCbp8":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1462,8 +1464,6 @@ module.exports = MediaQueryWatcher;
 })();
 
 module.exports = Class;
-},{}],"class":[function(require,module,exports){
-module.exports=require('GXCbp8');
 },{}],36:[function(require,module,exports){
 var Class = require('class');
 require('browsernizr/test/css/transitions');
@@ -1876,6 +1876,8 @@ var rightIndicatorDefaultTemplate = '<div class="xn-right-indicator"><div class=
 var containerTemplate = '<div class="xn-overview"></div>';
 
 var SELECTED_CLASS = "selected";
+var VIEWPORT_CLASS = "xn-viewport";
+var ITEM_CLASS = "xn-carousel-item";
 
 /**
  *  Generic carousel with several features such as animations, pagination, loading strategy.
@@ -1914,7 +1916,7 @@ module.exports = Class.extend({
 		};
 
 		this.$viewport = $(selector);
-		this.$viewport.addClass('xn-viewport');
+		this.$viewport.addClass(VIEWPORT_CLASS);
 		this.settings = $.extend({}, defaults, options);
 
 		if (typeof(this.settings.pageSize) !== 'number') {
@@ -2074,7 +2076,7 @@ module.exports = Class.extend({
 	 * @return {array} Array containing the carousel items
 	 */
 	getItems: function () {
-		return this.$overview.children('.xn-carousel-item');
+		return this.$overview.children('.' + ITEM_CLASS);
 	},
 
 	/**
@@ -2280,7 +2282,7 @@ module.exports = Class.extend({
 
 		var pageCount = this.getPageCount();
 
-		var $carouselItem = $('<div class="xn-carousel-item"></div>');
+		var $carouselItem = $('<div class="'+ ITEM_CLASS +'"></div>');
 
 		this.loadingModule.preLoadItem($carouselItem, item);
 
@@ -2384,7 +2386,6 @@ module.exports = Class.extend({
 			getItemsForCurrentPage: $.proxy(this._getDOMItemsForCurrentPage, this),
 			getContainerSize: $.proxy(this._getCarouselSize, this)
 		};
-
 		this.pagingModule = new PaginationModule(api, {
 			pageSize: this.settings.pageSize,
 			circularNavigation: this.settings.circularNavigation,
@@ -2392,7 +2393,8 @@ module.exports = Class.extend({
 				this._disableNavigators();
 				this.goToPage(pageIndex);
 			}, this),
-			paginationContainerSelector : this.settings.paginationContainerSelector
+			paginationContainerSelector : this.settings.paginationContainerSelector,
+			paginationItemSelector : this.settings.paginationItemSelector,
 		});
 	},
 
@@ -2408,7 +2410,7 @@ module.exports = Class.extend({
 				this.size.initialItemWidth = 100 / pageSize;
 				this._processAddedItems();
 			}
-			this.animationModule.updateAfterRemoval(this.$viewport.find('.xn-carousel-item'));
+			this.animationModule.updateAfterRemoval(this.$viewport.find('.' + ITEM_CLASS));
 			this.pagingModule.renderIndicator();
 			this.pagingModule.pagingIndicator.select(actualPage);
 			setTimeout(function () {
@@ -2497,12 +2499,26 @@ module.exports = Class.extend({
 			container: this.$overview,
 			getCurrentPage: $.proxy(this.getCurrentPage, this),
 			getItemsForPage: $.proxy(this._getDOMItemsForPage, this),
-			getItemsForCurrentPage: $.proxy(this._getDOMItemsForCurrentPage, this)
+			getItemsForCurrentPage: $.proxy(this._getDOMItemsForCurrentPage, this),
+			getItemClass: function() {return ITEM_CLASS;}
+		};
+
+		//TODO remove this callback when xn-item is not absolute positioned anymore
+		var afterLoadedCallback = function($image) {
+			function updateViewportHeight ($image) {
+				var viewportHeight = $image.parents('.' + ITEM_CLASS).outerHeight(true);
+				$image.parents('.' + VIEWPORT_CLASS).height(viewportHeight);
+			}
+			if (!this._viewportHeightUpdated){
+				this._viewportHeightUpdated = true;
+				updateViewportHeight($image);
+				$(window).resize(function(){updateViewportHeight($image);});
+			}
 		};
 
 		var loadingOptions = {
 			loadingType: this.settings.loadingType,
-			afterLoadedCallback: $.proxy(function () {}, this)
+			afterLoadedCallback: afterLoadedCallback
 		};
 
 		this.loadingModule = new Loading(api, loadingOptions);
@@ -3518,7 +3534,9 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"GXCbp8","jquery":"xlgdQ9"}],"kV8X1M":[function(require,module,exports){
+},{"class":"GXCbp8","jquery":"xlgdQ9"}],"wrapper":[function(require,module,exports){
+module.exports=require('kV8X1M');
+},{}],"kV8X1M":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3526,9 +3544,7 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"wrapper":[function(require,module,exports){
-module.exports=require('kV8X1M');
-},{}],"xlgdQ9":[function(require,module,exports){
+},{"./carousel":41,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"xlgdQ9":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
@@ -3562,9 +3578,10 @@ var Spinner = require('./spinner');
 
 module.exports = AbstractStrategy.extend({
 
-	init: function(loadingObject) {
+	init: function(loadingObject, itemClass) {
 		this._super(loadingObject);
 		this.spinner = new Spinner();
+		this.itemClass = itemClass;
 	},
 
 	preLoad: function ($item, carouselItemInnerHtml) {
@@ -3594,10 +3611,11 @@ module.exports = AbstractStrategy.extend({
 
 	postLoad: function (event) {
 		console.log('After loaded');
-		$(this).parents('.xn-carousel-item').removeClass('loading');
+		$(this).parents('.' + this.itemClass).removeClass('loading');
 		var self = event.data;
+		self.spinner.setSpinnerSize({spinnerHeight : $(this).height(), spinnerWidth : $(this).width()});
 		self.spinner.hideSpinner($(this));
-		self.loadingObject.afterLoaded();
+		self.loadingObject.afterLoaded($(this));
 	}
 
 });
@@ -3610,9 +3628,10 @@ var Spinner = require('./spinner');
 
 module.exports = AbstractStrategy.extend({
 
-	init: function(loadingObject) {
+	init: function(loadingObject, itemClass) {
 		this._super(loadingObject);
 		this.spinner = new Spinner();
+		this.itemClass = itemClass;
 	},
 
 	preLoad: function ($item, carouselItemInnerHtml) {
@@ -3648,9 +3667,10 @@ module.exports = AbstractStrategy.extend({
 	postLoad: function (event) {
 		console.debug('After loaded');
 		var self = event.data;
-		$(this).parents('.xn-carousel-item').removeClass('loading');
+		$(this).parents('.' + this.itemClass).removeClass('loading');
+		self.spinner.setSpinnerSize({spinnerHeight : $(this).height(), spinnerWidth : $(this).width()});
 		self.spinner.hideSpinner($(this));
-		self.loadingObject.afterLoaded();
+		self.loadingObject.afterLoaded($(this));
 	}
 
 });
@@ -3712,12 +3732,11 @@ module.exports = Class.extend({
 	 *
 	 * @this {LoadingModule}
 	 */
-	afterLoaded: function () {
+	afterLoaded: function ($image) {
 		var callback = this.afterLoadedCallback;
-		var self = this;
 
 		if (callback) {
-			callback.call(self);
+			callback.call(this, $image);
 		}
 	},
 
@@ -3729,9 +3748,9 @@ module.exports = Class.extend({
 	 */
 	_getStrategy: function () {
 		if (this.loadingType === 'lazy') {
-			return new LazyStrategy(this);
+			return new LazyStrategy(this, this.carouselApi.getItemClass());
 		}else{
-			return new EagerStrategy(this);
+			return new EagerStrategy(this, this.carouselApi.getItemClass());
 		}
 	},
 
@@ -3788,24 +3807,10 @@ module.exports = Class.extend({
 
         $loadingElement.parent().append($spinner[0]);
 
-        //Transform spinner fixed container size to a relative one.
-        height = 0; width = 0;
-        if ($loadingElement[0].clientHeight > 0 && $spinner.parent().height() > 0) {
-            height = $loadingElement[0].clientHeight * 100 / $spinner.parent().height();
-        }
-        if (height === 0 || height > 100) {
-            height = 100;
-        }
-
-        if ($loadingElement[0].clientWidth > 0 && $spinner.parent().width() > 0) {
-            width = $loadingElement[0].clientWidth * 100 / $spinner.parent().width();
-        }
-        if (width === 0 || width > 100) {
-            width = 100;
-        }
-
-        $spinner.css('height', height + "%");
-        $spinner.css('width', width + "%");
+        height = this.size ? this.size.spinnerHeight : $loadingElement[0].clientHeight;
+        width = this.size ? this.size.spinnerWidth : $loadingElement[0].clientWidth;
+        $spinner.css('height', height + "px");
+        $spinner.css('width', width + "px");
 
         $spinnerChild = $spinner.find('.spinner');
         $spinnerChild.css('height', '100%');
@@ -3841,6 +3846,10 @@ module.exports = Class.extend({
         var $spinner = this.$spinners[this.loadingElements.indexOf($loadingElement[0])];
         $spinner.remove();
         $loadingElement.show();
+    },
+
+    setSpinnerSize: function(spinnerSize) {
+        this.size = spinnerSize;
     }
 });
 
@@ -3867,6 +3876,7 @@ module.exports = Class.extend({
 		this.options = $.extend({}, DEFAULTS, options);
 
 		this.paginationContainerSelector = options.paginationContainerSelector || ITEM_CONTAINER_SELECTOR;
+		this.paginationItemSelector = options.paginationItemSelector || PAGE_ITEM_SELECTOR;
 		this.notifyPageSelected = options.onPageSelected;
 	},
 
@@ -3877,7 +3887,9 @@ module.exports = Class.extend({
 			this.$itemContainer = this.$itemContainer || this._renderContainer($parent);
 		}
 
-		this._renderPageItems(this.$itemContainer, this.options.getPageCount());
+		if (!this.options.paginationItemSelector){
+			this._renderPageItems(this.$itemContainer, this.options.getPageCount());
+		}
 
 		this.enablePaginationUI();
 
@@ -3938,6 +3950,7 @@ module.exports = Class.extend({
 			console.debug('Page item clicked: ' + pageIndex);
 			this.select(pageIndex);
 			this.notifyPageSelected(pageIndex);
+			event.preventDefault();
 		}
 	},
 
@@ -3981,6 +3994,7 @@ module.exports = Class.extend({
 		this.pageSize = options.pageSize;
 		this.circularNavigation = options.circularNavigation;
 		this.paginationContainerSelector = options.paginationContainerSelector || null;
+		this.paginationItemSelector = options.paginationItemSelector || null;
 		this.currentPage = 0;
 		this.prevCurrentPage = 0;
 	},
@@ -3994,7 +4008,8 @@ module.exports = Class.extend({
 		this.pagingIndicator = this.pagingIndicator || new PaginationIndicator({
 			getPageCount: $.proxy(this.getPageCount, this),
 			onPageSelected: this.onPageSelected,
-			paginationContainerSelector : this.paginationContainerSelector || null
+			paginationContainerSelector : this.paginationContainerSelector || null,
+			paginationItemSelector : this.paginationItemSelector || null
 		});
 		this.pagingIndicator.render(this.carouselApi.container);
 	},
