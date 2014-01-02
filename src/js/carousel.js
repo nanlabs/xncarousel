@@ -651,11 +651,11 @@ module.exports = Class.extend({
 				var viewportHeight = $image.parents('.' + ITEM_CLASS).outerHeight(true);
 				$image.parents('.' + VIEWPORT_CLASS).height(viewportHeight);
 			}
-			if (!this._viewportHeightUpdated){
-				this._viewportHeightUpdated = true;
-				updateViewportHeight($image);
+			if (!this._callbackAdded){
+				this._callbackAdded = true;
 				$(window).resize(function(){updateViewportHeight($image);});
 			}
+			updateViewportHeight($image);
 		};
 
 		var loadingOptions = {
