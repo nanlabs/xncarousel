@@ -32,11 +32,14 @@ module.exports = AbstractStrategy.extend({
 		});
 		$item.removeClass('proxy');
 		$item.addClass('loading');
-		$item.find('img[data-src]').each(function(){
-			var src  = $(this).attr('data-src');
-			$(this).attr('src',src).error(self, self.postLoad).load(self, self.postLoad);
-			$(this).removeAttr('data-src');
+		$item.find('img').each(function(){
+			$(this).error(self, self.postLoad).load(self, self.postLoad);
 			self.spinner.showSpinner($(this));
+			if (this.hasAttribute('data-src')){
+				var src  = $(this).attr('data-src');
+				$(this).attr('src',src);
+				$(this).removeAttr('data-src');
+			}
 		});
 	},
 
@@ -45,7 +48,7 @@ module.exports = AbstractStrategy.extend({
 		var self = event.data;
 		$(this).parents('.xn-carousel-item').removeClass('loading');
 		self.spinner.hideSpinner($(this));
-		self.loadingObject.afterLoaded();
+		self.loadingObject.afterLoaded($(this));
 	}
 
 });
