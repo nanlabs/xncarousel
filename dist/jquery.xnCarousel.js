@@ -1396,9 +1396,9 @@ MediaQueryWatcher.prototype = {
 
 // Exports the class
 module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"lrHQu6"}],"class":[function(require,module,exports){
-module.exports=require('hHRmiF');
-},{}],"hHRmiF":[function(require,module,exports){
+},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"xlgdQ9"}],"class":[function(require,module,exports){
+module.exports=require('GXCbp8');
+},{}],"GXCbp8":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1502,7 +1502,7 @@ module.exports = Class.extend({
 
 });
 
-},{"browsernizr":2,"browsernizr/test/css/transitions":29,"class":"hHRmiF"}],37:[function(require,module,exports){
+},{"browsernizr":2,"browsernizr/test/css/transitions":29,"class":"GXCbp8"}],37:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -1672,7 +1672,7 @@ module.exports = Class.extend({
 	}
 });
 
-},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"hHRmiF","jquery":"lrHQu6"}],38:[function(require,module,exports){
+},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"GXCbp8","jquery":"xlgdQ9"}],38:[function(require,module,exports){
 var AbstractStrategy = require('./abstract-strategy');
 
 module.exports = AbstractStrategy.extend({
@@ -1855,7 +1855,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":36,"jquery":"lrHQu6"}],41:[function(require,module,exports){
+},{"./abstract-strategy":36,"jquery":"xlgdQ9"}],41:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 var util = require('./util');
@@ -3080,7 +3080,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":51,"./pagination/paging-module":54,"./responsive-module":55,"./util":56,"class":"hHRmiF","jquery":"lrHQu6"}],42:[function(require,module,exports){
+},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":51,"./pagination/paging-module":54,"./responsive-module":55,"./util":56,"class":"GXCbp8","jquery":"xlgdQ9"}],42:[function(require,module,exports){
 /**
 * Returns a function which calls the specified function in the specified
 * scope.
@@ -3534,9 +3534,9 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"hHRmiF","jquery":"lrHQu6"}],"wrapper":[function(require,module,exports){
-module.exports=require('/91yud');
-},{}],"/91yud":[function(require,module,exports){
+},{"class":"GXCbp8","jquery":"xlgdQ9"}],"wrapper":[function(require,module,exports){
+module.exports=require('kV8X1M');
+},{}],"kV8X1M":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3544,7 +3544,7 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"lrHQu6","jquery-plugin-wrapper":30}],"lrHQu6":[function(require,module,exports){
+},{"./carousel":41,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"xlgdQ9":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
@@ -3552,7 +3552,7 @@ module.exports = Carousel;
 module.exports = jQuery;
 
 },{}],"jquery":[function(require,module,exports){
-module.exports=require('lrHQu6');
+module.exports=require('xlgdQ9');
 },{}],48:[function(require,module,exports){
 var Class = require('class');
 
@@ -3570,7 +3570,7 @@ module.exports = Class.extend({
 	
 });
 
-},{"class":"hHRmiF"}],49:[function(require,module,exports){
+},{"class":"GXCbp8"}],49:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3595,16 +3595,12 @@ module.exports = AbstractStrategy.extend({
 
 		this.loadingObject.$overview.append($item);
 
-
 		var self = this;
-		$item.find('img').each(function(){
-			$(this).error(self, self.postLoad).load(self, self.postLoad);
+		$item.find('img[data-src]').each(function(){
+			var src  = $(this).attr('data-src');
+			$(this).attr('src',src).error(self, self.postLoad).load(self, self.postLoad);
+			$(this).removeAttr('data-src');
 			self.spinner.showSpinner($(this));
-			if (this.hasAttribute('data-src')){
-				var src  = $(this).attr('data-src');
-				$(this).attr('src',src);
-				$(this).removeAttr('data-src');
-			}
 		});
 	},
 	
@@ -3624,7 +3620,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":48,"./spinner":52,"jquery":"lrHQu6"}],50:[function(require,module,exports){
+},{"./abstract-strategy":48,"./spinner":52,"jquery":"xlgdQ9"}],50:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3660,14 +3656,11 @@ module.exports = AbstractStrategy.extend({
 		});
 		$item.removeClass('proxy');
 		$item.addClass('loading');
-		$item.find('img').each(function(){
-			$(this).error(self, self.postLoad).load(self, self.postLoad);
+		$item.find('img[data-src]').each(function(){
+			var src  = $(this).attr('data-src');
+			$(this).attr('src',src).error(self, self.postLoad).load(self, self.postLoad);
+			$(this).removeAttr('data-src');
 			self.spinner.showSpinner($(this));
-			if (this.hasAttribute('data-src')){
-				var src  = $(this).attr('data-src');
-				$(this).attr('src',src);
-				$(this).removeAttr('data-src');
-			}
 		});
 	},
 
@@ -3682,7 +3675,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":48,"./spinner":52,"jquery":"lrHQu6"}],51:[function(require,module,exports){
+},{"./abstract-strategy":48,"./spinner":52,"jquery":"xlgdQ9"}],51:[function(require,module,exports){
 var Class = require('class');
 
 var LazyStrategy = require('./lazy-strategy');
@@ -3763,7 +3756,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./eager-strategy":49,"./lazy-strategy":50,"class":"hHRmiF"}],52:[function(require,module,exports){
+},{"./eager-strategy":49,"./lazy-strategy":50,"class":"GXCbp8"}],52:[function(require,module,exports){
 var Class = require('class'),
 SpinJs = require('../../../libs/spin.js'),
 $ = require('jquery');
@@ -3860,7 +3853,7 @@ module.exports = Class.extend({
     }
 });
 
-},{"../../../libs/spin.js":1,"class":"hHRmiF","jquery":"lrHQu6"}],53:[function(require,module,exports){
+},{"../../../libs/spin.js":1,"class":"GXCbp8","jquery":"xlgdQ9"}],53:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -3973,7 +3966,7 @@ module.exports = Class.extend({
 
 });
 
-},{"class":"hHRmiF","jquery":"lrHQu6"}],54:[function(require,module,exports){
+},{"class":"GXCbp8","jquery":"xlgdQ9"}],54:[function(require,module,exports){
 var Class = require('class');
 var PaginationIndicator = require('./paging-indicator.js');
 var $ = require('jquery');
@@ -4251,7 +4244,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./paging-indicator.js":53,"class":"hHRmiF","jquery":"lrHQu6"}],55:[function(require,module,exports){
+},{"./paging-indicator.js":53,"class":"GXCbp8","jquery":"xlgdQ9"}],55:[function(require,module,exports){
 var Class = require('class'),
 MediaQueryWatcher = require('mediaquerywatcher'),
 $ = require('jquery');
@@ -4437,7 +4430,7 @@ module.exports = Class.extend({
 	}
 	
 });
-},{"class":"hHRmiF","jquery":"lrHQu6","mediaquerywatcher":33}],56:[function(require,module,exports){
+},{"class":"GXCbp8","jquery":"xlgdQ9","mediaquerywatcher":33}],56:[function(require,module,exports){
 exports.getDependency = function(dependencies, name, defaultDep) {
 	dependencies = dependencies || {};
 	return dependencies[name] || defaultDep;
@@ -4531,6 +4524,5 @@ exports.isIE = function() {
   return (myNav.indexOf('msie') !== -1) ? parseFloat(myNav.split('msie')[1], 10) : false;
 };
 
-},{}]},{},["/91yud"])
-;
+},{}]},{},["kV8X1M"])
 })(this, jQuery);
