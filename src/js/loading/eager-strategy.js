@@ -5,9 +5,10 @@ var Spinner = require('./spinner');
 
 module.exports = AbstractStrategy.extend({
 
-	init: function(loadingObject) {
+	init: function(loadingObject, itemClass) {
 		this._super(loadingObject);
 		this.spinner = new Spinner();
+		this.itemClass = itemClass;
 	},
 
 	preLoad: function ($item, carouselItemInnerHtml) {
@@ -21,12 +22,16 @@ module.exports = AbstractStrategy.extend({
 
 		this.loadingObject.$overview.append($item);
 
+
 		var self = this;
-		$item.find('img[data-src]').each(function(){
-			var src  = $(this).attr('data-src');
-			$(this).attr('src',src).error(self, self.postLoad).load(self, self.postLoad);
-			$(this).removeAttr('data-src');
+		$item.find('img').each(function(){
+			$(this).error(self, self.postLoad).load(self, self.postLoad);
 			self.spinner.showSpinner($(this));
+			if (this.hasAttribute('data-src')){
+				var src  = $(this).attr('data-src');
+				$(this).attr('src',src);
+				$(this).removeAttr('data-src');
+			}
 		});
 	},
 	
@@ -37,10 +42,11 @@ module.exports = AbstractStrategy.extend({
 
 	postLoad: function (event) {
 		console.log('After loaded');
-		$(this).parents('.xn-carousel-item').removeClass('loading');
+		$(this).parents('.' + this.itemClass).removeClass('loading');
 		var self = event.data;
+		self.spinner.setSpinnerSize({spinnerHeight : $(this).height(), spinnerWidth : $(this).width()});
 		self.spinner.hideSpinner($(this));
-		self.loadingObject.afterLoaded();
+		self.loadingObject.afterLoaded($(this));
 	}
 
 });
