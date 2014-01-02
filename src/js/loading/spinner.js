@@ -48,24 +48,10 @@ module.exports = Class.extend({
 
         $loadingElement.parent().append($spinner[0]);
 
-        //Transform spinner fixed container size to a relative one.
-        height = 0; width = 0;
-        if ($loadingElement[0].clientHeight > 0 && $spinner.parent().height() > 0) {
-            height = $loadingElement[0].clientHeight * 100 / $spinner.parent().height();
-        }
-        if (height === 0 || height > 100) {
-            height = 100;
-        }
-
-        if ($loadingElement[0].clientWidth > 0 && $spinner.parent().width() > 0) {
-            width = $loadingElement[0].clientWidth * 100 / $spinner.parent().width();
-        }
-        if (width === 0 || width > 100) {
-            width = 100;
-        }
-
-        $spinner.css('height', height + "%");
-        $spinner.css('width', width + "%");
+        height = this.size ? this.size.spinnerHeight : $loadingElement[0].clientHeight;
+        width = this.size ? this.size.spinnerWidth : $loadingElement[0].clientWidth;
+        $spinner.css('height', height + "px");
+        $spinner.css('width', width + "px");
 
         $spinnerChild = $spinner.find('.spinner');
         $spinnerChild.css('height', '100%');
@@ -101,5 +87,9 @@ module.exports = Class.extend({
         var $spinner = this.$spinners[this.loadingElements.indexOf($loadingElement[0])];
         $spinner.remove();
         $loadingElement.show();
+    },
+
+    setSpinnerSize: function(spinnerSize) {
+        this.size = spinnerSize;
     }
 });

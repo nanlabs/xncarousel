@@ -18,6 +18,8 @@ var rightIndicatorDefaultTemplate = '<div class="xn-right-indicator"><div class=
 var containerTemplate = '<div class="xn-overview"></div>';
 
 var SELECTED_CLASS = "selected";
+var VIEWPORT_CLASS = "xn-viewport";
+var ITEM_CLASS = "xn-carousel-item";
 
 /**
  *  Generic carousel with several features such as animations, pagination, loading strategy.
@@ -56,7 +58,7 @@ module.exports = Class.extend({
 		};
 
 		this.$viewport = $(selector);
-		this.$viewport.addClass('xn-viewport');
+		this.$viewport.addClass(VIEWPORT_CLASS);
 		this.settings = $.extend({}, defaults, options);
 
 		if (typeof(this.settings.pageSize) !== 'number') {
@@ -216,7 +218,7 @@ module.exports = Class.extend({
 	 * @return {array} Array containing the carousel items
 	 */
 	getItems: function () {
-		return this.$overview.children('.xn-carousel-item');
+		return this.$overview.children('.' + ITEM_CLASS);
 	},
 
 	/**
@@ -422,7 +424,7 @@ module.exports = Class.extend({
 
 		var pageCount = this.getPageCount();
 
-		var $carouselItem = $('<div class="xn-carousel-item"></div>');
+		var $carouselItem = $('<div class="'+ ITEM_CLASS +'"></div>');
 
 		this.loadingModule.preLoadItem($carouselItem, item);
 
@@ -526,7 +528,6 @@ module.exports = Class.extend({
 			getItemsForCurrentPage: $.proxy(this._getDOMItemsForCurrentPage, this),
 			getContainerSize: $.proxy(this._getCarouselSize, this)
 		};
-
 		this.pagingModule = new PaginationModule(api, {
 			pageSize: this.settings.pageSize,
 			circularNavigation: this.settings.circularNavigation,
@@ -534,7 +535,8 @@ module.exports = Class.extend({
 				this._disableNavigators();
 				this.goToPage(pageIndex);
 			}, this),
-			paginationContainerSelector : this.settings.paginationContainerSelector
+			paginationContainerSelector : this.settings.paginationContainerSelector,
+			paginationItemSelector : this.settings.paginationItemSelector,
 		});
 	},
 
@@ -550,7 +552,7 @@ module.exports = Class.extend({
 				this.size.initialItemWidth = 100 / pageSize;
 				this._processAddedItems();
 			}
-			this.animationModule.updateAfterRemoval(this.$viewport.find('.xn-carousel-item'));
+			this.animationModule.updateAfterRemoval(this.$viewport.find('.' + ITEM_CLASS));
 			this.pagingModule.renderIndicator();
 			this.pagingModule.pagingIndicator.select(actualPage);
 			setTimeout(function () {
@@ -639,12 +641,26 @@ module.exports = Class.extend({
 			container: this.$overview,
 			getCurrentPage: $.proxy(this.getCurrentPage, this),
 			getItemsForPage: $.proxy(this._getDOMItemsForPage, this),
-			getItemsForCurrentPage: $.proxy(this._getDOMItemsForCurrentPage, this)
+			getItemsForCurrentPage: $.proxy(this._getDOMItemsForCurrentPage, this),
+			getItemClass: function() {return ITEM_CLASS;}
+		};
+
+		//TODO remove this callback when xn-item is not absolute positioned anymore
+		var afterLoadedCallback = function($image) {
+			function updateViewportHeight ($image) {
+				var viewportHeight = $image.parents('.' + ITEM_CLASS).outerHeight(true);
+				$image.parents('.' + VIEWPORT_CLASS).height(viewportHeight);
+			}
+			if (!this._viewportHeightUpdated){
+				this._viewportHeightUpdated = true;
+				updateViewportHeight($image);
+				$(window).resize(function(){updateViewportHeight($image);});
+			}
 		};
 
 		var loadingOptions = {
 			loadingType: this.settings.loadingType,
-			afterLoadedCallback: $.proxy(function () {}, this)
+			afterLoadedCallback: afterLoadedCallback
 		};
 
 		this.loadingModule = new Loading(api, loadingOptions);

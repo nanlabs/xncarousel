@@ -165,7 +165,7 @@ Name | Type | Default | Description
 **loadingType** | ```'lazy'``` or ```'eager'``` | ```lazy``` | Sets the items loading strategy. ```lazy``` will delay the item's image loading until that item is displayed (showing an animation while loading). ```eager``` will load all images as soon as possible
 **responsive** | ```true``` or ```false``` or ```rangesObject``` | ```false``` | Enables/disables responsive behaviour in all cases (when booleans) or it does dynamically for different resolutions. See [below][10]* in this guide for more details
 **paginationContainerSelector** | ```string``` | ```null``` | Defines an existing DOM element where the pagination indicators will be rendered. If ```null```, the default container will be created by the carousel
-
+**paginationItemSelector** | ```string``` | ```null``` | Defines an existing DOM element where the pagination indicators will be mark as with class *active*. If ```null```, the default pagination items will be created by the carousel
 
 <a name="responsive_details"></a>
 #### * Responsive parameter details
