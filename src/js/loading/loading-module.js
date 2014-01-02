@@ -54,12 +54,11 @@ module.exports = Class.extend({
 	 *
 	 * @this {LoadingModule}
 	 */
-	afterLoaded: function () {
+	afterLoaded: function ($image) {
 		var callback = this.afterLoadedCallback;
-		var self = this;
 
 		if (callback) {
-			callback.call(self);
+			callback.call(this, $image);
 		}
 	},
 
@@ -71,9 +70,9 @@ module.exports = Class.extend({
 	 */
 	_getStrategy: function () {
 		if (this.loadingType === 'lazy') {
-			return new LazyStrategy(this);
+			return new LazyStrategy(this, this.carouselApi.getItemClass());
 		}else{
-			return new EagerStrategy(this);
+			return new EagerStrategy(this, this.carouselApi.getItemClass());
 		}
 	},
 

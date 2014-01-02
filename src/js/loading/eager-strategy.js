@@ -5,9 +5,10 @@ var Spinner = require('./spinner');
 
 module.exports = AbstractStrategy.extend({
 
-	init: function(loadingObject) {
+	init: function(loadingObject, itemClass) {
 		this._super(loadingObject);
 		this.spinner = new Spinner();
+		this.itemClass = itemClass;
 	},
 
 	preLoad: function ($item, carouselItemInnerHtml) {
@@ -41,8 +42,9 @@ module.exports = AbstractStrategy.extend({
 
 	postLoad: function (event) {
 		console.log('After loaded');
-		$(this).parents('.xn-carousel-item').removeClass('loading');
+		$(this).parents('.' + this.itemClass).removeClass('loading');
 		var self = event.data;
+		self.spinner.setSpinnerSize({spinnerHeight : $(this).height(), spinnerWidth : $(this).width()});
 		self.spinner.hideSpinner($(this));
 		self.loadingObject.afterLoaded($(this));
 	}
