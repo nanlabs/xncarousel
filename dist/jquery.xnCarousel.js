@@ -1396,9 +1396,7 @@ MediaQueryWatcher.prototype = {
 
 // Exports the class
 module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"xlgdQ9"}],"class":[function(require,module,exports){
-module.exports=require('GXCbp8');
-},{}],"GXCbp8":[function(require,module,exports){
+},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"xlgdQ9"}],"GXCbp8":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1464,6 +1462,8 @@ module.exports=require('GXCbp8');
 })();
 
 module.exports = Class;
+},{}],"class":[function(require,module,exports){
+module.exports=require('GXCbp8');
 },{}],36:[function(require,module,exports){
 var Class = require('class');
 require('browsernizr/test/css/transitions');
@@ -1933,6 +1933,7 @@ module.exports = Class.extend({
 		//When the items width is fixed we need to update the paginator as the viewport size changes.
 		if (this.settings.itemWidth){
 			this.settings.pageSize = ~~(this.$viewport.width() / this.settings.itemWidth);
+			this.settings.pageSize = this.settings.pageSize > 0 ? this.settings.pageSize : 1;
 		}
 
 		$(window).resize($.proxy(this._updatePaginator, this));
@@ -2430,6 +2431,7 @@ module.exports = Class.extend({
 
 		if (this.settings.itemWidth) {
 			pageSize = ~~(this.$viewport.width() / this.settings.itemWidth);
+			pageSize = pageSize > 0 ? pageSize : 1;
 		}
 		if (forceUpdate === true || pageSize !== this.settings.pageSize && pageSize > 0)  {
 			var actualPage = this.pagingModule.getCurrentPage(),
@@ -3566,9 +3568,7 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"GXCbp8","jquery":"xlgdQ9"}],"wrapper":[function(require,module,exports){
-module.exports=require('kV8X1M');
-},{}],"kV8X1M":[function(require,module,exports){
+},{"class":"GXCbp8","jquery":"xlgdQ9"}],"kV8X1M":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3576,15 +3576,17 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"xlgdQ9":[function(require,module,exports){
+},{"./carousel":41,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"wrapper":[function(require,module,exports){
+module.exports=require('kV8X1M');
+},{}],"jquery":[function(require,module,exports){
+module.exports=require('xlgdQ9');
+},{}],"xlgdQ9":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
  */
 module.exports = jQuery;
 
-},{}],"jquery":[function(require,module,exports){
-module.exports=require('xlgdQ9');
 },{}],48:[function(require,module,exports){
 var Class = require('class');
 
@@ -4060,7 +4062,7 @@ module.exports = Class.extend({
 	 * @this {PagingModule}
 	 */
 	getPageCount: function () {
-		return Math.ceil(this.carouselApi.getItemCount() / this.pageSize);
+		return this.pageSize === 0 ? 0 : Math.ceil(this.carouselApi.getItemCount() / this.pageSize);
 	},
 
 	updatePageSize: function (pageSize) {
