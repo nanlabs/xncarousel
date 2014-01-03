@@ -41,7 +41,7 @@ module.exports = Class.extend({
 		var defaults = {
 			touchEnabled: false,
 			pageSize: 1,
-			rangesConfiguration: null,
+			breakpointsConfiguration: null,
 			itemWidth: null,
 			animationType: 'none',
 			loadingType: 'lazy',
@@ -544,7 +544,7 @@ module.exports = Class.extend({
 	},
 
 	_updateConfiguration: function(){
-		var configuration = this._getIntervalsProperty(this.settings.rangesConfiguration);
+		var configuration = this._getIntervalsProperty(this.settings.breakpointsConfiguration);
 		var hasToUpdate = false;
 		if (configuration) {
 			if (typeof(configuration.itemWidth) !== 'undefined') {
@@ -557,8 +557,8 @@ module.exports = Class.extend({
 			}
 			
 			if (typeof(configuration.pageSize) !== 'undefined') {
-				if (configuration.pageSize !== this.settings.pageSize) {
-					this.settings.pageSize = configuration.pageSize;
+				this.settings.pageSize = configuration.pageSize;
+				if (this.size.unitType === "px") {
 					hasToUpdate = true;
 				}
 			}
