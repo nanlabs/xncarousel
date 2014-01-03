@@ -161,7 +161,18 @@
                         loadingType:'lazy',
                         itemTemplate: sliderItemTemplate,
                         responsive: true,
-                        api: true
+                        api: true,
+                        rangesConfiguration: {
+                            "*..700" : {
+                                itemWidth: 200
+                            },
+                            "701..900" : {
+                                itemWidth: 300
+                            },
+                            "901..*" : {
+                                pageSize: 3
+                            }
+                        }
                     });
 
 

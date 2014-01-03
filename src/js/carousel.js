@@ -41,7 +41,7 @@ module.exports = Class.extend({
 		var defaults = {
 			touchEnabled: false,
 			pageSize: 1,
-			pageSizeIntervals: null,
+			rangesConfiguration: null,
 			itemWidth: null,
 			animationType: 'none',
 			loadingType: 'lazy',
@@ -61,28 +61,23 @@ module.exports = Class.extend({
 		this.$viewport.addClass(VIEWPORT_CLASS);
 		this.settings = $.extend({}, defaults, options);
 
-		if (typeof(this.settings.pageSize) !== 'number') {
-			this.settings.pageSizeIntervals =  this.settings.pageSize;
-			this.settings.pageSize = this._getIntervalsProperty(this.settings.pageSizeIntervals);
-		}
-
 		consoleShim();
+		
+		this.size = {};
+		this._updateConfiguration();
 
-		this.size = {
-			contentWidth: 0,
-			overviewWidth: 0,
-			initialItemWidth: this.settings.itemWidth ? this.settings.itemWidth : 100 / this.settings.pageSize,
-			itemWidth: null,
-			unitType: this.settings.itemWidth ? "px" : "%"
-		};
+		this.size.contentWidth = 0;
+		this.size.overviewWidth = 0;
+		this.size.initialItemWidth = this.settings.itemWidth ? this.settings.itemWidth : 100 / this.settings.pageSize;
+		this.size.itemWidth = null;
+		this.size.unitType = this.settings.itemWidth ? "px" : "%";
 
 		//When the items width is fixed we need to update the paginator as the viewport size changes.
 		if (this.settings.itemWidth){
 			this.settings.pageSize = ~~(this.$viewport.width() / this.settings.itemWidth);
 		}
-		if (this.settings.itemWidth || this.settings.pageSizeIntervals) {
-			$(window).resize($.proxy(this._updatePaginator, this));
-		}
+
+		$(window).resize($.proxy(this._updatePaginator, this));
 		
 		this._initPaginationModule();
 
@@ -547,18 +542,45 @@ module.exports = Class.extend({
 		});
 	},
 
+	_updateConfiguration: function(){
+		var configuration = this._getIntervalsProperty(this.settings.rangesConfiguration);
+		var hasToUpdate = false;
+		if (configuration) {
+			if (typeof(configuration.itemWidth) !== 'undefined') {
+				if (configuration.itemWidth !== this.settings.itemWidth) {
+					hasToUpdate = true;
+					this.settings.itemWidth = configuration.itemWidth;
+				}
+			}	else {
+				this.settings.itemWidth = null;				
+			}
+			
+			if (typeof(configuration.pageSize) !== 'undefined') {
+				if (configuration.pageSize !== this.settings.pageSize) {
+					this.settings.pageSize = configuration.pageSize;
+					hasToUpdate = true;
+				}
+			}
+			this.size.unitType = this.settings.itemWidth ? "px" : "%";
+		}
+		return hasToUpdate;
+	},
+
 	_updatePaginator: function () {
-		var pageSize = this.settings.itemWidth ? ~~(this.$viewport.width() / this.settings.itemWidth) : this._getIntervalsProperty(this.settings.pageSizeIntervals);
-		if (pageSize !== this.settings.pageSize && pageSize > 0)  {
+		var forceUpdate = this._updateConfiguration(),
+		pageSize = forceUpdate === true ? this.settings.pageSize : 0;
+
+		if (this.settings.itemWidth) {
+			pageSize = ~~(this.$viewport.width() / this.settings.itemWidth);
+		}
+		if (forceUpdate === true || pageSize !== this.settings.pageSize && pageSize > 0)  {
 			var actualPage = this.pagingModule.getCurrentPage(),
 			self = this;
 			this.settings.pageSize = pageSize;
 			this.pagingModule.updatePageSize(pageSize);
 			this.animationModule.updatePageSize(pageSize);
-			if (!this.settings.itemWidth) {
-				this.size.initialItemWidth = 100 / pageSize;
-				this._processAddedItems();
-			}
+			this.size.initialItemWidth = !this.settings.itemWidth ? 100 / pageSize : this.settings.itemWidth;
+			this._processAddedItems();
 			this.animationModule.updateAfterRemoval(this.$viewport.find('.' + ITEM_CLASS));
 			this.pagingModule.renderIndicator();
 			this.pagingModule.pagingIndicator.select(actualPage);
