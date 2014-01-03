@@ -46,7 +46,7 @@ module.exports = AbstractStrategy.extend({
 		var self = event.data;
 		self.spinner.setSpinnerSize({spinnerHeight : $(this).height(), spinnerWidth : $(this).width()});
 		self.spinner.hideSpinner($(this));
-		self.loadingObject.afterLoaded($(this));
+		self.loadingObject.afterLoaded($(this), event);
 	}
 
 });

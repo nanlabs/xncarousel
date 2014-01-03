@@ -54,11 +54,11 @@ module.exports = Class.extend({
 	 *
 	 * @this {LoadingModule}
 	 */
-	afterLoaded: function ($image) {
+	afterLoaded: function ($image, event) {
 		var callback = this.afterLoadedCallback;
 
 		if (callback) {
-			callback.call(this, $image);
+			callback.call(this, $image, event);
 		}
 	},
 
