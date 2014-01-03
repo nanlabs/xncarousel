@@ -463,10 +463,12 @@ module.exports = Class.extend({
 	 * @fires carousel:rendered - Event to notify that the rendering is ready.
 	 */
 	render: function (items) {
+		var classes = '';
 
-		if (typeof(items) === 'undefined'){
+		if (typeof(items) === 'undefined') {
 			var $items = this.$viewport.find('.xn-items');
 			items = [];
+			classes = $items.attr('class').replace(/\s*xn-items/g,'');
 			$.each($items.children(), function(i, el){
 				items.push(el.outerHTML);
 			});
@@ -474,6 +476,11 @@ module.exports = Class.extend({
 		}
 
 		this._createContainer();
+
+		if (classes !== '') {
+			this.$overview.attr('class', this.$overview.attr('class') + ' ' + classes);
+		}
+
 		this._initLoadingModule();
 
 		this.clear({ silent: true });
