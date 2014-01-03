@@ -75,6 +75,7 @@ module.exports = Class.extend({
 		//When the items width is fixed we need to update the paginator as the viewport size changes.
 		if (this.settings.itemWidth){
 			this.settings.pageSize = ~~(this.$viewport.width() / this.settings.itemWidth);
+			this.settings.pageSize = this.settings.pageSize > 0 ? this.settings.pageSize : 1;
 		}
 
 		$(window).resize($.proxy(this._updatePaginator, this));
@@ -572,6 +573,7 @@ module.exports = Class.extend({
 
 		if (this.settings.itemWidth) {
 			pageSize = ~~(this.$viewport.width() / this.settings.itemWidth);
+			pageSize = pageSize > 0 ? pageSize : 1;
 		}
 		if (forceUpdate === true || pageSize !== this.settings.pageSize && pageSize > 0)  {
 			var actualPage = this.pagingModule.getCurrentPage(),
