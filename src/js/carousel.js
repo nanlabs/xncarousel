@@ -646,16 +646,19 @@ module.exports = Class.extend({
 		};
 
 		//TODO remove this callback when xn-item is not absolute positioned anymore
-		var afterLoadedCallback = function($image) {
+		var afterLoadedCallback = function($image, event) {
 			function updateViewportHeight ($image) {
 				var viewportHeight = $image.parents('.' + ITEM_CLASS).outerHeight(true);
 				$image.parents('.' + VIEWPORT_CLASS).height(viewportHeight);
 			}
-			if (!this._callbackAdded){
-				this._callbackAdded = true;
-				$(window).resize(function(){updateViewportHeight($image);});
+
+			if (event.type !== "error") {
+				if (!this._callbackAdded){
+					this._callbackAdded = true;
+					$(window).resize(function(){updateViewportHeight($image, event);});
+				}
+				updateViewportHeight($image, event);
 			}
-			updateViewportHeight($image);
 		};
 
 		var loadingOptions = {

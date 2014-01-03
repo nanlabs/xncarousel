@@ -50,7 +50,7 @@ module.exports = AbstractStrategy.extend({
 		$(this).parents('.' + this.itemClass).removeClass('loading');
 		self.spinner.setSpinnerSize({spinnerHeight : $(this).height(), spinnerWidth : $(this).width()});
 		self.spinner.hideSpinner($(this));
-		self.loadingObject.afterLoaded($(this));
+		self.loadingObject.afterLoaded($(this), event);
 	}
 
 });
