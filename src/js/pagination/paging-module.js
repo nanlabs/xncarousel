@@ -52,7 +52,7 @@ module.exports = Class.extend({
 	 * @this {PagingModule}
 	 */
 	getPageCount: function () {
-		return Math.ceil(this.carouselApi.getItemCount() / this.pageSize);
+		return this.pageSize === 0 ? 0 : Math.ceil(this.carouselApi.getItemCount() / this.pageSize);
 	},
 
 	updatePageSize: function (pageSize) {
