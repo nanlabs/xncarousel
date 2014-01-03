@@ -160,7 +160,19 @@
                         itemHeight: 110,
                         loadingType:'lazy',
                         itemTemplate: sliderItemTemplate,
-						api: true
+                        responsive: true,
+                        api: true,
+                        rangesConfiguration: {
+                            "*..700" : {
+                                itemWidth: 200
+                            },
+                            "701..900" : {
+                                itemWidth: 300
+                            },
+                            "901..*" : {
+                                pageSize: 3
+                            }
+                        }
                     });
 
 
