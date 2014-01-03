@@ -1396,9 +1396,7 @@ MediaQueryWatcher.prototype = {
 
 // Exports the class
 module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"xlgdQ9"}],"class":[function(require,module,exports){
-module.exports=require('GXCbp8');
-},{}],"GXCbp8":[function(require,module,exports){
+},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"xlgdQ9"}],"GXCbp8":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1464,6 +1462,8 @@ module.exports=require('GXCbp8');
 })();
 
 module.exports = Class;
+},{}],"class":[function(require,module,exports){
+module.exports=require('GXCbp8');
 },{}],36:[function(require,module,exports){
 var Class = require('class');
 require('browsernizr/test/css/transitions');
@@ -2504,16 +2504,19 @@ module.exports = Class.extend({
 		};
 
 		//TODO remove this callback when xn-item is not absolute positioned anymore
-		var afterLoadedCallback = function($image) {
+		var afterLoadedCallback = function($image, event) {
 			function updateViewportHeight ($image) {
 				var viewportHeight = $image.parents('.' + ITEM_CLASS).outerHeight(true);
 				$image.parents('.' + VIEWPORT_CLASS).height(viewportHeight);
 			}
-			if (!this._callbackAdded){
-				this._callbackAdded = true;
-				$(window).resize(function(){updateViewportHeight($image);});
+
+			if (event.type !== "error") {
+				if (!this._callbackAdded){
+					this._callbackAdded = true;
+					$(window).resize(function(){updateViewportHeight($image, event);});
+				}
+				updateViewportHeight($image, event);
 			}
-			updateViewportHeight($image);
 		};
 
 		var loadingOptions = {
@@ -3619,7 +3622,7 @@ module.exports = AbstractStrategy.extend({
 		var self = event.data;
 		self.spinner.setSpinnerSize({spinnerHeight : $(this).height(), spinnerWidth : $(this).width()});
 		self.spinner.hideSpinner($(this));
-		self.loadingObject.afterLoaded($(this));
+		self.loadingObject.afterLoaded($(this), event);
 	}
 
 });
@@ -3677,7 +3680,7 @@ module.exports = AbstractStrategy.extend({
 		$(this).parents('.' + this.itemClass).removeClass('loading');
 		self.spinner.setSpinnerSize({spinnerHeight : $(this).height(), spinnerWidth : $(this).width()});
 		self.spinner.hideSpinner($(this));
-		self.loadingObject.afterLoaded($(this));
+		self.loadingObject.afterLoaded($(this), event);
 	}
 
 });
@@ -3739,11 +3742,11 @@ module.exports = Class.extend({
 	 *
 	 * @this {LoadingModule}
 	 */
-	afterLoaded: function ($image) {
+	afterLoaded: function ($image, event) {
 		var callback = this.afterLoadedCallback;
 
 		if (callback) {
-			callback.call(this, $image);
+			callback.call(this, $image, event);
 		}
 	},
 
