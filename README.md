@@ -156,33 +156,32 @@ Name | Type | Default | Description
 **circularNavigation** | ```boolean``` | ```false``` | ```true``` enables the circular (loop) navigation
 **itemTemplate** | ```function``` | empty template | Function that receives an item and returns the HTML to be used when rendering that item. Used as a template when loading items via JSON
 **pageSize** | ```number``` | 1 | Number of items per page. Items width will adjust to always fit this amount of items on a single page. Ignored when ```itemWidth``` is defined
-**itemWidth** | ```number``` | ```null``` | tem width in pixels. When defined, ```pageSize``` is ignored, as items will always have this width, so if the carousel container size change, the amount of items on a single page will also change accordingly
+**itemWidth** | ```number``` | ```null``` | Item width in pixels. When defined, ```pageSize``` is ignored, as items will always have this width, so if the carousel container size change, the amount of items on a single page will also change accordingly
+**breakpointsConfiguration** | ```object``` | ```null``` | Allows to define pageSize or itemWidth dynamically according to the window content area width. When this options is setted, autonomous pageSize and itemWidth options are ignored as this has more precedence over them  See [below][10]* in this guide for more details
 **pagingIndicators** | ```boolean``` | ```false``` | ```true``` to display the page indicators (bullets). ```false``` to hide them. See the [pagination][8] section for more details.
 **pageInterval** | ```number``` | 0 | If > 0, carousel will automatically move to the next page using the value as interval in milliseconds, ie 1000 means the carousel will change the page once a second. If set to 0, automatic navigation is disabled
 **showNavigationArrows** | ```true``` or ```false``` or ```'auto'``` | ```'auto'``` | Shows page navigation arrows (prev/next). To understand the possible values, see the [pagination][9] section.
 **animationType** | ```'slide'``` or ```'fade'``` or ```'none'``` | ```'none'``` | Transition effect to be used when navigating pages
 **moveSpeed** | ```number``` | 1000 | Duration of the transition animations (in milliseconds)
 **loadingType** | ```'lazy'``` or ```'eager'``` | ```lazy``` | Sets the items loading strategy. ```lazy``` will delay the item's image loading until that item is displayed (showing an animation while loading). ```eager``` will load all images as soon as possible
-**responsive** | ```true``` or ```false``` or ```rangesObject``` | ```false``` | Enables/disables responsive behaviour in all cases (when booleans) or it does dynamically for different resolutions. See [below][10]* in this guide for more details
 **paginationContainerSelector** | ```string``` | ```null``` | Defines an existing DOM element where the pagination indicators will be rendered. If ```null```, the default container will be created by the carousel
 **paginationItemSelector** | ```string``` | ```null``` | Defines an existing DOM element where the pagination indicators will be mark as with class *active*. If ```null```, the default pagination items will be created by the carousel
 
-<a name="responsive_details"></a>
-#### * Responsive parameter details
+<a name="breakpointsConfiguration_details"></a>
+#### * breakpointsConfiguration parameter details
 ```javascript
-rangesObject : 
-    { 
-        "*..320" : true,
-    	"321..768" : false,
-    	"769..*" : true
-    }
+breakpointsConfiguration : 
+	{ 
+      "*..320" : {pageSize : 1},
+    	"321..768" : {itemWidth : 200},
+    	"769..*" : {itemWidth : 300}
+  }
 ```
-
  this stands for: 
 
- - **max-width 320px**: carousel responsive enabled.
- - **min-width 321px** and max-width 768px: carousel responsive disabled.
- - **min-width 769px**: carousel responsive enabled.
+ - **max-width 320px**: pageSize setted to 1 item.
+ - **min-width 321px** and max-width 768px: itemWidth setted to 200px.
+ - **min-width 769px**: itemWidth setted to 300px.
 
  
  
@@ -321,20 +320,6 @@ Name | Parameters | Trigger
 
 
 
-## Responsive behaviour
-
-Let's put an example to get this better. Suppose that the carousel viewport has a media query like this setted:
-
-
-    @media (max-width: 900px) {
-       width: 80%;
-       height: 296px;
-    }
-
-
-If carousel responsive option is set to false, the media query works as defaults, otherwise it updates the height to keep the aspect. So for this case the height (296px) applies to the upper limit (900px) and then it keeps the same proportions at different resolutions. Also remember that the carousel responsive option accepts an object with different ranges (like CSS3 media queries do) where this behaviour is enabled/disabled.
-
-
 <a name="development"></a>
 ## Development 
 
@@ -400,7 +385,7 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
   [7]: #styling
   [8]: #pagination_indicators
   [9]: #pagination_arrows
-  [10]: #responsive_details
+  [10]: #breakpointsConfiguration_details
   [11]: https://raw.github.com/nanlabs/xncarousel/master/dist/jquery.xnCarousel.min.css
   [12]: https://raw.github.com/nanlabs/xncarousel/master/dist/jquery.xnCarousel.less
   [13]: https://raw.github.com/nanlabs/xncarousel/master/dist/jquery.xnCarousel.scss

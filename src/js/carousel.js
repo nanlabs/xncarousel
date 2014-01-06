@@ -4,8 +4,6 @@ var util = require('./util');
 
 var consoleShim = require ('./console-shim-module');
 
-var responsiveModule = require('./responsive-module');
-
 var DragSupport = require('./dragging-module');
 var PaginationModule = require('./pagination/paging-module');
 var Animation = require('./animation/animation-module');
@@ -50,7 +48,6 @@ module.exports = Class.extend({
 			pageInterval: 0,
 			showNavigationArrows: 'auto',
 			circularNavigation: false,
-			responsive: false,
 			paginationContainerSelector: null,
 			itemTemplate: function () {
 				return '<div></div>';
@@ -81,8 +78,6 @@ module.exports = Class.extend({
 		$(window).resize($.proxy(this._updatePaginator, this));
 		
 		this._initPaginationModule();
-
-		this._initializeResponsiveModule(this.settings.responsive);
 
 		this.leftIndicatorClickHandler = $.proxy(this.leftIndicatorClickHandler, this);
 		this.rightIndicatorClickHandler = $.proxy(this.rightIndicatorClickHandler, this);
@@ -654,16 +649,6 @@ module.exports = Class.extend({
 
 		this.$viewport[0].ontouchstart = function(event) { event.stopPropagation(); };
 		this.$viewport[0].ontouchend = function(event) { event.stopPropagation(); };
-	},
-
-	_initializeResponsiveModule: function (responsive) {
-		if (responsive !== false) {
-			new responsiveModule({
-				getSelectors : $.proxy(this._getCarouselSelectors, this),
-				getStylesheet : $.proxy(this._getCarouselStylesheet, this),
-				getIntervalsProperty : $.proxy(this._getIntervalsProperty, this)
-			}, this.$viewport, responsive);
-		}
 	},
 
 	_initLoadingModule: function () {
