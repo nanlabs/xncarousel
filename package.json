@@ -38,7 +38,6 @@
     "jquery": ">=1.9.1"
   },
   "dependencies": {
-    "mediaquerywatcher": "git+ssh://git@bitbucket.org:jmf78ar/media-query-watcher.git",
 	"jquery-plugin-wrapper": "git://github.com/nanlabs/jquery-plugin-wrapper.git#master",
 	"browsernizr": "~1.0.1"
   },
