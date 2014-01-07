@@ -579,8 +579,10 @@ module.exports = Class.extend({
 			this.size.initialItemWidth = !this.settings.itemWidth ? 100 / pageSize : this.settings.itemWidth;
 			this._processAddedItems();
 			this.animationModule.updateAfterRemoval(this.$viewport.find('.' + ITEM_CLASS));
-			this.pagingModule.renderIndicator();
-			this.pagingModule.pagingIndicator.select(actualPage);
+			if (this.settings.pagingIndicators === true) {
+				this.pagingModule.renderIndicator();
+				this.pagingModule.pagingIndicator.select(actualPage);
+			}
 			setTimeout(function () {
 				var pageCount = self.pagingModule.pagingIndicator.$itemContainer.children().length;
 				self.goToPage(actualPage < pageCount ? actualPage : pageCount - 1);
