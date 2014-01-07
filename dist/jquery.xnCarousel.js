@@ -1127,276 +1127,7 @@ module.exports = {
 
 
 
-},{}],31:[function(require,module,exports){
-/*! matchMedia() polyfill addListener/removeListener extension. Author & copyright (c) 2012: Scott Jehl. Dual MIT/BSD license */
-(function(){
-    // Bail out for browsers that have addListener support
-    if (window.matchMedia && window.matchMedia('all').addListener) {
-        return false;
-    }
-
-    var localMatchMedia = window.matchMedia,
-        hasMediaQueries = localMatchMedia('only all').matches,
-        isListening     = false,
-        timeoutID       = 0,    // setTimeout for debouncing 'handleChange'
-        queries         = [],   // Contains each 'mql' and associated 'listeners' if 'addListener' is used
-        handleChange    = function() {
-            // Debounce
-            clearTimeout(timeoutID);
-
-            timeoutID = setTimeout(function() {
-                for (var i = 0, il = queries.length; i < il; i++) {
-                    var mql         = queries[i].mql,
-                        listeners   = queries[i].listeners || [],
-                        matches     = localMatchMedia(mql.media).matches;
-
-                    // Update mql.matches value and call listeners
-                    // Fire listeners only if transitioning to or from matched state
-                    if (matches !== mql.matches) {
-                        mql.matches = matches;
-
-                        for (var j = 0, jl = listeners.length; j < jl; j++) {
-                            listeners[j].call(window, mql);
-                        }
-                    }
-                }
-            }, 30);
-        };
-
-    window.matchMedia = function(media) {
-        var mql         = localMatchMedia(media),
-            listeners   = [],
-            index       = 0;
-
-        mql.addListener = function(listener) {
-            // Changes would not occur to css media type so return now (Affects IE <= 8)
-            if (!hasMediaQueries) {
-                return;
-            }
-
-            // Set up 'resize' listener for browsers that support CSS3 media queries (Not for IE <= 8)
-            // There should only ever be 1 resize listener running for performance
-            if (!isListening) {
-                isListening = true;
-                window.addEventListener('resize', handleChange, true);
-            }
-
-            // Push object only if it has not been pushed already
-            if (index === 0) {
-                index = queries.push({
-                    mql         : mql,
-                    listeners   : listeners
-                });
-            }
-
-            listeners.push(listener);
-        };
-
-        mql.removeListener = function(listener) {
-            for (var i = 0, il = listeners.length; i < il; i++){
-                if (listeners[i] === listener){
-                    listeners.splice(i, 1);
-                }
-            }
-        };
-
-        return mql;
-    };
-}());
-
-},{}],32:[function(require,module,exports){
-/*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
-
-window.matchMedia || (window.matchMedia = function() {
-    "use strict";
-
-    // For browsers that support matchMedium api such as IE 9 and webkit
-    var styleMedia = (window.styleMedia || window.media);
-
-    // For those that don't support matchMedium
-    if (!styleMedia) {
-        var style       = document.createElement('style'),
-            script      = document.getElementsByTagName('script')[0],
-            info        = null;
-
-        style.type  = 'text/css';
-        style.id    = 'matchmediajs-test';
-
-        script.parentNode.insertBefore(style, script);
-
-        // 'style.currentStyle' is used by IE <= 8 and 'window.getComputedStyle' for all other browsers
-        info = ('getComputedStyle' in window) && window.getComputedStyle(style, null) || style.currentStyle;
-
-        styleMedia = {
-            matchMedium: function(media) {
-                var text = '@media ' + media + '{ #matchmediajs-test { width: 1px; } }';
-
-                // 'style.styleSheet' is used by IE <= 8 and 'style.textContent' for all other browsers
-                if (style.styleSheet) {
-                    style.styleSheet.cssText = text;
-                } else {
-                    style.textContent = text;
-                }
-
-                // Test if media query is true or false
-                return info.width === '1px';
-            }
-        };
-    }
-
-    return function(media) {
-        return {
-            matches: styleMedia.matchMedium(media || 'all'),
-            media: media || 'all'
-        };
-    };
-}());
-
-},{}],33:[function(require,module,exports){
-var $ = require('jquery'), CSSRuleRegex = /^([^:]+):(.+)/;
-
-//IE polyfill
-require('./lib/matchMedia');
-require('./lib/matchMedia.addListener');
-
-/**
- * Uses the settings.errorLogger to find the errorLogger if it was defined.
- * The logger will be used to report errors on invalid items.
- * If no logger is found, errors wont be reported.
- */
-function setErrorLogger() {
-  if(!this.settings.errorLogger) { return; }
-
-  var logger;
-
-  if(Util.isString(this.settings.errorLogger)) {
-    logger = Util.getDeepValue(this.settings.errorLogger);
-  } else {
-    logger = this.settings.errorLogger;
-  }
-
-  this._errorLogger = logger;
-
-  console.info((this._errorLogger)?
-      "Error logger is defined. It will be used to log invalid items.":
-      "No error logger found. Errors wont be logged");
-}
-
-function obtainCSSValues(selector, CSS) {
-  var pattern = new RegExp(selector.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + "\\s*{(\\s*[^}]+)}");
-  return CSS.match(pattern)[1];
-}
-
-//gets css rule object
-//@param: String
-//ie: {"width" : "100px"}
-function getCSSRule(rule) {
-  var CSSrule = {},
-  data = CSSRuleRegex.exec(rule);
-  CSSrule.property = data [1];
-  CSSrule.value = data [2];
-  return CSSrule;
-}
-
-//return all selector css values for a media query rule in a key/value format.
-function obtainCSSValuesFromRule(cssRules) {
-  var rules = {};
-  $.each(cssRules, function(i, rule) {
-    var values = obtainCSSValues(rule.selectorText, rule.cssText).split(';');
-    
-    $.each(rule.selectorText.replace(/,\s+/g,',').split(','), function(i, selector) {
-      rules[selector] = [];
-      $.each(values, function(i, value) {
-        if (CSSRuleRegex.test(value) === true) {
-          rules[selector].push(getCSSRule(value));
-        }
-      });
-    });
-          
-  });
-  return rules;
-}
-
-/**
- * Class constructor
- */
-function MediaQueryWatcher () {
-  this.mediaQueriesRules = {};
-}
-
-//return all selector css values for a media query rule in a key/value format.
-function obtainCSS(rule) {
-  var rules = {};
-    var values = obtainCSSValues(rule.selectorText, rule.cssText).split(';');
-    rules[rule.selectorText] = [];
-    $.each(values, function(i, value) {
-      if (CSSRuleRegex.test(value) === true) {
-        rules[rule.selectorText].push(getCSSRule(value));
-      }
-    });
-  return rules;
-}
-
-/**
- * Media Query Watcher Class contents
- */
-MediaQueryWatcher.prototype = {
-
- addMediaQueriesListener : function (styleSheet, mediaChangeHandler) {
-    var rules, actualAppliedRules = ["noMediaRule"], mql;
-    if (styleSheet) {
-      rules = styleSheet.cssRules;
-      for (var j = 0; j < rules.length; j += 1) {
-        if (rules[j].constructor === window.CSSMediaRule) {
-            this.mediaQueriesRules[rules[j].media.mediaText] = this.mediaQueriesRules[rules[j].media.mediaText] || {};
-            $.extend(this.mediaQueriesRules[rules[j].media.mediaText], obtainCSSValuesFromRule(rules[j].cssRules));
-            mql = window.matchMedia(rules[j].media.mediaText);
-            if (mql.matches === true) {
-              actualAppliedRules.push(rules[j].media.mediaText); 
-            }
-            mql.addListener(mediaChangeHandler);
-        } else if (rules[j].constructor === window.CSSStyleRule) {
-            this.mediaQueriesRules["noMediaRule"] = this.mediaQueriesRules["noMediaRule"] || {};
-            $.extend(this.mediaQueriesRules["noMediaRule"], obtainCSSValuesFromRule([rules[j]]));
-        }
-      }
-    }
-    
-    return actualAppliedRules;
-  },
-
-  //gets the target CSS properties from a @mediaData for the indicated selectors in descending priority order.
-  getMediaQueryProperties : function (mediaData, selectors, targetProperties) {
-    var propertiesObject = {}, itemsRemoved = 0;
-
-    if (typeof(mediaData) !== 'undefined') {
-      $.each(selectors, function (index, selector) {
-        var property, propertyPosition;
-        if (typeof(mediaData[selector]) !== 'undefined') {
-          $.each(mediaData[selector], function(i, val) {
-            property = val.property.split(" ").join("");
-            propertyPosition = targetProperties.indexOf(property);
-            if (propertyPosition !== -1) {
-              propertiesObject[property] = val.value.split(" ").join("");
-              targetProperties.splice(propertyPosition - itemsRemoved, 1);
-              itemsRemoved += 1;
-            }
-          });
-        }
-        if (targetProperties.length === 0) {
-          return false;
-        }
-      });
-    }
-
-    return propertiesObject;
-  }
-
-};
-
-// Exports the class
-module.exports = MediaQueryWatcher;
-},{"./lib/matchMedia":32,"./lib/matchMedia.addListener":31,"jquery":"xlgdQ9"}],"GXCbp8":[function(require,module,exports){
+},{}],"GXCbp8":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1464,7 +1195,7 @@ module.exports = MediaQueryWatcher;
 module.exports = Class;
 },{}],"class":[function(require,module,exports){
 module.exports=require('GXCbp8');
-},{}],36:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 var Class = require('class');
 require('browsernizr/test/css/transitions');
 var Modernizr = require('browsernizr');
@@ -1502,7 +1233,7 @@ module.exports = Class.extend({
 
 });
 
-},{"browsernizr":2,"browsernizr/test/css/transitions":29,"class":"GXCbp8"}],37:[function(require,module,exports){
+},{"browsernizr":2,"browsernizr/test/css/transitions":29,"class":"GXCbp8"}],34:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -1672,7 +1403,7 @@ module.exports = Class.extend({
 	}
 });
 
-},{"./fade-strategy":38,"./no-animation-strategy":39,"./slider-strategy":40,"class":"GXCbp8","jquery":"xlgdQ9"}],38:[function(require,module,exports){
+},{"./fade-strategy":35,"./no-animation-strategy":36,"./slider-strategy":37,"class":"GXCbp8","jquery":"xlgdQ9"}],35:[function(require,module,exports){
 var AbstractStrategy = require('./abstract-strategy');
 
 module.exports = AbstractStrategy.extend({
@@ -1748,7 +1479,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":36}],39:[function(require,module,exports){
+},{"./abstract-strategy":33}],36:[function(require,module,exports){
 var SliderStrategy = require('./slider-strategy');
 
 var NoAnimationStrategy = SliderStrategy.extend({
@@ -1768,7 +1499,7 @@ var NoAnimationStrategy = SliderStrategy.extend({
 
 module.exports = NoAnimationStrategy;
 
-},{"./slider-strategy":40}],40:[function(require,module,exports){
+},{"./slider-strategy":37}],37:[function(require,module,exports){
 var AbstractStrategy = require('./abstract-strategy');
 var $ = require('jquery');
 
@@ -1855,14 +1586,12 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":36,"jquery":"xlgdQ9"}],41:[function(require,module,exports){
+},{"./abstract-strategy":33,"jquery":"xlgdQ9"}],38:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 var util = require('./util');
 
 var consoleShim = require ('./console-shim-module');
-
-var responsiveModule = require('./responsive-module');
 
 var DragSupport = require('./dragging-module');
 var PaginationModule = require('./pagination/paging-module');
@@ -1908,7 +1637,6 @@ module.exports = Class.extend({
 			pageInterval: 0,
 			showNavigationArrows: 'auto',
 			circularNavigation: false,
-			responsive: false,
 			paginationContainerSelector: null,
 			itemTemplate: function () {
 				return '<div></div>';
@@ -1939,8 +1667,6 @@ module.exports = Class.extend({
 		$(window).resize($.proxy(this._updatePaginator, this));
 		
 		this._initPaginationModule();
-
-		this._initializeResponsiveModule(this.settings.responsive);
 
 		this.leftIndicatorClickHandler = $.proxy(this.leftIndicatorClickHandler, this);
 		this.rightIndicatorClickHandler = $.proxy(this.rightIndicatorClickHandler, this);
@@ -2415,10 +2141,10 @@ module.exports = Class.extend({
 			}
 			
 			if (typeof(configuration.pageSize) !== 'undefined') {
-				this.settings.pageSize = configuration.pageSize;
-				if (this.size.unitType === "px") {
+				if (this.size.unitType === "px" || this.settings.pageSize !== configuration.pageSize) {
 					hasToUpdate = true;
 				}
+				this.settings.pageSize = configuration.pageSize;
 			}
 			this.size.unitType = this.settings.itemWidth ? "px" : "%";
 		}
@@ -2512,16 +2238,6 @@ module.exports = Class.extend({
 
 		this.$viewport[0].ontouchstart = function(event) { event.stopPropagation(); };
 		this.$viewport[0].ontouchend = function(event) { event.stopPropagation(); };
-	},
-
-	_initializeResponsiveModule: function (responsive) {
-		if (responsive !== false) {
-			new responsiveModule({
-				getSelectors : $.proxy(this._getCarouselSelectors, this),
-				getStylesheet : $.proxy(this._getCarouselStylesheet, this),
-				getIntervalsProperty : $.proxy(this._getIntervalsProperty, this)
-			}, this.$viewport, responsive);
-		}
 	},
 
 	_initLoadingModule: function () {
@@ -3114,7 +2830,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./animation/animation-module":37,"./console-shim-module":42,"./dragging-module":43,"./loading/loading-module":51,"./pagination/paging-module":54,"./responsive-module":55,"./util":56,"class":"GXCbp8","jquery":"xlgdQ9"}],42:[function(require,module,exports){
+},{"./animation/animation-module":34,"./console-shim-module":39,"./dragging-module":40,"./loading/loading-module":48,"./pagination/paging-module":51,"./util":52,"class":"GXCbp8","jquery":"xlgdQ9"}],39:[function(require,module,exports){
 /**
 * Returns a function which calls the specified function in the specified
 * scope.
@@ -3361,7 +3077,7 @@ var execute = function() {
 };
 
 module.exports = execute;
-},{"./util":56}],43:[function(require,module,exports){
+},{"./util":52}],40:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -3568,7 +3284,9 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"GXCbp8","jquery":"xlgdQ9"}],"kV8X1M":[function(require,module,exports){
+},{"class":"GXCbp8","jquery":"xlgdQ9"}],"wrapper":[function(require,module,exports){
+module.exports=require('kV8X1M');
+},{}],"kV8X1M":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3576,18 +3294,16 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":41,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"wrapper":[function(require,module,exports){
-module.exports=require('kV8X1M');
-},{}],"jquery":[function(require,module,exports){
-module.exports=require('xlgdQ9');
-},{}],"xlgdQ9":[function(require,module,exports){
+},{"./carousel":38,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"xlgdQ9":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
  */
 module.exports = jQuery;
 
-},{}],48:[function(require,module,exports){
+},{}],"jquery":[function(require,module,exports){
+module.exports=require('xlgdQ9');
+},{}],45:[function(require,module,exports){
 var Class = require('class');
 
 module.exports = Class.extend({
@@ -3604,7 +3320,7 @@ module.exports = Class.extend({
 	
 });
 
-},{"class":"GXCbp8"}],49:[function(require,module,exports){
+},{"class":"GXCbp8"}],46:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3658,7 +3374,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":48,"./spinner":52,"jquery":"xlgdQ9"}],50:[function(require,module,exports){
+},{"./abstract-strategy":45,"./spinner":49,"jquery":"xlgdQ9"}],47:[function(require,module,exports){
 var $ = require('jquery');
 
 var AbstractStrategy = require('./abstract-strategy');
@@ -3716,7 +3432,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":48,"./spinner":52,"jquery":"xlgdQ9"}],51:[function(require,module,exports){
+},{"./abstract-strategy":45,"./spinner":49,"jquery":"xlgdQ9"}],48:[function(require,module,exports){
 var Class = require('class');
 
 var LazyStrategy = require('./lazy-strategy');
@@ -3797,7 +3513,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./eager-strategy":49,"./lazy-strategy":50,"class":"GXCbp8"}],52:[function(require,module,exports){
+},{"./eager-strategy":46,"./lazy-strategy":47,"class":"GXCbp8"}],49:[function(require,module,exports){
 var Class = require('class'),
 SpinJs = require('../../../libs/spin.js'),
 $ = require('jquery');
@@ -3894,7 +3610,7 @@ module.exports = Class.extend({
     }
 });
 
-},{"../../../libs/spin.js":1,"class":"GXCbp8","jquery":"xlgdQ9"}],53:[function(require,module,exports){
+},{"../../../libs/spin.js":1,"class":"GXCbp8","jquery":"xlgdQ9"}],50:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
@@ -4007,7 +3723,7 @@ module.exports = Class.extend({
 
 });
 
-},{"class":"GXCbp8","jquery":"xlgdQ9"}],54:[function(require,module,exports){
+},{"class":"GXCbp8","jquery":"xlgdQ9"}],51:[function(require,module,exports){
 var Class = require('class');
 var PaginationIndicator = require('./paging-indicator.js');
 var $ = require('jquery');
@@ -4285,193 +4001,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./paging-indicator.js":53,"class":"GXCbp8","jquery":"xlgdQ9"}],55:[function(require,module,exports){
-var Class = require('class'),
-MediaQueryWatcher = require('mediaquerywatcher'),
-$ = require('jquery');
-
-
-/*
-*	Given a element its height is calculated based on the actual applied media query.
-*/
-module.exports = Class.extend({
-	init: function (api, $element, activeIntervals) {
-		var actualAppliedMediaRules, self = this;
-		this.api = api;
-		this.$element = $element;
-		this.activeIntervals = activeIntervals;
-		this.mediaStylesProperties = {};
-		this.mediaQueryWatcher = new MediaQueryWatcher();
-		actualAppliedMediaRules = this.mediaQueryWatcher.addMediaQueriesListener(api.getStylesheet(), $.proxy(this._mediaChangedHandler, this));
-		this.mediaStylesProperties.actualAppliedProperties = {}; 
-		$.each(actualAppliedMediaRules, function(i, actualAppliedMediaRule){
-			self._setActualMediaProperties(actualAppliedMediaRule, ['height', 'width']);
-		});
-		this._windowResizedHandler();
-		$(window).resize($.proxy(this._windowResizedHandler, this));
-	},
-
-	//Determines if this module is active for the actual viewport width based on the provided options.
-	_isActiveForViewportWidth : function () {
-		if (this.activeIntervals === true) {
-			//this module is active in all resolutions
-			return true;
-		}
-		var active = this.api.getIntervalsProperty(this.activeIntervals);
-		return active ? active : false;
-	},
-
-	//Whenever a media query changes, it gets the indicated CSS properties from a target stylesheet.
-	_mediaChangedHandler: function (mql) {
-		var self = this,
-		mediaQueriesRules = this.mediaQueryWatcher.mediaQueriesRules, exists = false;
-		
-		//we actually have to know if a media query does not exist for viewport actual state.
-		if (mql.matches === false) {
-			$.each(mediaQueriesRules, function(media) {
-				if (media !== "noMediaRule") {
-					exists = self._mediaQueryMatchesForCarousel(media);
-				}
-				return !exists;
-			});
-		}
-
-		if (mql.matches === true || exists === false) {
-			if (mql.matches === true && this._mediaQueryMatchesForCarousel(mql.media) === false) {
-				return;
-			}
-			this.mediaStylesProperties.actualAppliedProperties = {};
-			this._setActualMediaProperties("noMediaRule", ['height', 'width']);
-		}
-
-		if (mql.matches === true) {
-			this._setActualMediaProperties(mql.media, ['height', 'width']);
-		}
-		
-		//defer execution so other action do not invalidate this one.
-		setTimeout(function(){
-			self._windowResizedHandler();
-		},0);
-	},
-
-	//Stores the selected CSS properties from a media query for the actual viewport size, to avoid continuous querying.
-	_setActualMediaProperties: function (actualAppliedMediaRule, targetProperties) {
-		var actualAppliedProperties;
-		
-		this.mediaStylesProperties.actualAppliedMediaRule = actualAppliedMediaRule;
-
-		actualAppliedProperties = this.mediaQueryWatcher.getMediaQueryProperties(this.mediaQueryWatcher.mediaQueriesRules[actualAppliedMediaRule], this.api.getSelectors(), targetProperties);
-		this.mediaStylesProperties.viewportWidth = this._getMediaQueryViewportWidth(actualAppliedMediaRule);
-		
-		this.mediaStylesProperties.actualAppliedProperties = $.extend({}, this.mediaStylesProperties.actualAppliedProperties, actualAppliedProperties);
-	},
-
-	//Helper to determine wether a mediaQuery applies to the actual viewport size.
-	_mediaQueryMatchesForCarousel: function (mediaRule) {
-		var self = this;
-
-		function matchesForCarousel(mediaRule) {
-			var mediaData = self.mediaQueryWatcher.mediaQueriesRules[mediaRule],
-			exists = false;
-		
-			$.each(mediaData, function(selector) {
-				$.each(selector.replace(/,\s+/g,',').split(','), function(i, selector) {
-					if (self.api.getSelectors().indexOf(selector) !== -1) {
-						exists =true;
-					}
-					return !exists;
-				});
-				return !exists;
-			});
-			return exists;
-		}
-
-		var min = this._getMediaQueryMinWidth(mediaRule),
-		max = this._getMediaQueryMaxWidth(mediaRule),
-		viewportWidth = window.innerWidth;
-		
-		if (min !== null && max !== null) {
-			return ((viewportWidth >= min && viewportWidth <= max) && matchesForCarousel(mediaRule) === true ) ? true : false;
-		} else if (min !== null) {
-			return (viewportWidth >= min && matchesForCarousel(mediaRule) === true ) ? true : false;
-		} else {
-			return (viewportWidth <= max && matchesForCarousel(mediaRule) === true ) ? true : false;
-		}
-	},
-
-	//Parses the media query to obtain width values.
-	_getMediaQueryViewportWidth : function (mediaRule) {
-		var exprResult = this._getMediaQueryMaxWidth(mediaRule);
-		return exprResult !== null ? exprResult :  this._getMediaQueryMinWidth(mediaRule);
-	},
-
-	//Return unit value ("px", "%", "em" for re-use correct one when translating)
-  _getUnit : function (val){
-    return val.match(/\D+$/);
-  },
-
-	//Remove 'px' and other artifacts
-  _cleanValue : function (val) {
-    return parseFloat(val.replace(this._getUnit(val), ''));
-  },
-
-	_getPxSize : function (value, unit) {
-		switch(unit)
-		{
-		case "px":
-			return value;
-		case "em":
-			return value * 16;
-		case "rem":
-			return value * 16;
-		}
-	},
-
-	//Parses the media query to obtain width values.
-	_getMediaQueryMinWidth : function (mediaRule) {
-		var minWidthMediaRuleExpr = /(min-width|min-device-width)\s*:\s*([0-9]+[^0-9]+)\)/gi,
-		exprResult;
-
-		exprResult = minWidthMediaRuleExpr.exec(mediaRule);
-		if (exprResult !== null && typeof(exprResult[2] !== 'undefined')) {
-			return this._getPxSize(this._cleanValue(exprResult[2]), this._getUnit(exprResult[2])[0]);
-		} else {
-			return null;
-		}
-	},
-
-		//Parses the media query to obtain width values.
-	_getMediaQueryMaxWidth : function (mediaRule) {
-		var maxWidthMediaRuleExpr = /(max-width|max-device-width)\s*:\s*([0-9]+[^0-9]+)\)/gi,
-		exprResult;
-
-		exprResult = maxWidthMediaRuleExpr.exec(mediaRule);
-		if (exprResult !== null && typeof(exprResult[2] !== 'undefined')) {
-			return this._getPxSize(this._cleanValue(exprResult[2]), this._getUnit(exprResult[2])[0]);
-		} else {
-			return null;
-		}
-	},
-
-	//Recalculates viewport height of an indicated item to keep aspect ratio.
-	_windowResizedHandler: function () {
-		var actualAppliedMediaRule = this.mediaStylesProperties.actualAppliedMediaRule, height;
-		
-		if (this.mediaStylesProperties.actualAppliedProperties.height) {
-			if (this._isActiveForViewportWidth() === true && (actualAppliedMediaRule !== "noMediaRule")) {
-					height = window.innerWidth * parseInt(this.mediaStylesProperties.actualAppliedProperties.height, 10) / this.mediaStylesProperties.viewportWidth;
-			} else { //Default css behaviour
-					height = parseInt(this.mediaStylesProperties.actualAppliedProperties.height, 10);
-			}
-			this.$element.css('height', height + "px");
-		}
-		if (this.mediaStylesProperties.actualAppliedProperties.width) {
-			this.$element.css('width', this.mediaStylesProperties.actualAppliedProperties.width);
-		}
-	}
-	
-});
-},{"class":"GXCbp8","jquery":"xlgdQ9","mediaquerywatcher":33}],56:[function(require,module,exports){
+},{"./paging-indicator.js":50,"class":"GXCbp8","jquery":"xlgdQ9"}],52:[function(require,module,exports){
 exports.getDependency = function(dependencies, name, defaultDep) {
 	dependencies = dependencies || {};
 	return dependencies[name] || defaultDep;
