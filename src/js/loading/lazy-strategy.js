@@ -15,14 +15,14 @@ module.exports = AbstractStrategy.extend({
 		console.debug('Preloading item');
 
 		var imgSrcAltered =  carouselItemInnerHtml.replace(' src=', ' data-src=');
-		var $itemContent = $(imgSrcAltered);
+		var $itemContent = $(imgSrcAltered); 
 
 		$item.append($itemContent);
 		$item.addClass('proxy');
 
 		this.loadingObject.$overview.append($item);
 	},
-
+	
 	load: function ($item) {
 		console.debug('Loading item');
 		var self = this;

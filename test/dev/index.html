@@ -115,7 +115,7 @@
                         }
                     });
 
-                    $(".xn-viewport.standalone.hero").xnCarousel("render", data.results);
+					$(".xn-viewport.standalone.hero").xnCarousel("render", data.results);
 
                     $(".xn-viewport.plugin.hero").xnCarousel({
                         touchEnabled: true,
@@ -124,12 +124,12 @@
                         animationType: 'fade',
                         moveSpeed: 1000,
                         itemHeight: 110,
-                        showNavigationArrows: false,
+						showNavigationArrows: false,
                         loadingType:'lazy',
                         itemTemplate: heroItemTemplate
                     });
 
-                    $(".xn-viewport.plugin.hero").xnCarousel("render", data.results);
+					$(".xn-viewport.plugin.hero").xnCarousel("render", data.results);
 
                     $(".xn-viewport.plugin.slide").xnCarousel({
                         touchEnabled: true,
@@ -138,16 +138,16 @@
                         circularNavigation: true,
                         animationType: 'fade',
                         moveSpeed: 500,
-                        showNavigationArrows: 'auto',
+						showNavigationArrows: 'auto',
                         //pageInterval: 3000,
                         itemHeight: 110,
                         loadingType:'lazy',
                         itemTemplate: sliderItemTemplate
                     });
 
-                    $(".xn-viewport.plugin.slide").xnCarousel("render", data.results);
+					$(".xn-viewport.plugin.slide").xnCarousel("render", data.results);
 
-                    var carousel = $(".xn-viewport.api").xnCarousel({
+					var carousel = $(".xn-viewport.api").xnCarousel({
                         touchEnabled: true,
                         pageSize: 3,
                         pagingIndicators: true,
@@ -172,7 +172,7 @@
                     });
 
 
-                    carousel.render(data.results);
+					carousel.render(data.results);
 
                     // Modification API
 

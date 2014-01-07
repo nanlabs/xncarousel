@@ -52,8 +52,10 @@ module.exports = Class.extend({
 
 	_renderPageItems: function ($container, pageCount) {
 		this.clear();
-		for (var i = 0; i < pageCount; i++) {
-			this.addItem();
+		if (pageCount>1){
+			for (var i = 0; i < pageCount; i++) {
+				this.addItem();
+			}
 		}
 	},
 
