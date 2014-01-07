@@ -552,10 +552,10 @@ module.exports = Class.extend({
 			}
 			
 			if (typeof(configuration.pageSize) !== 'undefined') {
-				this.settings.pageSize = configuration.pageSize;
-				if (this.size.unitType === "px") {
+				if (this.size.unitType === "px" || this.settings.pageSize !== configuration.pageSize) {
 					hasToUpdate = true;
 				}
+				this.settings.pageSize = configuration.pageSize;
 			}
 			this.size.unitType = this.settings.itemWidth ? "px" : "%";
 		}
