@@ -1,6 +1,13 @@
 var SliderStrategy = require('./slider-strategy');
+var console;
 
 var NoAnimationStrategy = SliderStrategy.extend({
+
+	init: function(animationObject) {
+		this._super(animationObject);
+		console = animationObject.carouselApi.getLogger();
+	},
+
 	_animate: function ($overview, position) {
 
 		var callback = this.animationObject.afterAnimation;

@@ -1,14 +1,16 @@
 var $ = require('jquery');
+var console;
 
 var AbstractStrategy = require('./abstract-strategy');
 var Spinner = require('./spinner');
 
 module.exports = AbstractStrategy.extend({
 
-	init: function(loadingObject, itemClass) {
+	init: function(loadingObject, api) {
 		this._super(loadingObject);
 		this.spinner = new Spinner();
-		this.itemClass = itemClass;
+		this.itemClass = api.getItemClass();
+		console = api.getLogger();
 	},
 
 	preLoad: function ($item, carouselItemInnerHtml) {

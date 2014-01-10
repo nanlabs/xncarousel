@@ -24,7 +24,10 @@ describe 'Pagination module', (done)->
 			removeClass: ->
 			addClass: ->
 
+		getLogger = -> console
+
 		api =
+			getLogger: getLogger
 			container: $elem
 			getItemCount: -> 17
 			getItemsForPage: ->

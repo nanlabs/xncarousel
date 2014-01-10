@@ -24,12 +24,13 @@ var bind = function(func, scope)
 	};
 };
 
-var execute = function() {
+var execute = function(options) {
 
 	// Create console if not present
 	if (!window["console"]) {
 		window.console = /** @type {Console} */ ({});
 	}
+
 	var console = (/** @type {Object} */ window.console);
 
 	// Implement console log if needed
@@ -241,6 +242,15 @@ var execute = function() {
 		console["count"] = function() {};
 	}
 
+	var consoleProxy = {},
+	showLogs =  typeof(options) === 'undefined' ? true : options;
+
+	consoleProxy.log = showLogs === false || typeof(showLogs.indexOf) === "function" && showLogs.indexOf('log') === -1 ? function() {} : bind(console.log, console);
+	consoleProxy.warn = showLogs === false || typeof(showLogs.indexOf) === "function" && showLogs.indexOf('warn') === -1 ? function() {} : bind(console.warn, console);
+	consoleProxy.debug = showLogs === false || typeof(showLogs.indexOf) === "function" && showLogs.indexOf('debug') === -1 ? function() {} : bind(console.debug, console);
+	consoleProxy.error = showLogs === false || typeof(showLogs.indexOf) === "function" && showLogs.indexOf('error') === -1 ? function() {} : bind(console.error, console);
+
+	return consoleProxy;
 };
 
 module.exports = execute;

@@ -1,5 +1,6 @@
 var $ = require('jquery');
 var Class = require('class');
+var console;
 
 var ITEM_CONTAINER_SELECTOR = '.xn-pagination .item-container';
 var PAGE_ITEM_SELECTOR = '.item';
@@ -22,6 +23,7 @@ module.exports = Class.extend({
 		this.paginationContainerSelector = options.paginationContainerSelector || ITEM_CONTAINER_SELECTOR;
 		this.paginationItemSelector = options.paginationItemSelector || PAGE_ITEM_SELECTOR;
 		this.notifyPageSelected = options.onPageSelected;
+		console = options.api.getLogger();
 	},
 
 	render: function ($parent) {

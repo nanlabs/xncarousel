@@ -4,6 +4,7 @@ var Class = require('class');
 var FadeStrategy = require('./fade-strategy');
 var SliderStrategy = require('./slider-strategy');
 var NoAnimationStrategy = require('./no-animation-strategy');
+var console;
 
 /**
  *	Module to control the carousel animation.
@@ -32,6 +33,7 @@ module.exports = Class.extend({
 		this.pagingAnimation = false;
 
 		this.animationStrategy = this._getStrategy();
+		console = api.getLogger();
 	},
 
 	updatePageSize: function (pageSize) {

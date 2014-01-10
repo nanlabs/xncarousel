@@ -11,5 +11,5 @@
 	"boss": true,
 	"eqnull": true,
 	"browser": true,
-	"predef": ["jQuery", "console", "require", "module", "JSON", "exports"]
+	"globals": {"console" : true, "jQuery" : true, "console" : true, "require" : true, "module" : true, "JSON" : true, "exports" : true}
 }

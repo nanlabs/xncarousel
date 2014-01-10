@@ -24,7 +24,9 @@ describe 'Pagination indicator', ->
     getPageCount = ->
       return pageCount
 
-    paginator = new PagingIndicator({ getPageCount: getPageCount, onPageSelected: pageSelectedCallback})
+    api = {}
+    api.getLogger = -> console
+    paginator = new PagingIndicator({api: api, getPageCount: getPageCount, onPageSelected: pageSelectedCallback})
     paginator.render($elem)
 
   cleanElement = ->

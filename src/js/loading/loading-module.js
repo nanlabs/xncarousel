@@ -70,9 +70,9 @@ module.exports = Class.extend({
 	 */
 	_getStrategy: function () {
 		if (this.loadingType === 'lazy') {
-			return new LazyStrategy(this, this.carouselApi.getItemClass());
+			return new LazyStrategy(this, this.carouselApi);
 		}else{
-			return new EagerStrategy(this, this.carouselApi.getItemClass());
+			return new EagerStrategy(this, this.carouselApi);
 		}
 	},
 
