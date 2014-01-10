@@ -1,6 +1,7 @@
 var $ = require('jquery');
 var Class = require('class');
 var util = require('./util');
+var console;
 
 var consoleShim = require ('./console-shim-module');
 
@@ -49,6 +50,7 @@ module.exports = Class.extend({
 			showNavigationArrows: 'auto',
 			circularNavigation: false,
 			paginationContainerSelector: null,
+			showLogs: false,
 			itemTemplate: function () {
 				return '<div></div>';
 			}
@@ -58,7 +60,7 @@ module.exports = Class.extend({
 		this.$viewport.addClass(VIEWPORT_CLASS);
 		this.settings = $.extend({}, defaults, options);
 
-		consoleShim();
+		console = consoleShim(this.settings.showLogs);
 		
 		this.size = {};
 		this._updateConfiguration();
@@ -520,6 +522,7 @@ module.exports = Class.extend({
 	_initPaginationModule: function () {
 
 		var api = {
+			getLogger: function() {return console;},
 			container: this.$viewport,
 			getItemCount: $.proxy(this.getItemCount, this),
 			getItemsForPage: $.proxy(this._getDOMItemsForPage, this),
@@ -597,6 +600,7 @@ module.exports = Class.extend({
 	_initAnimationModule: function () {
 
 		var api = {
+			getLogger: function() {return console;},
 			container: this.$overview,
 			getCurrentPage: $.proxy(this.getCurrentPage, this),
 			getPageCount: $.proxy(this.getPageCount, this),
@@ -629,6 +633,7 @@ module.exports = Class.extend({
 	_initDraggingModule: function () {
 
 		var dragModuleOptions = {
+			api: {getLogger: function() {return console;}},
 			onDrag: $.proxy(this.updatePageWhileDragging, this),
 			onDragFinish: $.proxy(this.updatePageAfterDragging, this)
 		};
@@ -656,6 +661,7 @@ module.exports = Class.extend({
 	_initLoadingModule: function () {
 
 		var api = {
+			getLogger: function() {return console;},
 			container: this.$overview,
 			getCurrentPage: $.proxy(this.getCurrentPage, this),
 			getItemsForPage: $.proxy(this._getDOMItemsForPage, this),

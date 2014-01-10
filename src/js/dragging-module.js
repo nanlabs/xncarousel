@@ -1,6 +1,6 @@
 var $ = require('jquery');
 var Class = require('class');
-
+var console;
 /**
  *  Dragging module which makes the carousel touch-enabled.
  *	@module carousel/dragging
@@ -31,6 +31,8 @@ var DragSupport = Class.extend({
 
     this.endTouchHandler = $.proxy(this.endTouchHandler, this);
     this.mouseUpHandler = $.proxy(this.mouseUpHandler, this);
+
+    console = options.api.getLogger();
 
     this._enableStartEvents();
   },

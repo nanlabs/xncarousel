@@ -1,6 +1,12 @@
 var AbstractStrategy = require('./abstract-strategy');
+var console;
 
 module.exports = AbstractStrategy.extend({
+
+	init: function(animationObject) {
+		this._super(animationObject);
+		console = animationObject.carouselApi.getLogger();
+	},
 
 	animateToPage: function ($overview, $currentItem, $nextItem) {
 		this._animateItem($currentItem, $nextItem);

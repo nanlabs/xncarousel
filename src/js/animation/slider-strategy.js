@@ -1,7 +1,13 @@
 var AbstractStrategy = require('./abstract-strategy');
 var $ = require('jquery');
+var console;
 
 module.exports = AbstractStrategy.extend({
+
+	init: function(animationObject) {
+		this._super(animationObject);
+		console = animationObject.carouselApi.getLogger();
+	},
 
 	animateToPage: function ($overview, $currentItem, $pageToShow) {
 		var overviewPosition = this.getPixels($overview, 'left');

@@ -1,6 +1,7 @@
 var Class = require('class');
 var PaginationIndicator = require('./paging-indicator.js');
 var $ = require('jquery');
+var console;
 
 var CURRENT_PAGE_CLASS = 'active';
 
@@ -28,6 +29,7 @@ module.exports = Class.extend({
 		this.paginationItemSelector = options.paginationItemSelector || null;
 		this.currentPage = 0;
 		this.prevCurrentPage = 0;
+		console = carouselApi.getLogger();
 	},
 
 	/**
@@ -37,6 +39,7 @@ module.exports = Class.extend({
 	 */
 	renderIndicator: function() {
 		this.pagingIndicator = this.pagingIndicator || new PaginationIndicator({
+			api: this.carouselApi,
 			getPageCount: $.proxy(this.getPageCount, this),
 			onPageSelected: this.onPageSelected,
 			paginationContainerSelector : this.paginationContainerSelector || null,
