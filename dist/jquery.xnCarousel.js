@@ -1240,6 +1240,7 @@ var Class = require('class');
 var FadeStrategy = require('./fade-strategy');
 var SliderStrategy = require('./slider-strategy');
 var NoAnimationStrategy = require('./no-animation-strategy');
+var console;
 
 /**
  *	Module to control the carousel animation.
@@ -1268,6 +1269,7 @@ module.exports = Class.extend({
 		this.pagingAnimation = false;
 
 		this.animationStrategy = this._getStrategy();
+		console = api.getLogger();
 	},
 
 	updatePageSize: function (pageSize) {
@@ -1405,8 +1407,14 @@ module.exports = Class.extend({
 
 },{"./fade-strategy":35,"./no-animation-strategy":36,"./slider-strategy":37,"class":"GXCbp8","jquery":"xlgdQ9"}],35:[function(require,module,exports){
 var AbstractStrategy = require('./abstract-strategy');
+var console;
 
 module.exports = AbstractStrategy.extend({
+
+	init: function(animationObject) {
+		this._super(animationObject);
+		console = animationObject.carouselApi.getLogger();
+	},
 
 	animateToPage: function ($overview, $currentItem, $nextItem) {
 		this._animateItem($currentItem, $nextItem);
@@ -1481,8 +1489,15 @@ module.exports = AbstractStrategy.extend({
 
 },{"./abstract-strategy":33}],36:[function(require,module,exports){
 var SliderStrategy = require('./slider-strategy');
+var console;
 
 var NoAnimationStrategy = SliderStrategy.extend({
+
+	init: function(animationObject) {
+		this._super(animationObject);
+		console = animationObject.carouselApi.getLogger();
+	},
+
 	_animate: function ($overview, position) {
 
 		var callback = this.animationObject.afterAnimation;
@@ -1502,8 +1517,14 @@ module.exports = NoAnimationStrategy;
 },{"./slider-strategy":37}],37:[function(require,module,exports){
 var AbstractStrategy = require('./abstract-strategy');
 var $ = require('jquery');
+var console;
 
 module.exports = AbstractStrategy.extend({
+
+	init: function(animationObject) {
+		this._super(animationObject);
+		console = animationObject.carouselApi.getLogger();
+	},
 
 	animateToPage: function ($overview, $currentItem, $pageToShow) {
 		var overviewPosition = this.getPixels($overview, 'left');
@@ -1590,6 +1611,7 @@ module.exports = AbstractStrategy.extend({
 var $ = require('jquery');
 var Class = require('class');
 var util = require('./util');
+var console;
 
 var consoleShim = require ('./console-shim-module');
 
@@ -1638,6 +1660,7 @@ module.exports = Class.extend({
 			showNavigationArrows: 'auto',
 			circularNavigation: false,
 			paginationContainerSelector: null,
+			showLogs: false,
 			itemTemplate: function () {
 				return '<div></div>';
 			}
@@ -1647,7 +1670,7 @@ module.exports = Class.extend({
 		this.$viewport.addClass(VIEWPORT_CLASS);
 		this.settings = $.extend({}, defaults, options);
 
-		consoleShim();
+		console = consoleShim(this.settings.showLogs);
 		
 		this.size = {};
 		this._updateConfiguration();
@@ -2109,6 +2132,7 @@ module.exports = Class.extend({
 	_initPaginationModule: function () {
 
 		var api = {
+			getLogger: function() {return console;},
 			container: this.$viewport,
 			getItemCount: $.proxy(this.getItemCount, this),
 			getItemsForPage: $.proxy(this._getDOMItemsForPage, this),
@@ -2186,6 +2210,7 @@ module.exports = Class.extend({
 	_initAnimationModule: function () {
 
 		var api = {
+			getLogger: function() {return console;},
 			container: this.$overview,
 			getCurrentPage: $.proxy(this.getCurrentPage, this),
 			getPageCount: $.proxy(this.getPageCount, this),
@@ -2218,6 +2243,7 @@ module.exports = Class.extend({
 	_initDraggingModule: function () {
 
 		var dragModuleOptions = {
+			api: {getLogger: function() {return console;}},
 			onDrag: $.proxy(this.updatePageWhileDragging, this),
 			onDragFinish: $.proxy(this.updatePageAfterDragging, this)
 		};
@@ -2245,6 +2271,7 @@ module.exports = Class.extend({
 	_initLoadingModule: function () {
 
 		var api = {
+			getLogger: function() {return console;},
 			container: this.$overview,
 			getCurrentPage: $.proxy(this.getCurrentPage, this),
 			getItemsForPage: $.proxy(this._getDOMItemsForPage, this),
@@ -2859,12 +2886,13 @@ var bind = function(func, scope)
 	};
 };
 
-var execute = function() {
+var execute = function(options) {
 
 	// Create console if not present
 	if (!window["console"]) {
 		window.console = /** @type {Console} */ ({});
 	}
+
 	var console = (/** @type {Object} */ window.console);
 
 	// Implement console log if needed
@@ -3076,13 +3104,22 @@ var execute = function() {
 		console["count"] = function() {};
 	}
 
+	var consoleProxy = {},
+	showLogs =  typeof(options) === 'undefined' ? true : options;
+
+	consoleProxy.log = showLogs === false || typeof(showLogs.indexOf) === "function" && showLogs.indexOf('log') === -1 ? function() {} : bind(console.log, console);
+	consoleProxy.warn = showLogs === false || typeof(showLogs.indexOf) === "function" && showLogs.indexOf('warn') === -1 ? function() {} : bind(console.warn, console);
+	consoleProxy.debug = showLogs === false || typeof(showLogs.indexOf) === "function" && showLogs.indexOf('debug') === -1 ? function() {} : bind(console.debug, console);
+	consoleProxy.error = showLogs === false || typeof(showLogs.indexOf) === "function" && showLogs.indexOf('error') === -1 ? function() {} : bind(console.error, console);
+
+	return consoleProxy;
 };
 
 module.exports = execute;
 },{"./util":52}],40:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
-
+var console;
 /**
  *  Dragging module which makes the carousel touch-enabled.
  *	@module carousel/dragging
@@ -3113,6 +3150,8 @@ var DragSupport = Class.extend({
 
     this.endTouchHandler = $.proxy(this.endTouchHandler, this);
     this.mouseUpHandler = $.proxy(this.mouseUpHandler, this);
+
+    console = options.api.getLogger();
 
     this._enableStartEvents();
   },
@@ -3296,15 +3335,15 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":38,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"jquery":[function(require,module,exports){
-module.exports=require('xlgdQ9');
-},{}],"xlgdQ9":[function(require,module,exports){
+},{"./carousel":38,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"xlgdQ9":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
  */
 module.exports = jQuery;
 
+},{}],"jquery":[function(require,module,exports){
+module.exports=require('xlgdQ9');
 },{}],45:[function(require,module,exports){
 var Class = require('class');
 
@@ -3324,16 +3363,18 @@ module.exports = Class.extend({
 
 },{"class":"GXCbp8"}],46:[function(require,module,exports){
 var $ = require('jquery');
+var console;
 
 var AbstractStrategy = require('./abstract-strategy');
 var Spinner = require('./spinner');
 
 module.exports = AbstractStrategy.extend({
 
-	init: function(loadingObject, itemClass) {
+	init: function(loadingObject, api) {
 		this._super(loadingObject);
 		this.spinner = new Spinner();
-		this.itemClass = itemClass;
+		this.itemClass = api.getItemClass();
+		console = api.getLogger();
 	},
 
 	preLoad: function ($item, carouselItemInnerHtml) {
@@ -3378,16 +3419,18 @@ module.exports = AbstractStrategy.extend({
 
 },{"./abstract-strategy":45,"./spinner":49,"jquery":"xlgdQ9"}],47:[function(require,module,exports){
 var $ = require('jquery');
+var console;
 
 var AbstractStrategy = require('./abstract-strategy');
 var Spinner = require('./spinner');
 
 module.exports = AbstractStrategy.extend({
 
-	init: function(loadingObject, itemClass) {
+	init: function(loadingObject, api) {
 		this._super(loadingObject);
 		this.spinner = new Spinner();
-		this.itemClass = itemClass;
+		this.itemClass = api.getItemClass();
+		console = api.getLogger();
 	},
 
 	preLoad: function ($item, carouselItemInnerHtml) {
@@ -3507,9 +3550,9 @@ module.exports = Class.extend({
 	 */
 	_getStrategy: function () {
 		if (this.loadingType === 'lazy') {
-			return new LazyStrategy(this, this.carouselApi.getItemClass());
+			return new LazyStrategy(this, this.carouselApi);
 		}else{
-			return new EagerStrategy(this, this.carouselApi.getItemClass());
+			return new EagerStrategy(this, this.carouselApi);
 		}
 	},
 
@@ -3615,6 +3658,7 @@ module.exports = Class.extend({
 },{"../../../libs/spin.js":1,"class":"GXCbp8","jquery":"xlgdQ9"}],50:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
+var console;
 
 var ITEM_CONTAINER_SELECTOR = '.xn-pagination .item-container';
 var PAGE_ITEM_SELECTOR = '.item';
@@ -3637,6 +3681,7 @@ module.exports = Class.extend({
 		this.paginationContainerSelector = options.paginationContainerSelector || ITEM_CONTAINER_SELECTOR;
 		this.paginationItemSelector = options.paginationItemSelector || PAGE_ITEM_SELECTOR;
 		this.notifyPageSelected = options.onPageSelected;
+		console = options.api.getLogger();
 	},
 
 	render: function ($parent) {
@@ -3731,6 +3776,7 @@ module.exports = Class.extend({
 var Class = require('class');
 var PaginationIndicator = require('./paging-indicator.js');
 var $ = require('jquery');
+var console;
 
 var CURRENT_PAGE_CLASS = 'active';
 
@@ -3758,6 +3804,7 @@ module.exports = Class.extend({
 		this.paginationItemSelector = options.paginationItemSelector || null;
 		this.currentPage = 0;
 		this.prevCurrentPage = 0;
+		console = carouselApi.getLogger();
 	},
 
 	/**
@@ -3767,6 +3814,7 @@ module.exports = Class.extend({
 	 */
 	renderIndicator: function() {
 		this.pagingIndicator = this.pagingIndicator || new PaginationIndicator({
+			api: this.carouselApi,
 			getPageCount: $.proxy(this.getPageCount, this),
 			onPageSelected: this.onPageSelected,
 			paginationContainerSelector : this.paginationContainerSelector || null,
