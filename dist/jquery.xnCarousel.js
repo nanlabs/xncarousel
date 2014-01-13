@@ -2197,7 +2197,7 @@ module.exports = Class.extend({
 				this.pagingModule.pagingIndicator.select(actualPage);
 			}
 			setTimeout(function () {
-				var pageCount = self.pagingModule.pagingIndicator.$itemContainer.children().length;
+				var pageCount = self.getPageCount();
 				self.goToPage(actualPage < pageCount ? actualPage : pageCount - 1);
 			}, 0);
 		}
