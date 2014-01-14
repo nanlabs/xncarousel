@@ -60,6 +60,7 @@
     "grunt-mocha": "~0.4.1",
     "pre-git": "0.0.14",
     "grunt-jsdoc": "~0.4.2",
-    "grunt-release": "~0.6.0"
+    "grunt-release": "~0.6.0",
+    "grunt-shell": "~0.6.1"
   }
 }

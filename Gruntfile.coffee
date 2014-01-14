@@ -169,10 +169,19 @@ module.exports = (grunt) ->
 					usernameVar: 'GITHUB_USERNAME' #ENVIRONMENT VARIABLE that contains Github username
 					passwordVar: 'GITHUB_PASSWORD' #ENVIRONMENT VARIABLE that contains Github password
 
+		shell:
+			checkMaster:
+				command: 'git rev-parse --abbrev-ref HEAD',
+				options:
+					callback:
+						(err, stdout, stderr, ret) ->
+							grunt.fail.fatal "You must be on master branch to run 'release' task"  if stdout isnt "master"
+							ret()
 
 	## Aux Plugins.
 	grunt.loadNpmTasks 'grunt-contrib-clean'
 	grunt.loadNpmTasks 'grunt-contrib-copy'
+	grunt.loadNpmTasks 'grunt-shell'
 
 	# Compilation plugins
 	grunt.loadNpmTasks 'grunt-contrib-less'
@@ -203,6 +212,7 @@ module.exports = (grunt) ->
 	## Internal tasks
 	grunt.registerTask '_compile', ['clean', 'jshint', 'coffeelint', 'browserify']
 	grunt.registerTask '_package', ['less', 'copy:less', 'copy:scss', 'uglify', 'clean:tmp']
+	grunt.registerTask 'release-carousel', ['test', 'shell:checkMaster', 'release']
 
 	# Partial (dev) tasks
 	grunt.registerTask 'test', ['_compile', 'mocha', 'clean:tmp', 'notify:test']
