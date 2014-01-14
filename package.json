@@ -1,6 +1,6 @@
 {
   "name": "xnCarousel",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "xnCarousel jQuery Plugin",
   "private": true,
   "keywords": [
@@ -22,7 +22,7 @@
     "src/js",
     "src/less",
     "style.less",
-	"libs/*.js"
+    "libs/*.js"
   ],
   "scripts": {
     "test": "grunt test",
@@ -32,14 +32,14 @@
     "lib": "./src"
   },
   "pre-commit": [
-    
+    "grunt pre-commit"
   ],
   "optionalDependencies": {
     "jquery": ">=1.9.1"
   },
   "dependencies": {
-	"jquery-plugin-wrapper": "git://github.com/nanlabs/jquery-plugin-wrapper.git#master",
-	"browsernizr": "~1.0.1"
+    "jquery-plugin-wrapper": "git://github.com/nanlabs/jquery-plugin-wrapper.git#master",
+    "browsernizr": "~1.0.1"
   },
   "devDependencies": {
     "grunt-contrib-jshint": "0.6.4",
@@ -58,7 +58,8 @@
     "coffeeify": "~0.5.2",
     "grunt-coffeelint": "0.0.7",
     "grunt-mocha": "~0.4.1",
-    "pre-git": "0.0.13",
-    "grunt-jsdoc": "~0.4.2"
+    "pre-git": "0.0.14",
+    "grunt-jsdoc": "~0.4.2",
+    "grunt-release": "~0.6.0"
   }
 }

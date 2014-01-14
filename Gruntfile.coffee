@@ -154,6 +154,21 @@ module.exports = (grunt) ->
 			coverage:
 				path: "http://localhost:#{serverPort}/test/automated/code-coverage.html"
 
+		release:
+			options:
+				commit: true #default: true
+				tag: true #default: true
+				push: true #default: true
+				pushTags: true #default: true
+				npm: false
+				tagName: '<%= version %>' #default: '<%= version %>'
+				commitMessage: 'xnCarousel <%= version %> release' #default: 'release <%= version %>'
+				tagMessage: 'tagging version <%= version %>'
+				github:
+					repo: 'http://github.com/nanlabs/xncarousel.git'
+					usernameVar: 'GITHUB_USERNAME' #ENVIRONMENT VARIABLE that contains Github username
+					passwordVar: 'GITHUB_PASSWORD' #ENVIRONMENT VARIABLE that contains Github password
+
 
 	## Aux Plugins.
 	grunt.loadNpmTasks 'grunt-contrib-clean'
@@ -163,6 +178,9 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-less'
 	grunt.loadNpmTasks 'grunt-contrib-uglify'
 	grunt.loadNpmTasks 'grunt-browserify'
+
+	#Release plugin
+	grunt.loadNpmTasks 'grunt-release'
 
 	## Used for linting
 	grunt.loadNpmTasks 'grunt-contrib-jshint'
