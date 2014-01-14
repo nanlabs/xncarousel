@@ -154,15 +154,42 @@ module.exports = (grunt) ->
 			coverage:
 				path: "http://localhost:#{serverPort}/test/automated/code-coverage.html"
 
+		release:
+			options:
+				commit: true #default: true
+				tag: true #default: true
+				push: true #default: true
+				pushTags: true #default: true
+				npm: false
+				tagName: '<%= version %>' #default: '<%= version %>'
+				commitMessage: 'xnCarousel <%= version %> release' #default: 'release <%= version %>'
+				tagMessage: 'tagging version <%= version %>'
+				github:
+					repo: 'http://github.com/nanlabs/xncarousel.git'
+					usernameVar: 'GITHUB_USERNAME' #ENVIRONMENT VARIABLE that contains Github username
+					passwordVar: 'GITHUB_PASSWORD' #ENVIRONMENT VARIABLE that contains Github password
+
+		shell:
+			checkMaster:
+				command: 'git rev-parse --abbrev-ref HEAD',
+				options:
+					callback:
+						(err, stdout, stderr, ret) ->
+							grunt.fail.fatal "You must be on master branch to run 'release' task"  if stdout isnt "master"
+							ret()
 
 	## Aux Plugins.
 	grunt.loadNpmTasks 'grunt-contrib-clean'
 	grunt.loadNpmTasks 'grunt-contrib-copy'
+	grunt.loadNpmTasks 'grunt-shell'
 
 	# Compilation plugins
 	grunt.loadNpmTasks 'grunt-contrib-less'
 	grunt.loadNpmTasks 'grunt-contrib-uglify'
 	grunt.loadNpmTasks 'grunt-browserify'
+
+	#Release plugin
+	grunt.loadNpmTasks 'grunt-release'
 
 	## Used for linting
 	grunt.loadNpmTasks 'grunt-contrib-jshint'
@@ -185,6 +212,7 @@ module.exports = (grunt) ->
 	## Internal tasks
 	grunt.registerTask '_compile', ['clean', 'jshint', 'coffeelint', 'browserify']
 	grunt.registerTask '_package', ['less', 'copy:less', 'copy:scss', 'uglify', 'clean:tmp']
+	grunt.registerTask '_pre-release', ['test', 'shell:checkMaster']
 
 	# Partial (dev) tasks
 	grunt.registerTask 'test', ['_compile', 'mocha', 'clean:tmp', 'notify:test']
@@ -195,6 +223,9 @@ module.exports = (grunt) ->
 	# Full build tasks
 	grunt.registerTask 'pre-commit', ['test-browsers', '_package', 'notify:build']
 	grunt.registerTask 'build-no-tests', ['_compile', '_package', 'notify:build_no_tests']
+	grunt.registerTask 'major-release', ['_pre-release', 'release:major']
+	grunt.registerTask 'minor-release', ['_pre-release', 'release:minor']
+	grunt.registerTask 'patch-release', ['_pre-release', 'release:patch']
 
 	## Default task
 	grunt.registerTask 'default', ['test', '_package', 'notify:build']
