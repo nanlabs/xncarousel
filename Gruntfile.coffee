@@ -212,7 +212,7 @@ module.exports = (grunt) ->
 	## Internal tasks
 	grunt.registerTask '_compile', ['clean', 'jshint', 'coffeelint', 'browserify']
 	grunt.registerTask '_package', ['less', 'copy:less', 'copy:scss', 'uglify', 'clean:tmp']
-	grunt.registerTask 'release-carousel', ['test', 'shell:checkMaster', 'release']
+	grunt.registerTask '_pre-release', ['test', 'shell:checkMaster']
 
 	# Partial (dev) tasks
 	grunt.registerTask 'test', ['_compile', 'mocha', 'clean:tmp', 'notify:test']
@@ -223,6 +223,9 @@ module.exports = (grunt) ->
 	# Full build tasks
 	grunt.registerTask 'pre-commit', ['test-browsers', '_package', 'notify:build']
 	grunt.registerTask 'build-no-tests', ['_compile', '_package', 'notify:build_no_tests']
+	grunt.registerTask 'major-release', ['_pre-release', 'release:major']
+	grunt.registerTask 'minor-release', ['_pre-release', 'release:minor']
+	grunt.registerTask 'patch-release', ['_pre-release', 'release:patch']
 
 	## Default task
 	grunt.registerTask 'default', ['test', '_package', 'notify:build']
