@@ -175,7 +175,7 @@ module.exports = (grunt) ->
 				options:
 					callback:
 						(err, stdout, stderr, ret) ->
-							grunt.fail.fatal "You must be on master branch to run 'release' task"  if stdout isnt "master"
+							grunt.fail.fatal "You must be on master branch to run 'release' task"  if (/^master/).test(stdout) isnt true
 							ret()
 
 	## Aux Plugins.
