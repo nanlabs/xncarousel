@@ -1127,9 +1127,7 @@ module.exports = {
 
 
 
-},{}],"class":[function(require,module,exports){
-module.exports=require('hHRmiF');
-},{}],"hHRmiF":[function(require,module,exports){
+},{}],"GXCbp8":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -1195,6 +1193,8 @@ module.exports=require('hHRmiF');
 })();
 
 module.exports = Class;
+},{}],"class":[function(require,module,exports){
+module.exports=require('GXCbp8');
 },{}],33:[function(require,module,exports){
 var Class = require('class');
 require('browsernizr/test/css/transitions');
@@ -1233,13 +1233,14 @@ module.exports = Class.extend({
 
 });
 
-},{"browsernizr":2,"browsernizr/test/css/transitions":29,"class":"hHRmiF"}],34:[function(require,module,exports){
+},{"browsernizr":2,"browsernizr/test/css/transitions":29,"class":"GXCbp8"}],34:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 
 var FadeStrategy = require('./fade-strategy');
 var SliderStrategy = require('./slider-strategy');
 var NoAnimationStrategy = require('./no-animation-strategy');
+var console;
 
 /**
  *	Module to control the carousel animation.
@@ -1268,6 +1269,7 @@ module.exports = Class.extend({
 		this.pagingAnimation = false;
 
 		this.animationStrategy = this._getStrategy();
+		console = api.getLogger();
 	},
 
 	updatePageSize: function (pageSize) {
@@ -1403,10 +1405,16 @@ module.exports = Class.extend({
 	}
 });
 
-},{"./fade-strategy":35,"./no-animation-strategy":36,"./slider-strategy":37,"class":"hHRmiF","jquery":"lrHQu6"}],35:[function(require,module,exports){
+},{"./fade-strategy":35,"./no-animation-strategy":36,"./slider-strategy":37,"class":"GXCbp8","jquery":"xlgdQ9"}],35:[function(require,module,exports){
 var AbstractStrategy = require('./abstract-strategy');
+var console;
 
 module.exports = AbstractStrategy.extend({
+
+	init: function(animationObject) {
+		this._super(animationObject);
+		console = animationObject.carouselApi.getLogger();
+	},
 
 	animateToPage: function ($overview, $currentItem, $nextItem) {
 		this._animateItem($currentItem, $nextItem);
@@ -1481,8 +1489,15 @@ module.exports = AbstractStrategy.extend({
 
 },{"./abstract-strategy":33}],36:[function(require,module,exports){
 var SliderStrategy = require('./slider-strategy');
+var console;
 
 var NoAnimationStrategy = SliderStrategy.extend({
+
+	init: function(animationObject) {
+		this._super(animationObject);
+		console = animationObject.carouselApi.getLogger();
+	},
+
 	_animate: function ($overview, position) {
 
 		var callback = this.animationObject.afterAnimation;
@@ -1502,8 +1517,14 @@ module.exports = NoAnimationStrategy;
 },{"./slider-strategy":37}],37:[function(require,module,exports){
 var AbstractStrategy = require('./abstract-strategy');
 var $ = require('jquery');
+var console;
 
 module.exports = AbstractStrategy.extend({
+
+	init: function(animationObject) {
+		this._super(animationObject);
+		console = animationObject.carouselApi.getLogger();
+	},
 
 	animateToPage: function ($overview, $currentItem, $pageToShow) {
 		var overviewPosition = this.getPixels($overview, 'left');
@@ -1586,10 +1607,11 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":33,"jquery":"lrHQu6"}],38:[function(require,module,exports){
+},{"./abstract-strategy":33,"jquery":"xlgdQ9"}],38:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
 var util = require('./util');
+var console;
 
 var consoleShim = require ('./console-shim-module');
 
@@ -1638,6 +1660,7 @@ module.exports = Class.extend({
 			showNavigationArrows: 'auto',
 			circularNavigation: false,
 			paginationContainerSelector: null,
+			showLogs: false,
 			itemTemplate: function () {
 				return '<div></div>';
 			}
@@ -1647,7 +1670,7 @@ module.exports = Class.extend({
 		this.$viewport.addClass(VIEWPORT_CLASS);
 		this.settings = $.extend({}, defaults, options);
 
-		consoleShim();
+		console = consoleShim(this.settings.showLogs);
 		
 		this.size = {};
 		this._updateConfiguration();
@@ -2109,6 +2132,7 @@ module.exports = Class.extend({
 	_initPaginationModule: function () {
 
 		var api = {
+			getLogger: function() {return console;},
 			container: this.$viewport,
 			getItemCount: $.proxy(this.getItemCount, this),
 			getItemsForPage: $.proxy(this._getDOMItemsForPage, this),
@@ -2168,10 +2192,12 @@ module.exports = Class.extend({
 			this.size.initialItemWidth = !this.settings.itemWidth ? 100 / pageSize : this.settings.itemWidth;
 			this._processAddedItems();
 			this.animationModule.updateAfterRemoval(this.$viewport.find('.' + ITEM_CLASS));
-			this.pagingModule.renderIndicator();
-			this.pagingModule.pagingIndicator.select(actualPage);
+			if (this.settings.pagingIndicators === true) {
+				this.pagingModule.renderIndicator();
+				this.pagingModule.pagingIndicator.select(actualPage);
+			}
 			setTimeout(function () {
-				var pageCount = self.pagingModule.pagingIndicator.$itemContainer.children().length;
+				var pageCount = self.getPageCount();
 				self.goToPage(actualPage < pageCount ? actualPage : pageCount - 1);
 			}, 0);
 		}
@@ -2184,6 +2210,7 @@ module.exports = Class.extend({
 	_initAnimationModule: function () {
 
 		var api = {
+			getLogger: function() {return console;},
 			container: this.$overview,
 			getCurrentPage: $.proxy(this.getCurrentPage, this),
 			getPageCount: $.proxy(this.getPageCount, this),
@@ -2216,6 +2243,7 @@ module.exports = Class.extend({
 	_initDraggingModule: function () {
 
 		var dragModuleOptions = {
+			api: {getLogger: function() {return console;}},
 			onDrag: $.proxy(this.updatePageWhileDragging, this),
 			onDragFinish: $.proxy(this.updatePageAfterDragging, this)
 		};
@@ -2243,6 +2271,7 @@ module.exports = Class.extend({
 	_initLoadingModule: function () {
 
 		var api = {
+			getLogger: function() {return console;},
 			container: this.$overview,
 			getCurrentPage: $.proxy(this.getCurrentPage, this),
 			getItemsForPage: $.proxy(this._getDOMItemsForPage, this),
@@ -2830,7 +2859,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./animation/animation-module":34,"./console-shim-module":39,"./dragging-module":40,"./loading/loading-module":48,"./pagination/paging-module":51,"./util":52,"class":"hHRmiF","jquery":"lrHQu6"}],39:[function(require,module,exports){
+},{"./animation/animation-module":34,"./console-shim-module":39,"./dragging-module":40,"./loading/loading-module":48,"./pagination/paging-module":51,"./util":52,"class":"GXCbp8","jquery":"xlgdQ9"}],39:[function(require,module,exports){
 /**
 * Returns a function which calls the specified function in the specified
 * scope.
@@ -2857,12 +2886,13 @@ var bind = function(func, scope)
 	};
 };
 
-var execute = function() {
+var execute = function(options) {
 
 	// Create console if not present
 	if (!window["console"]) {
 		window.console = /** @type {Console} */ ({});
 	}
+
 	var console = (/** @type {Object} */ window.console);
 
 	// Implement console log if needed
@@ -3074,13 +3104,22 @@ var execute = function() {
 		console["count"] = function() {};
 	}
 
+	var consoleProxy = {},
+	showLogs =  typeof(options) === 'undefined' ? true : options;
+
+	consoleProxy.log = showLogs === false || typeof(showLogs.indexOf) === "function" && showLogs.indexOf('log') === -1 ? function() {} : bind(console.log, console);
+	consoleProxy.warn = showLogs === false || typeof(showLogs.indexOf) === "function" && showLogs.indexOf('warn') === -1 ? function() {} : bind(console.warn, console);
+	consoleProxy.debug = showLogs === false || typeof(showLogs.indexOf) === "function" && showLogs.indexOf('debug') === -1 ? function() {} : bind(console.debug, console);
+	consoleProxy.error = showLogs === false || typeof(showLogs.indexOf) === "function" && showLogs.indexOf('error') === -1 ? function() {} : bind(console.error, console);
+
+	return consoleProxy;
 };
 
 module.exports = execute;
 },{"./util":52}],40:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
-
+var console;
 /**
  *  Dragging module which makes the carousel touch-enabled.
  *	@module carousel/dragging
@@ -3111,6 +3150,8 @@ var DragSupport = Class.extend({
 
     this.endTouchHandler = $.proxy(this.endTouchHandler, this);
     this.mouseUpHandler = $.proxy(this.mouseUpHandler, this);
+
+    console = options.api.getLogger();
 
     this._enableStartEvents();
   },
@@ -3284,9 +3325,9 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"hHRmiF","jquery":"lrHQu6"}],"wrapper":[function(require,module,exports){
-module.exports=require('/91yud');
-},{}],"/91yud":[function(require,module,exports){
+},{"class":"GXCbp8","jquery":"xlgdQ9"}],"wrapper":[function(require,module,exports){
+module.exports=require('kV8X1M');
+},{}],"kV8X1M":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3294,7 +3335,7 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":38,"jquery":"lrHQu6","jquery-plugin-wrapper":30}],"lrHQu6":[function(require,module,exports){
+},{"./carousel":38,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"xlgdQ9":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
@@ -3302,7 +3343,7 @@ module.exports = Carousel;
 module.exports = jQuery;
 
 },{}],"jquery":[function(require,module,exports){
-module.exports=require('lrHQu6');
+module.exports=require('xlgdQ9');
 },{}],45:[function(require,module,exports){
 var Class = require('class');
 
@@ -3320,18 +3361,20 @@ module.exports = Class.extend({
 	
 });
 
-},{"class":"hHRmiF"}],46:[function(require,module,exports){
+},{"class":"GXCbp8"}],46:[function(require,module,exports){
 var $ = require('jquery');
+var console;
 
 var AbstractStrategy = require('./abstract-strategy');
 var Spinner = require('./spinner');
 
 module.exports = AbstractStrategy.extend({
 
-	init: function(loadingObject, itemClass) {
+	init: function(loadingObject, api) {
 		this._super(loadingObject);
 		this.spinner = new Spinner();
-		this.itemClass = itemClass;
+		this.itemClass = api.getItemClass();
+		console = api.getLogger();
 	},
 
 	preLoad: function ($item, carouselItemInnerHtml) {
@@ -3374,18 +3417,20 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":45,"./spinner":49,"jquery":"lrHQu6"}],47:[function(require,module,exports){
+},{"./abstract-strategy":45,"./spinner":49,"jquery":"xlgdQ9"}],47:[function(require,module,exports){
 var $ = require('jquery');
+var console;
 
 var AbstractStrategy = require('./abstract-strategy');
 var Spinner = require('./spinner');
 
 module.exports = AbstractStrategy.extend({
 
-	init: function(loadingObject, itemClass) {
+	init: function(loadingObject, api) {
 		this._super(loadingObject);
 		this.spinner = new Spinner();
-		this.itemClass = itemClass;
+		this.itemClass = api.getItemClass();
+		console = api.getLogger();
 	},
 
 	preLoad: function ($item, carouselItemInnerHtml) {
@@ -3432,7 +3477,7 @@ module.exports = AbstractStrategy.extend({
 
 });
 
-},{"./abstract-strategy":45,"./spinner":49,"jquery":"lrHQu6"}],48:[function(require,module,exports){
+},{"./abstract-strategy":45,"./spinner":49,"jquery":"xlgdQ9"}],48:[function(require,module,exports){
 var Class = require('class');
 
 var LazyStrategy = require('./lazy-strategy');
@@ -3505,15 +3550,15 @@ module.exports = Class.extend({
 	 */
 	_getStrategy: function () {
 		if (this.loadingType === 'lazy') {
-			return new LazyStrategy(this, this.carouselApi.getItemClass());
+			return new LazyStrategy(this, this.carouselApi);
 		}else{
-			return new EagerStrategy(this, this.carouselApi.getItemClass());
+			return new EagerStrategy(this, this.carouselApi);
 		}
 	},
 
 });
 
-},{"./eager-strategy":46,"./lazy-strategy":47,"class":"hHRmiF"}],49:[function(require,module,exports){
+},{"./eager-strategy":46,"./lazy-strategy":47,"class":"GXCbp8"}],49:[function(require,module,exports){
 var Class = require('class'),
 SpinJs = require('../../../libs/spin.js'),
 $ = require('jquery');
@@ -3610,9 +3655,10 @@ module.exports = Class.extend({
     }
 });
 
-},{"../../../libs/spin.js":1,"class":"hHRmiF","jquery":"lrHQu6"}],50:[function(require,module,exports){
+},{"../../../libs/spin.js":1,"class":"GXCbp8","jquery":"xlgdQ9"}],50:[function(require,module,exports){
 var $ = require('jquery');
 var Class = require('class');
+var console;
 
 var ITEM_CONTAINER_SELECTOR = '.xn-pagination .item-container';
 var PAGE_ITEM_SELECTOR = '.item';
@@ -3635,6 +3681,7 @@ module.exports = Class.extend({
 		this.paginationContainerSelector = options.paginationContainerSelector || ITEM_CONTAINER_SELECTOR;
 		this.paginationItemSelector = options.paginationItemSelector || PAGE_ITEM_SELECTOR;
 		this.notifyPageSelected = options.onPageSelected;
+		console = options.api.getLogger();
 	},
 
 	render: function ($parent) {
@@ -3725,10 +3772,11 @@ module.exports = Class.extend({
 
 });
 
-},{"class":"hHRmiF","jquery":"lrHQu6"}],51:[function(require,module,exports){
+},{"class":"GXCbp8","jquery":"xlgdQ9"}],51:[function(require,module,exports){
 var Class = require('class');
 var PaginationIndicator = require('./paging-indicator.js');
 var $ = require('jquery');
+var console;
 
 var CURRENT_PAGE_CLASS = 'active';
 
@@ -3756,6 +3804,7 @@ module.exports = Class.extend({
 		this.paginationItemSelector = options.paginationItemSelector || null;
 		this.currentPage = 0;
 		this.prevCurrentPage = 0;
+		console = carouselApi.getLogger();
 	},
 
 	/**
@@ -3765,6 +3814,7 @@ module.exports = Class.extend({
 	 */
 	renderIndicator: function() {
 		this.pagingIndicator = this.pagingIndicator || new PaginationIndicator({
+			api: this.carouselApi,
 			getPageCount: $.proxy(this.getPageCount, this),
 			onPageSelected: this.onPageSelected,
 			paginationContainerSelector : this.paginationContainerSelector || null,
@@ -4003,7 +4053,7 @@ module.exports = Class.extend({
 
 });
 
-},{"./paging-indicator.js":50,"class":"hHRmiF","jquery":"lrHQu6"}],52:[function(require,module,exports){
+},{"./paging-indicator.js":50,"class":"GXCbp8","jquery":"xlgdQ9"}],52:[function(require,module,exports){
 exports.getDependency = function(dependencies, name, defaultDep) {
 	dependencies = dependencies || {};
 	return dependencies[name] || defaultDep;
@@ -4097,6 +4147,5 @@ exports.isIE = function() {
   return (myNav.indexOf('msie') !== -1) ? parseFloat(myNav.split('msie')[1], 10) : false;
 };
 
-},{}]},{},["/91yud"])
-;
+},{}]},{},["kV8X1M"])
 })(this, jQuery);
