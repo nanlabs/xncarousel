@@ -163,9 +163,10 @@ Name | Type | Default | Description
 **showNavigationArrows** | ```true``` or ```false``` or ```'auto'``` | ```'auto'``` | Shows page navigation arrows (prev/next). To understand the possible values, see the [pagination][9] section.
 **animationType** | ```'slide'``` or ```'fade'``` or ```'none'``` | ```'none'``` | Transition effect to be used when navigating pages
 **moveSpeed** | ```number``` | 1000 | Duration of the transition animations (in milliseconds)
-**loadingType** | ```'lazy'``` or ```'eager'``` | ```lazy``` | Sets the items loading strategy. ```lazy``` will delay the item's image loading until that item is displayed (showing an animation while loading). ```eager``` will load all images as soon as possible
+**loadingType** | ```'lazy'``` or ```'eager'``` | ```lazy``` | Sets the items loading strategy. ```lazy``` will delay the item's image loading until that item is displayed (showing an animation while loading). ```eager``` will load all images as soon as possible. You should replace src attribute to data-src in your template img tags to have lazy strategy working.
 **paginationContainerSelector** | ```string``` | ```null``` | Defines an existing DOM element where the pagination indicators will be rendered. If ```null```, the default container will be created by the carousel
 **paginationItemSelector** | ```string``` | ```null``` | Defines an existing DOM element where the pagination indicators will be mark as with class *active*. If ```null```, the default pagination items will be created by the carousel
+**showLogs** | ```true``` or ```false``` or <code>['log'&#124;'warn'&#124;'error'&#124;'debug']</code> | ```null``` | shows/hides console logs.
 
 <a name="breakpointsConfiguration_details"></a>
 #### * breakpointsConfiguration parameter details
