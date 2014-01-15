@@ -13,7 +13,7 @@ module.exports = (grunt) ->
 
 		OUTPUT_JS: 'jquery.<%= pkg.name %>'
 		banner: '/*! <%= pkg.name %> - v<%=pkg.version%> - ' +
-		'<%= grunt.template.today("yyyy-mm-dd") %>\n' +
+		'<%= grunt.template.today("yyyy-mm-dd, h:MM:ss TT") %>\n' +
 		'<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
 		'* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;*/\n'
 
