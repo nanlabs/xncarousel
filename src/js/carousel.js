@@ -474,6 +474,12 @@ module.exports = Class.extend({
 			this.$overview.attr('class', this.$overview.attr('class') + ' ' + classes);
 		}
 
+		//TODO remove this callback when xn-item is not absolute positioned anymore
+		var updateViewportHeight = function ($item) {
+			var viewportHeight = $item.outerHeight(true);
+			$item.parents('.' + VIEWPORT_CLASS).height(viewportHeight);
+		};
+
 		this._initLoadingModule();
 
 		this.clear({ silent: true });
@@ -482,6 +488,12 @@ module.exports = Class.extend({
 		$.each(items, function (i, e) {
 			self.addItem(e, true);
 		});
+
+		$(window).resize(
+			function () {
+				updateViewportHeight($(self.$overview.children().get(0)));
+			}
+		);
 
 		this._initAnimationModule();
 
@@ -658,7 +670,7 @@ module.exports = Class.extend({
 		this.$viewport[0].ontouchend = function(event) { event.stopPropagation(); };
 	},
 
-	_initLoadingModule: function () {
+_initLoadingModule: function (updateViewportHeight) {
 
 		var api = {
 			getLogger: function() {return console;},
@@ -668,20 +680,10 @@ module.exports = Class.extend({
 			getItemsForCurrentPage: $.proxy(this._getDOMItemsForCurrentPage, this),
 			getItemClass: function() {return ITEM_CLASS;}
 		};
-
-		//TODO remove this callback when xn-item is not absolute positioned anymore
+		
 		var afterLoadedCallback = function($image, event) {
-			function updateViewportHeight ($image) {
-				var viewportHeight = $image.parents('.' + ITEM_CLASS).outerHeight(true);
-				$image.parents('.' + VIEWPORT_CLASS).height(viewportHeight);
-			}
-
 			if (event.type !== "error") {
-				if (!this._callbackAdded){
-					this._callbackAdded = true;
-					$(window).resize(function(){updateViewportHeight($image, event);});
-				}
-				updateViewportHeight($image, event);
+				updateViewportHeight($image.parents('.' + ITEM_CLASS), event);
 			}
 		};
 
