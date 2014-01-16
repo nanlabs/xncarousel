@@ -1127,8 +1127,6 @@ module.exports = {
 
 
 
-},{}],"class":[function(require,module,exports){
-module.exports=require('GXCbp8');
 },{}],"GXCbp8":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
@@ -1195,6 +1193,8 @@ module.exports=require('GXCbp8');
 })();
 
 module.exports = Class;
+},{}],"class":[function(require,module,exports){
+module.exports=require('GXCbp8');
 },{}],33:[function(require,module,exports){
 var Class = require('class');
 require('browsernizr/test/css/transitions');
@@ -2090,7 +2090,7 @@ module.exports = Class.extend({
 			$item.parents('.' + VIEWPORT_CLASS).height(viewportHeight);
 		};
 
-		this._initLoadingModule();
+		this._initLoadingModule(updateViewportHeight);
 
 		this.clear({ silent: true });
 
@@ -3327,7 +3327,9 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"GXCbp8","jquery":"xlgdQ9"}],"kV8X1M":[function(require,module,exports){
+},{"class":"GXCbp8","jquery":"xlgdQ9"}],"wrapper":[function(require,module,exports){
+module.exports=require('kV8X1M');
+},{}],"kV8X1M":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3335,9 +3337,7 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":38,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"wrapper":[function(require,module,exports){
-module.exports=require('kV8X1M');
-},{}],"xlgdQ9":[function(require,module,exports){
+},{"./carousel":38,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"xlgdQ9":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *

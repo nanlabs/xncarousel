@@ -480,7 +480,7 @@ module.exports = Class.extend({
 			$item.parents('.' + VIEWPORT_CLASS).height(viewportHeight);
 		};
 
-		this._initLoadingModule();
+		this._initLoadingModule(updateViewportHeight);
 
 		this.clear({ silent: true });
 
