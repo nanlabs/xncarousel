@@ -1127,6 +1127,8 @@ module.exports = {
 
 
 
+},{}],"class":[function(require,module,exports){
+module.exports=require('GXCbp8');
 },{}],"GXCbp8":[function(require,module,exports){
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
@@ -1193,8 +1195,6 @@ module.exports = {
 })();
 
 module.exports = Class;
-},{}],"class":[function(require,module,exports){
-module.exports=require('GXCbp8');
 },{}],33:[function(require,module,exports){
 var Class = require('class');
 require('browsernizr/test/css/transitions');
@@ -2084,6 +2084,12 @@ module.exports = Class.extend({
 			this.$overview.attr('class', this.$overview.attr('class') + ' ' + classes);
 		}
 
+		//TODO remove this callback when xn-item is not absolute positioned anymore
+		var updateViewportHeight = function ($item) {
+			var viewportHeight = $item.outerHeight(true);
+			$item.parents('.' + VIEWPORT_CLASS).height(viewportHeight);
+		};
+
 		this._initLoadingModule();
 
 		this.clear({ silent: true });
@@ -2092,6 +2098,12 @@ module.exports = Class.extend({
 		$.each(items, function (i, e) {
 			self.addItem(e, true);
 		});
+
+		$(window).resize(
+			function () {
+				updateViewportHeight($(self.$overview.children().get(0)));
+			}
+		);
 
 		this._initAnimationModule();
 
@@ -2268,7 +2280,7 @@ module.exports = Class.extend({
 		this.$viewport[0].ontouchend = function(event) { event.stopPropagation(); };
 	},
 
-	_initLoadingModule: function () {
+_initLoadingModule: function (updateViewportHeight) {
 
 		var api = {
 			getLogger: function() {return console;},
@@ -2278,20 +2290,10 @@ module.exports = Class.extend({
 			getItemsForCurrentPage: $.proxy(this._getDOMItemsForCurrentPage, this),
 			getItemClass: function() {return ITEM_CLASS;}
 		};
-
-		//TODO remove this callback when xn-item is not absolute positioned anymore
+		
 		var afterLoadedCallback = function($image, event) {
-			function updateViewportHeight ($image) {
-				var viewportHeight = $image.parents('.' + ITEM_CLASS).outerHeight(true);
-				$image.parents('.' + VIEWPORT_CLASS).height(viewportHeight);
-			}
-
 			if (event.type !== "error") {
-				if (!this._callbackAdded){
-					this._callbackAdded = true;
-					$(window).resize(function(){updateViewportHeight($image, event);});
-				}
-				updateViewportHeight($image, event);
+				updateViewportHeight($image.parents('.' + ITEM_CLASS), event);
 			}
 		};
 
@@ -3325,9 +3327,7 @@ var DragSupport = Class.extend({
 // Exports the class
 module.exports = DragSupport;
 
-},{"class":"GXCbp8","jquery":"xlgdQ9"}],"wrapper":[function(require,module,exports){
-module.exports=require('kV8X1M');
-},{}],"kV8X1M":[function(require,module,exports){
+},{"class":"GXCbp8","jquery":"xlgdQ9"}],"kV8X1M":[function(require,module,exports){
 /**
  * jQuery plugin wrapper
  */
@@ -3335,7 +3335,9 @@ var Carousel = require('./carousel');
 require('jquery-plugin-wrapper').wrap("xnCarousel", Carousel, require('jquery'));
 module.exports = Carousel;
 
-},{"./carousel":38,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"xlgdQ9":[function(require,module,exports){
+},{"./carousel":38,"jquery":"xlgdQ9","jquery-plugin-wrapper":30}],"wrapper":[function(require,module,exports){
+module.exports=require('kV8X1M');
+},{}],"xlgdQ9":[function(require,module,exports){
 /**
  * Helper module to adapt jQuery to CommonJS
  *
