@@ -1,5 +1,4 @@
 
-
 # xnCarousel jQuery Plugin
 
 jQuery plugin to create a fully featured Carousel component 
@@ -151,7 +150,7 @@ $(".carousel-container").xnCarousel("render", itemsArray);
 ### Component options:
 
 Name | Type | Default | Description
-----|------|----|----
+----|---|----|------
 **touchEnabled** | ```boolean``` | ```false``` | Enables or disables the touch feature
 **circularNavigation** | ```boolean``` | ```false``` | ```true``` enables the circular (loop) navigation
 **itemTemplate** | ```function``` | empty template | Function that receives an item and returns the HTML to be used when rendering that item. Used as a template when loading items via JSON
